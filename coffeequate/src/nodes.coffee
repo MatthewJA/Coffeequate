@@ -2,7 +2,7 @@ define ->
 
 	# Basic nodes for the expression tree.
 
-	Node: class
+	class BasicNode
 		# A basic node for the expression tree.
 		# All nodes inherit from this.
 		constructor: (@label) ->
@@ -12,33 +12,20 @@ define ->
 			# Return an array of children.
 			@children
 
-	RoseNode: class extends @Node
-		# A node with any number of children.
-		constructor: (@label) ->
+	return {
 
-	BinaryNode: class extends @Node
-		# A node with exactly two children, a left and a right child.
-		constructor: (@label) ->
-			@children =
-				left: null
-				right: null
+		RoseNode: class extends BasicNode
+			# A node with any number of children.
 
-		getChildren: ->
-			# Return an array of children.
-			[@children.left, @children.right]
+		BinaryNode: class extends BasicNode
+			# A node with exactly two children, a left and a right child.
+			constructor: (@label) ->
+				@children =
+					left: null
+					right: null
 
-	Term: class
-		# A basic node for the expression tree.
-		# All nodes inherit from this.
-		constructor: (@label) ->
-			@children = []
+			getChildren: ->
+				# Return an array of children.
+				[@children.left, @children.right]
 
-		getChildren: ->
-			# Return an array of children.
-			@children
-
-	SymbolicConstant: class extends @Node
-		# Symbolic constants in the equation tree, e.g. π
-		constructor: (@label, @value=null) ->
-
-		evaluate: ->
+	}
