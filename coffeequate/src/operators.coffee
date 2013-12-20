@@ -2,14 +2,14 @@ define ["Node"], (Node) ->
 
 	# Defines operator nodes of the expression tree.
 
-	add: class extends Node
-		initialise: ->
+	Add: class extends Node
+		constructor: ->
 			super("+")
 
-	mul: class extends Node
-		initialise: ->
+	Mul: class extends Node
+		constructor: ->
 			super("*")
 
-	pow: class extends Node
-		initialise: ->
+	Pow: class extends Node
+		constructor: ->
 			super("**")

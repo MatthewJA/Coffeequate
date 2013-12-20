@@ -4,4 +4,4 @@ define ->
 	# All nodes inherit from this.
 
 	class Node
-		initialise: (@label) ->
+		constructor: (@label) ->
