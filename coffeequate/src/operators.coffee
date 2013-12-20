@@ -1,15 +1,15 @@
-define ["Node"], (Node) ->
+define ["nodes"], (nodes) ->
 
 	# Defines operator nodes of the expression tree.
 
-	Add: class extends Node
+	Add: class extends nodes.RoseNode
 		constructor: ->
 			super("+")
 
-	Mul: class extends Node
+	Mul: class extends nodes.RoseNode
 		constructor: ->
 			super("*")
 
-	Pow: class extends Node
+	Pow: class extends nodes.BinaryNode
 		constructor: ->
 			super("**")
