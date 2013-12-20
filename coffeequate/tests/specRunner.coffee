@@ -3,8 +3,7 @@ require.config
 	urlArgs: "cb=" + Math.random() # Cache breaker
 	paths:
 		"spec": "../tests/spec"
-		"jquery": "lib/jquery.min"
-		"JSAlgebra": "lib/JS-Algebra/src"
+		"jquery": "../tests/lib/jQuery/jquery.min"
 	shim:
 		"jquery":
 			exports: ["jquery"]
@@ -15,11 +14,7 @@ require ["jquery"], ($) ->
 	jasmineEnv.addReporter(htmlReporter)
 
 	specs = [
-		# "spec/equationIndex"
-		# "spec/expressionIndex"
-		"spec/equivalenciesIndex"
-		# "spec/getFormula"
-		"spec/solveEquation"
+		"spec/nodes"
 	]
 
 	jasmineEnv.specFilter = (spec) ->
