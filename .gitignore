@@ -1,0 +1,8 @@
+### Compiled Source ###
+*.js
+
+### Editor Specific ###
+*.sublime-workspace
+
+### Libraries ###
+!**/lib/**/*.js
