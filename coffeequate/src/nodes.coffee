@@ -28,7 +28,7 @@ define ->
 				@children
 
 			toString: ->
-				@children.join(" #{@label} ")
+				"(#{@label}#{if @children then " " else ""}#{@children.join(" ")})"
 
 		BinaryNode: class extends BasicNode
 			# A node with exactly two children, a left and a right child.
@@ -42,6 +42,6 @@ define ->
 				[@children.left, @children.right]
 
 			toString: ->
-				"#{@children.left} #{@label} #{@children.right}"
+				"(#{@label} #{@children.left} #{@children.right})"
 
 	}
