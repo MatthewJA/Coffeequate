@@ -1,6 +1,4 @@
-
-
-define ["nodes"], (nodes) ->
+define ["parse"], (parse) ->
 
 	# Terminals for the equation tree.
 
@@ -10,7 +8,12 @@ define ["nodes"], (nodes) ->
 
 		evaluate: ->
 
+		toString: ->
+			@label
+
 	return {
+
+		Terminal: Terminal
 
 		Variable: class extends Terminal
 			# Variables in the equation tree, e.g. m
@@ -18,25 +21,20 @@ define ["nodes"], (nodes) ->
 		Constant: class extends Terminal
 			# Constants in the equation tree, e.g. 1/2
 			constructor: (value) ->
-				if typeof(value) == "string" or value instanceof String
-					## TODO: Use regex here!
-					value = value.split("/")
-					if value.length == 0
-						@numerator = 1
-						@denominator = 1
-					else if value.length == 1
-						@numerator = parseFloat(value[0])
-						@denominator = 1
-					else if value.length == 2
-						@numerator = parseFloat(value[0])
-						@denominator = parseFloat(value[1])
-					else
-						throw new Error("Invalid constant #{value.join("/")}")
+				[@numerator, @denominator] = parse.constant(value)
 
 			evaluate: ->
 				@numerator/@denominator
 
+			toString: ->
+				unless @denominator == 1
+					return "#{@numerator}/#{@denominator}"
+				return "#{@numerator}"
+
 		SymbolicConstant: class extends Terminal
 			# Symbolic constants in the equation tree, e.g. π
 			constructor: (@label, @value=null) ->
+
+			evaluate: ->
+				@value
 	}
