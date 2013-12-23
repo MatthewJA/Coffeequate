@@ -25,22 +25,24 @@ define ["require"], (require) ->
 		# E.g. "1 + 2 * 3 ** 4" -> Add(1, Mul(2, Pow(3, 4)))
 
 		###
-			ADDN := MULT | MULT "+" ADDN
-			MULT := POWR | POWR "*" MULT
-			POWR := BRAC | BRAC "**" POWR
+			ADDN := MULT | ADDN "+" MULT
+			MULT := POWR | MULT "*" POWR
+			POWR := BRAC | POWR "**" BRAC
 			BRAC := "-" BRAC | "(" ADDN ")" | TERM
 			TERM := <Existing Code>
 		###
 
+		# Any strangeness in this parser is probably because I accidentally wrote it backwards.
+
 		constructor: (string) ->
-			@tokens = StringToExpression.tokenise(string)
+			@tokens = StringToExpression.tokenise(string).reverse()
 			@upto = 0
 			@operators = require("operators")
 			return @parseAddition() # Return a node instead of returning this parser class.
 
 		@tokenise: (string) ->
 			# Convert a string into an array of token strings.
-			string.split(/(\*\*|[+*]|\s)/).filter((z) -> !/^\s*$/.test(z))
+			string.split(/(\*\*|[+*()\-]|\s)/).filter((z) -> !/^\s*$/.test(z))
 
 		getToken: ->
 			@tokens[@upto]
@@ -60,7 +62,7 @@ define ["require"], (require) ->
 			addn = @parseAddition()
 
 			# We're done!
-			return new @operators.Add(mult, addn)
+			return new @operators.Add(addn, mult)
 
 		parseMultiplication: ->
 			# We know we have to have a POWR to start with, so parse that.
@@ -77,7 +79,7 @@ define ["require"], (require) ->
 			mult = @parseMultiplication()
 
 			# We're done!
-			return new @operators.Mul(powr, mult)
+			return new @operators.Mul(mult, powr)
 
 		parsePower: ->
 			# We know we have to have a BRAC to start with, so parse that.
@@ -94,37 +96,43 @@ define ["require"], (require) ->
 			powr = @parsePower()
 
 			# We're done!
-			return new @operators.Pow(brac, powr)
+			return new @operators.Pow(powr, brac)
 
 		parseBracket: ->
 			# BRAC := "-" BRAC | "(" ADDN ")" | TERM
-
-			# Do we start with a "-"?
-			if @getToken() == "-"
-				# We do!
-				# Now we have another BRAC.
-				@upto += 1
-				brac = @parseBracket()
-
-				# We're done!
-				return new @operators.Mul(-1, brac)
-
-			# We don't, but do we start with a "("?
-			else if @getToken() == "("
+			# Do we start with a ")"?
+			# Because I wrote this backwards...
+			if @getToken() == ")"
 				# We do!
 				# Now we have another ADDN.
 				@upto += 1
 				addn = @parseAddition()
 
-				# We're done!
-				return addn
+				# We should have a closing bracket.
+				unless @getToken() == "("
+					throw new Error("ParseError: Expected '(' but found #{@getToken()}")
+
+				@upto += 1
+
+				# We're done, almost!
+
+				# Do we have a negative sign?
+				if @getToken() == "-" # Yeah, I wrote this backwards.
+					@upto += 1
+					return new @operators.Mul(-1, addn)
+				else
+					return addn
 
 			# Nothing else, so we must have a TERM!
 			else
 				term = @parseTerm()
 
-				# We're done!
-				return term
+				# We're done, unless we are followed by a minus sign (because I wrote this backwards).
+				if @getToken() == "-"
+					@upto += 1
+					return new @operators.Mul(-1, term)
+				else
+					return term
 
 		parseTerm: ->
 			term = stringToTerminal(@getToken())
@@ -135,8 +143,8 @@ define ["require"], (require) ->
 
 		ParseError: ParseError
 
-		ExpressionFromString: StringToExpression # new expressionFromString(string) seems a natural alias.
-		StringToExpression: StringToExpression # Consistency.
+		stringToExpression: (string) ->
+			return new StringToExpression(string)
 
 		constant: (value) ->
 			# Take a string and return [numerator, denominator].

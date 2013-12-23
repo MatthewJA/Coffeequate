@@ -28,6 +28,14 @@ define ["terminals", "parse"], (terminals, parse) ->
 				term = new terminals.Constant(1.2)
 				expect(term.evaluate()).toBe(1.2)
 
+			it "accept fractions", ->
+				term = new terminals.Constant(1, 2)
+				expect(term.evaluate()).toBe(1/2)
+
+			it "accept decimals", ->
+				term = new terminals.Constant(0.12)
+				expect(term.evaluate()).toBe(0.12)
+
 			it "reject non-parseable inputs", ->
 				expect(-> new terminals.Constant("")).toThrow(new parse.ParseError("", "constant"))
 				expect(-> new terminals.Constant(true)).toThrow(new parse.ParseError(true, "constant"))
