@@ -2,6 +2,17 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 
 	# Defines operator nodes of the expression tree.
 
+	compare = (a, b) ->
+		# Compare two values to get an order.
+		# a < b -> -1
+		# a = b ->  0
+		# a > b ->  1
+		###
+		Order:
+		-6: Constants, by number
+		-5: 
+		###
+
 	prettyPrint = (array) ->
 		out = []
 		for i in array
@@ -143,9 +154,7 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 						term[0].children.push(term.splice(1, 1)[0])
 
 				else if term[0] instanceof Add
-					console.log("adding #{term[0]}")
 					if term[1] instanceof Add
-						console.log("adding #{term[1]} 1")
 						# Of the form (a + b) * (c + d), with any number of children.
 						# Expand.
 						results = []
@@ -168,7 +177,16 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 				else
 					term[0] = new Mul(term[0])
 
+			# The terms should be ordered.
+			# term[0] = term[0].sorted()
+
 			return term[0]
+
+		sorted: ->
+			# Sort and return this node.
+			# Numbers first, then letters, in numerical and alphabetical order.
+			# Then power nodes, in order of the base.
+			# Then addition nodes, in order of their first child.
 
 	class Pow extends nodes.BinaryNode
 		# Represent powers.
@@ -186,6 +204,56 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 				(if @children.left.copy? then @children.left.copy() else @children.left),
 				(if @children.right.copy? then @children.right.copy() else @children.right)
 			)
+
+		expand: ->
+			# Expand all the children.
+			if @children.left.expand?
+				left = @children.left.expand()
+			else if @children.left.copy?
+				left = @children.left.copy()
+			else
+				left = @children.left
+
+			if @children.right.expand?
+				right = @children.right.expand()
+			else if @children.right.copy?
+				right = @children.right.copy()
+			else
+				right = @children.right
+
+			if left.children?
+				if left instanceof Pow
+					# (a ** b) ** c -> (a ** (b * c))
+					left.children.right = new Mul(left.children.right, right)
+					left.expand()
+				else if left instanceof Mul
+					# Put all the things on the left to the power of the right.
+					for child, index in left.children
+						console.log("3", child, right)
+						newPow = new Pow(child, right)
+						newPow = newPow.expand()
+						left.children[index] = newPow # This is so I don't have to worry about what
+													  # type the child is! :D
+				else if left instanceof Add
+					# Convert this into a multiplication of addition nodes, if the power is an integer.
+					# Otherwise, leave it.
+					if right instanceof terminals.Constant and right.evaluate() % 1 == 0
+						# Expand!
+						children = []
+						for i in [1..right.evaluate()]
+							children.push(left)
+						newMul = new Mul(children...)
+						newMul = newMul.expand()
+						left = newMul
+					else
+						console.log("2", left, right)
+						left = new Pow(left, right)
+
+				return left
+			else
+				# Can't expand any more!
+				console.log(left, right)
+				return new Pow(left, right)
 
 	return {
 

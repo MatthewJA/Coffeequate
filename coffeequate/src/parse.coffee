@@ -110,7 +110,8 @@ define ["require"], (require) ->
 
 				# We should have a closing bracket.
 				unless @getToken() == "("
-					throw new Error("ParseError: Expected '(' but found #{@getToken()}")
+					throw new Error("ParseError: Expected '(' but found '#{@getToken()}' at position " +
+						"#{@tokens.length - @upto}/#{@tokens.length} in token stream '#{@tokens.reverse().join(" ")}'")
 
 				@upto += 1
 

@@ -27,8 +27,12 @@ define ->
 			getChildren: ->
 				@children
 
-			toString: ->
+			toLisp: ->
 				"(#{@label}#{if @children then " " else ""}#{@children.join(" ")})"
+
+			toString: ->
+				"(#{@children.join(" #{@label} ")})"
+
 
 		BinaryNode: class extends BasicNode
 			# A node with exactly two children, a left and a right child.
@@ -41,7 +45,10 @@ define ->
 				# Return an array of children.
 				[@children.left, @children.right]
 
-			toString: ->
+			toLisp: ->
 				"(#{@label} #{@children.left} #{@children.right})"
+
+			toString: ->
+				"(#{@children.left} #{@label} #{@children.right})"
 
 	}
