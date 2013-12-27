@@ -22,15 +22,13 @@ define ["operators", "parse"], (operators, parse) ->
 				add = parse.stringToExpression("1 + (2 + (3 + 4))")
 				expect(add.expand().toString()).toBe("(1 + 2 + 3 + 4)")
 				add = parse.stringToExpression("1 + ((2 + 5) + (3 + 4))")
-				expect(add.expand().toString()).toBe("(1 + 2 + 5 + 3 + 4)")
+				expect(add.expand().toString()).toBe("(1 + 2 + 3 + 4 + 5)")
 				add = parse.stringToExpression("((a * b) + (c * d)) + ((e * f) + (g * h))")
 				expect(add.expand().toString()).toBe("((a * b) + (c * d) + (e * f) + (g * h))")
 				add = parse.stringToExpression("3 + 2 + 1")
 				expect(add.expand().toString()).toBe("(1 + 2 + 3)")
 				add = parse.stringToExpression("3 + x + 1")
 				expect(add.expand().toString()).toBe("(1 + 3 + x)")
-
-			it "compare"
 
 		describe "representing multiplication", ->
 
@@ -63,17 +61,15 @@ define ["operators", "parse"], (operators, parse) ->
 
 				it "more complex expressions", ->
 					mul = parse.stringToExpression("-(x + (x * 4) ** 2) + 7")
-					expect(mul.expand().toString()).toBe("((-1 * x) + (-1 * (4 ** 2) * (x ** 2)) + 7)")
+					expect(mul.expand().toString()).toBe("(7 + (-1 * x) + (-1 * (4 ** 2) * (x ** 2)))")
 					mul = parse.stringToExpression("(((x + 4) * 2)**(x + - 2) + - 2)**x")
-					expect(mul.expand().toString()).toBe("((((2 ** (x + (-1 * 2))) * ((4 + x) ** (x + (-1 * 2)))) + (-1 * 2)) ** x)")
+					expect(mul.expand().toString()).toBe("(((-1 * 2) + ((2 ** (x + (-1 * 2))) * ((4 + x) ** (x + (-1 * 2))))) ** x)")
 
 				it "expressions into a sorted form", ->
 					mul = parse.stringToExpression("3 * 2 * 1")
 					expect(mul.expand().toString()).toBe("(1 * 2 * 3)")
 					mul = parse.stringToExpression("3 * x * 1")
 					expect(mul.expand().toString()).toBe("(1 * 3 * x)")
-
-			it "compare"
 
 		describe "representing powers", ->
 
@@ -94,8 +90,6 @@ define ["operators", "parse"], (operators, parse) ->
 				expect(pow.expand().toString()).toBe("((1 * 1) + (1 * x) + (1 * x) + (x * x))")
 				pow = parse.stringToExpression("(a * b * c)**d")
 				expect(pow.expand().toString()).toBe("((a ** d) * (b ** d) * (c ** d))")
-
-			it "compare"
 
 		it "can be formed into a tree", ->
 

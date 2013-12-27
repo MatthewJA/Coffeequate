@@ -17,6 +17,7 @@ require ["jquery"], ($) ->
 		"spec/nodes"
 		"spec/terminals"
 		"spec/parse"
+		"spec/compare"
 	]
 
 	jasmineEnv.specFilter = (spec) ->

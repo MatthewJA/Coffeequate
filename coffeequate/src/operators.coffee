@@ -48,11 +48,20 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 
 		compareSameType: (b) ->
 			# Compare this object with another of the same type.
+			if @children.length == b.children.length
+				lengthComparison = 0
+			else if @children.length < b.children.length
+				lengthComparison = -1
+			else
+				lengthComparison = 1
+
 			for child, index in @children
+				return 1 unless b.children[index]?
 				c = compare(@children[index], b.children[index])
 				if c != 0
 					return c
-			return 0
+
+			return lengthComparison
 
 		expand: ->
 			# Addition is associative, so expand (+ (+ a b) c) into (+ a b c).
@@ -98,11 +107,20 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 
 		compareSameType: (b) ->
 			# Compare this object with another of the same type.
+			if @children.length == b.children.length
+				lengthComparison = 0
+			else if @children.length < b.children.length
+				lengthComparison = -1
+			else
+				lengthComparison = 1
+
 			for child, index in @children
+				return 1 unless b.children[index]?
 				c = compare(@children[index], b.children[index])
 				if c != 0
 					return c
-			return 0
+
+			return lengthComparison
 
 		@expandMulAdd: (mul, add) ->
 			# Multiply out.
@@ -350,5 +368,7 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 		Mul: Mul
 
 		Pow: Pow
+
+		compare: compare
 
 	}
