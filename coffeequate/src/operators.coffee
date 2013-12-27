@@ -68,6 +68,12 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 
 			return new Add(children...)
 
+		sort: ->
+			# Sort this node.
+			for child in @children
+				children.sort?()
+			@children.sort(compare)
+
 	class Mul extends nodes.RoseNode
 		# Represent multiplication.
 		constructor: (args...) ->
@@ -179,7 +185,7 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 					term[0] = new Mul(term[0])
 
 			# The terms should be ordered.
-			term[0] = term[0].sorted()
+			term[0].sort?()
 
 			return term[0]
 
@@ -200,11 +206,11 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 
 			return new Pow(left, right)
 
-		sorted: ->
-			# Sort and return this node.
-			# Numbers first, then letters, in numerical and alphabetical order.
-			# Then power nodes, in order of the base.
-			# Then addition nodes, in order of their first child.
+		sort: ->
+			# Sort this node.
+			for child in @children
+				children.sort?()
+			@children.sort(compare)
 
 	class Pow extends nodes.BinaryNode
 		# Represent powers.
@@ -224,6 +230,10 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 				(if @children.left.copy? then @children.left.copy() else @children.left),
 				(if @children.right.copy? then @children.right.copy() else @children.right)
 			)
+
+		sort: ->
+			@children.left.sort?()
+			@children.right.sort?()
 
 		compareSameType: (b) ->
 			# Compare this object with another of the same type.
@@ -310,66 +320,13 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 		-1: Addition nodes, by first child
 		###
 
-		if a instanceof terminals.Constant
-			if b instanceof terminals.Constant
-				# Compare by value.
-				if a.evaluate() < b.evaluate()
-					return -1
-				else if a.evaluate() == b.evaluate()
-					return 0
-				else
-					return 1
+		if a.cmp? and b.cmp?
+			if a.cmp == b.cmp
+				return a.compareSameType(b)
 			else
-				return -1
-		else if a instanceof terminals.SymbolicConstant
-			if b instanceof terminals.Constant
-				return 1
-			else if b instanceof terminals.SymbolicConstant
-				# Compare by label.
-			else
-				return -1
-		else if a instanceof terminals.Variable
-			if b instanceof terminals.Constant or b instanceof terminals.SymbolicConstant
-				return 1
-			else if b instanceof terminals.Variable
-				# Compare by label.
-			else
-				return -1
-		else if a instanceof Pow
-			if (b instanceof terminals.Constant or
-				b instanceof terminals.SymbolicConstant or
-				b instanceof terminals.Variable)
-				return 1
-			else if b instanceof Pow
-				# Compare by base.
-				return compare(a.children.left, b.children.left)
-			else
-				return -1
-		else if a instanceof Mul
-			if (b instanceof terminals.Constant or
-				b instanceof terminals.SymbolicConstant or
-				b instanceof terminals.Variable or
-				b instanceof Pow)
-				return 1
-			else if b instanceof Mul
-				# Compare by first child.
-				return compare(a.children[0], b.children[0])
-			else
-				return -1
-		else if a instanceof Add
-			if (b instanceof terminals.Constant or
-				b instanceof terminals.SymbolicConstant or
-				b instanceof terminals.Variable or
-				b instanceof Pow or
-				b instanceof Mul)
-				return 1
-			else if b instanceof Add
-				# Compare by first child.
-				return compare(a.children[0], b.children[0])
-			else
-				return -1
+				return (a-b)/Math.abs(a-b)
 		else
-			return 1
+			return 0
 
 	return {
 
