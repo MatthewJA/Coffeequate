@@ -39,21 +39,27 @@ define ["operators", "parse"], (operators, parse) ->
 			it "require at least one child", ->
 				expect(-> new operators.Mul()).toThrow(new Error("Mul nodes must have at least one child."))
 
-			it "expand", ->
-				mul = parse.stringToExpression("1 * (2 * 3)")
-				expect(mul.expand().toString()).toBe("(1 * 2 * 3)")
-				mul = parse.stringToExpression("1 * (2 + 3)")
-				expect(mul.expand().toString()).toBe("((1 * 2) + (1 * 3))")
-				mul = parse.stringToExpression("1 * (2 + 3 ** 2)")
-				expect(mul.expand().toString()).toBe("((1 * 2) + (1 * (3 ** 2)))")
-				mul = parse.stringToExpression("(1 * 2) * (2 * 3)")
-				expect(mul.expand().toString()).toBe("(1 * 2 * 2 * 3)")
-				mul = parse.stringToExpression("(1 + 2) * (2 + 3)")
-				expect(mul.expand().toString()).toBe("((1 * 2) + (1 * 3) + (2 * 2) + (2 * 3))")
-				mul = parse.stringToExpression("-(x + (x * 4) ** 2) + 7")
-				expect(mul.expand().toString()).toBe("((-1 * x) + (-1 * (x ** 2) * (4 ** 2)) + 7)")
-				mul = parse.stringToExpression("(((x + 4) * 2)**(x + - 2) + - 2)**x")
-				expect(mul.expand().toString()).toBe("(((((x + 4) ** (x + (-1 * 2))) * (2 ** (x + (-1 * 2)))) + (-1 * 2)) ** x)")
+			describe "expand", ->
+
+				it "associative expressions of multiplication", ->
+					mul = parse.stringToExpression("1 * (2 * 3)")
+					expect(mul.expand().toString()).toBe("(1 * 2 * 3)")
+					mul = parse.stringToExpression("(1 * 2) * (2 * 3)")
+					expect(mul.expand().toString()).toBe("(1 * 2 * 2 * 3)")
+
+				it "distributive expressions over addition", ->
+					mul = parse.stringToExpression("1 * (2 + 3)")
+					expect(mul.expand().toString()).toBe("((1 * 2) + (1 * 3))")
+					mul = parse.stringToExpression("1 * (2 + 3 ** 2)")
+					expect(mul.expand().toString()).toBe("((1 * 2) + (1 * (3 ** 2)))")
+					mul = parse.stringToExpression("(1 + 2) * (2 + 3)")
+					expect(mul.expand().toString()).toBe("((1 * 2) + (1 * 3) + (2 * 2) + (2 * 3))")
+
+				it "more complex expressions", ->
+					mul = parse.stringToExpression("-(x + (x * 4) ** 2) + 7")
+					expect(mul.expand().toString()).toBe("((-1 * x) + (-1 * (x ** 2) * (4 ** 2)) + 7)")
+					mul = parse.stringToExpression("(((x + 4) * 2)**(x + - 2) + - 2)**x")
+					expect(mul.expand().toString()).toBe("(((((x + 4) ** (x + (-1 * 2))) * (2 ** (x + (-1 * 2)))) + (-1 * 2)) ** x)")
 
 		describe "representing powers", ->
 

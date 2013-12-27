@@ -1,17 +1,6 @@
 define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 
-	# Defines operator nodes of the expression tree.
-
-	compare = (a, b) ->
-		# Compare two values to get an order.
-		# a < b -> -1
-		# a = b ->  0
-		# a > b ->  1
-		###
-		Order:
-		-6: Constants, by number
-		-5: 
-		###
+	# Defines operator nodes of the expression tree.	
 
 	prettyPrint = (array) ->
 		out = []
@@ -48,12 +37,18 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 			if args.length < 2
 				throw new Error("Add nodes must have at least one child.")
 
+			@cmp = -1
+
 			args = parseArgs(args...)
 			super("+", args)
 
 		copy: ->
 			args = ((if i.copy? then i.copy() else i) for i in @children)
 			return new Add(args...)
+
+		compareSameType: (b) ->
+			# Compare this object with another of the same type.
+			return compare(@children[0], b.children[0])
 
 		expand: ->
 			# Addition is associative, so expand (+ (+ a b) c) into (+ a b c).
@@ -79,12 +74,18 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 			if args.length < 1
 				throw new Error("Mul nodes must have at least one child.")
 
+			@cmp = -2
+
 			args = parseArgs(args...)
 			super("*", args)
 		
 		copy: ->
 			args = ((if i.copy? then i.copy() else i) for i in @children)
 			return new Mul(args...)
+
+		compareSameType: (b) ->
+			# Compare this object with another of the same type.
+			return compare(@children[0], b.children[0])
 
 		@expandMulAdd: (mul, add) ->
 			# Multiply out.
@@ -178,9 +179,26 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 					term[0] = new Mul(term[0])
 
 			# The terms should be ordered.
-			# term[0] = term[0].sorted()
+			term[0] = term[0].sorted()
 
 			return term[0]
+
+		simplify: ->
+			if @children.left.simplify?
+				left = @children.left.simplify()
+			else if @children.left.copy?
+				left = @children.left.copy()
+			else
+				left = @children.left
+
+			if @children.right.simplify?
+				right = @children.right.simplify()
+			else if @children.right.copy?
+				right = @children.right.copy()
+			else
+				right = @children.right
+
+			return new Pow(left, right)
 
 		sorted: ->
 			# Sort and return this node.
@@ -196,6 +214,8 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 			if args.length > 0
 				throw new Error("Pow nodes must have two children.")
 
+			@cmp = -3
+
 			[base, power] = parseArgs(base, power)
 			super("**", base, power)
 
@@ -204,6 +224,10 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 				(if @children.left.copy? then @children.left.copy() else @children.left),
 				(if @children.right.copy? then @children.right.copy() else @children.right)
 			)
+
+		compareSameType: (b) ->
+			# Compare this object with another of the same type.
+			return compare(@children.left, b.children.left)
 
 		expand: ->
 			# Expand all the children.
@@ -229,7 +253,6 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 				else if left instanceof Mul
 					# Put all the things on the left to the power of the right.
 					for child, index in left.children
-						console.log("3", child, right)
 						newPow = new Pow(child, right)
 						newPow = newPow.expand()
 						left.children[index] = newPow # This is so I don't have to worry about what
@@ -246,7 +269,6 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 						newMul = newMul.expand()
 						left = newMul
 					else
-						console.log("2", left, right)
 						left = new Pow(left, right)
 
 				return left
@@ -254,6 +276,100 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 				# Can't expand any more!
 				console.log(left, right)
 				return new Pow(left, right)
+
+		simplify: ->
+			if @children.left.simplify?
+				left = @children.left.simplify()
+			else if @children.left.copy?
+				left = @children.left.copy()
+			else
+				left = @children.left
+
+			if @children.right.simplify?
+				right = @children.right.simplify()
+			else if @children.right.copy?
+				right = @children.right.copy()
+			else
+				right = @children.right
+
+			return new Pow(left, right)
+
+
+	compare = (a, b) ->
+		# Compare two values to get an order.
+		# a < b -> -1
+		# a = b ->  0
+		# a > b ->  1
+		###
+		Order:
+		-6: Constants, by value
+		-5: Symbolic constants, by label
+		-4: Variables, by label
+		-3: Power nodes, by base
+		-2: Multiplication nodes, by first child
+		-1: Addition nodes, by first child
+		###
+
+		if a instanceof terminals.Constant
+			if b instanceof terminals.Constant
+				# Compare by value.
+				if a.evaluate() < b.evaluate()
+					return -1
+				else if a.evaluate() == b.evaluate()
+					return 0
+				else
+					return 1
+			else
+				return -1
+		else if a instanceof terminals.SymbolicConstant
+			if b instanceof terminals.Constant
+				return 1
+			else if b instanceof terminals.SymbolicConstant
+				# Compare by label.
+			else
+				return -1
+		else if a instanceof terminals.Variable
+			if b instanceof terminals.Constant or b instanceof terminals.SymbolicConstant
+				return 1
+			else if b instanceof terminals.Variable
+				# Compare by label.
+			else
+				return -1
+		else if a instanceof Pow
+			if (b instanceof terminals.Constant or
+				b instanceof terminals.SymbolicConstant or
+				b instanceof terminals.Variable)
+				return 1
+			else if b instanceof Pow
+				# Compare by base.
+				return compare(a.children.left, b.children.left)
+			else
+				return -1
+		else if a instanceof Mul
+			if (b instanceof terminals.Constant or
+				b instanceof terminals.SymbolicConstant or
+				b instanceof terminals.Variable or
+				b instanceof Pow)
+				return 1
+			else if b instanceof Mul
+				# Compare by first child.
+				return compare(a.children[0], b.children[0])
+			else
+				return -1
+		else if a instanceof Add
+			if (b instanceof terminals.Constant or
+				b instanceof terminals.SymbolicConstant or
+				b instanceof terminals.Variable or
+				b instanceof Pow or
+				b instanceof Mul)
+				return 1
+			else if b instanceof Add
+				# Compare by first child.
+				return compare(a.children[0], b.children[0])
+			else
+				return -1
+		else
+			return 1
 
 	return {
 
