@@ -48,7 +48,11 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 
 		compareSameType: (b) ->
 			# Compare this object with another of the same type.
-			return compare(@children[0], b.children[0])
+			for child, index in @children
+				c = compare(@children[index], b.children[index])
+				if c != 0
+					return c
+			return 0
 
 		expand: ->
 			# Addition is associative, so expand (+ (+ a b) c) into (+ a b c).
@@ -66,12 +70,15 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 				else
 					children.push(child)
 
-			return new Add(children...)
+			add = new Add(children...)
+			add.sort()
+
+			return add
 
 		sort: ->
 			# Sort this node.
 			for child in @children
-				children.sort?()
+				child.sort?()
 			@children.sort(compare)
 
 	class Mul extends nodes.RoseNode
@@ -91,7 +98,11 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 
 		compareSameType: (b) ->
 			# Compare this object with another of the same type.
-			return compare(@children[0], b.children[0])
+			for child, index in @children
+				c = compare(@children[index], b.children[index])
+				if c != 0
+					return c
+			return 0
 
 		@expandMulAdd: (mul, add) ->
 			# Multiply out.
@@ -209,7 +220,7 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 		sort: ->
 			# Sort this node.
 			for child in @children
-				children.sort?()
+				child.sort?()
 			@children.sort(compare)
 
 	class Pow extends nodes.BinaryNode
@@ -237,7 +248,11 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 
 		compareSameType: (b) ->
 			# Compare this object with another of the same type.
-			return compare(@children.left, b.children.left)
+			c = compare(@children.left, b.children.left)
+			if c != 0
+				return c
+			else
+				return compare(@children.right, b.children.right)
 
 		expand: ->
 			# Expand all the children.
@@ -324,7 +339,7 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 			if a.cmp == b.cmp
 				return a.compareSameType(b)
 			else
-				return (a-b)/Math.abs(a-b)
+				return (a.cmp-b.cmp)/Math.abs(a.cmp-b.cmp)
 		else
 			return 0
 
