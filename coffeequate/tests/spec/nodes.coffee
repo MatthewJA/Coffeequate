@@ -39,6 +39,14 @@ define ["operators", "parse"], (operators, parse) ->
 				expect(add.simplify().toString()).toBe("((2 * x) + (2 * y))")
 				add = parse.stringToExpression("((2 * x) + (3 * x))")
 				expect(add.simplify().toString()).toBe("(5 * x)")
+				add = parse.stringToExpression("(x + 0)")
+				expect(add.simplify().toString()).toBe("x")
+				add = parse.stringToExpression("(x + 0 + 0 + y)")
+				expect(add.simplify().toString()).toBe("(x + y)")
+				add = parse.stringToExpression("(x + (2 * x))")
+				expect(add.simplify().toString()).toBe("(3 * x)")
+				add = parse.stringToExpression("(-1 + 1**1)")
+				expect(add.simplify().toString()).toBe("0")
 
 		describe "representing multiplication", ->
 
@@ -88,6 +96,10 @@ define ["operators", "parse"], (operators, parse) ->
 				expect(mul.simplify().toString()).toBe("x")
 				mul = parse.stringToExpression("x * x")
 				expect(mul.simplify().toString()).toBe("(x ** 2)")
+				mul = parse.stringToExpression("x * y * x")
+				expect(mul.simplify().toString()).toBe("(y * (x ** 2))")
+				mul = parse.stringToExpression("x * 1 * y * 1 ** 1")
+				expect(mul.simplify().toString()).toBe("(x * y)")
 
 		describe "representing powers", ->
 
@@ -122,6 +134,10 @@ define ["operators", "parse"], (operators, parse) ->
 				expect(pow.simplify().toString()).toBe("x")
 				pow = parse.stringToExpression("(4 ** 0.5)")
 				expect(pow.simplify().toString()).toBe("2")
+				pow = parse.stringToExpression("(4 ** -1 * 4 ** 1")
+				expect(pow.simplify().toString()).toBe("1")
+				pow = parse.stringToExpression("(x ** -1 * x ** 1")
+				expect(pow.simplify().toString()).toBe("1")
 
 		it "can be formed into a tree", ->
 

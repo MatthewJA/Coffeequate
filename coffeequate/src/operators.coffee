@@ -90,6 +90,21 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 				child.sort?()
 			@children.sort(compare)
 
+		equals: (b) ->
+			# Check equality between this and another object.
+			unless b instanceof Add
+				return false
+			unless b.children.length == @children.length
+				return false
+			for child, index in @children
+				if child.equals?
+					unless child.equals(b.children[index])
+						return false
+				else
+					unless child == b.children[index]
+						return false
+			return true
+
 		simplify: ->
 			terms = []
 			for child in @children
@@ -107,7 +122,7 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 			while i < terms.length
 				term = terms[i]
 				if term instanceof Add
-					terms.splice(i, 1)
+					terms.splice(i, 1)[0]
 					# Pull the children into this node (this flattens the addition tree).
 					for c in term.children
 						terms.push(c)
@@ -132,7 +147,7 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 							else
 								variabletermmul = new Mul(child)
 
-					if variabletermmul.length == 1
+					if variabletermmul.children.length == 1
 						variabletermmul = variabletermmul.children[0]
 
 					if constanttermmul? and (not variabletermmul?)
@@ -149,6 +164,7 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 						# If we can't find it, add [var, const] to liketerms.
 						found = false
 						for liketerm, index in liketerms
+							console.log(liketerm[0])
 							if liketerm[0].equals?
 								if liketerm[0].equals(variabletermmul)
 									liketerms[index][1] = new Add(liketerm[1], constanttermmul)
@@ -218,6 +234,26 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 			args = ((if i.copy? then i.copy() else i) for i in @children)
 			return new Mul(args...)
 
+		simplifyConstants: ->
+			constantterm = new terminals.Constant("1")
+			variableterm = null
+
+			for child in @children
+				if child instanceof terminals.Constant
+					constantterm = constantterm.multiply(child)
+				else
+					if variableterm?
+						variableterm.children.push(child)
+					else
+						variableterm = new Mul(child)
+
+			unless variableterm?
+				return constantterm
+			if constantterm.evaluate() == 1
+				return variableterm
+
+			return new Mul(constantterm, variableterm)
+
 		compareSameType: (b) ->
 			# Compare this object with another of the same type.
 			if @children.length == b.children.length
@@ -261,6 +297,21 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 			newAdd = new Add(results...)
 			newAdd = newAdd.expand()
 			return newAdd
+
+		equals: (b) ->
+			# Check equality between this and another object.
+			unless b instanceof Mul
+				return false
+			unless b.children.length == @children.length
+				return false
+			for child, index in @children
+				if child.equals?
+					unless child.equals(b.children[index])
+						return false
+				else
+					unless child == b.children[index]
+						return false
+			return true
 
 		expand: ->
 			# Multiplication is distributive over addition, as well as associative, so
@@ -348,7 +399,7 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 			while i < terms.length
 				term = terms[i]
 				if term instanceof Mul
-					child = terms.splice(i, 1)
+					child = terms.splice(i, 1)[0]
 					# Pull the children into this node (this flattens the multiplication tree).
 					for c in child.children
 						terms.push(c)
@@ -411,6 +462,7 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 			for liketerm in liketerms
 				if liketerm[1].evaluate?() != 1
 					newPow = new Pow(liketerm[0], liketerm[1])
+					newPow = newPow.simplify()
 				else
 					newPow = liketerm[0]
 				if newMul?
@@ -425,6 +477,16 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 				newMul.children.push(constantterm)
 
 			newMul.sort()
+
+			# Is the result here just numerical?
+			numerical = true
+			for child in newMul.children
+				unless child instanceof terminals.Constant
+					numerical = false
+					break
+
+			if numerical
+				return newMul.simplifyConstants()
 
 			return newMul unless newMul.children.length == 1
 			return newMul.children[0]
@@ -457,6 +519,27 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 		sort: ->
 			@children.left.sort?()
 			@children.right.sort?()
+
+		equals: (b) ->
+			# Check equality between this and another object.
+			unless b instanceof Pow
+				return false
+
+			if @children.left.equals?
+				unless @children.left.equals(b.children.left)
+					return false
+			else
+				unless @children.left == b.children.left
+					return false
+
+			if @children.right.equals?
+				unless @children.right.equals(b.children.right)
+					return false
+			else
+				unless @children.right == b.children.right
+					return false
+
+			return true
 
 		compareSameType: (b) ->
 			# Compare this object with another of the same type.
@@ -531,8 +614,13 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 
 			if right.evaluate?() == 1
 				return left
+			else if right.evaluate?() == 0
+				return new terminals.Constant("1")
 			else
-				return new Pow(left, right)
+				if right instanceof terminals.Constant and left instanceof terminals.Constant
+					return Math.pow(left.evaluate(), right.evaluate())
+				else
+					return new Pow(left, right)
 
 
 	compare = (a, b) ->
