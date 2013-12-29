@@ -30,6 +30,16 @@ define ["operators", "parse"], (operators, parse) ->
 				add = parse.stringToExpression("3 + x + 1")
 				expect(add.expand().toString()).toBe("(1 + 3 + x)")
 
+			it "simplify", ->
+				add = parse.stringToExpression("1 + 1")
+				expect(add.simplify().toString()).toBe("2")
+				add = parse.stringToExpression("x + x")
+				expect(add.simplify().toString()).toBe("(2 * x)")
+				add = parse.stringToExpression("x + x + y + y")
+				expect(add.simplify().toString()).toBe("((2 * x) + (2 * y))")
+				add = parse.stringToExpression("((2 * x) + (3 * x))")
+				expect(add.simplify().toString()).toBe("(5 * x)")
+
 		describe "representing multiplication", ->
 
 			it "represent multiplication", ->
@@ -71,6 +81,14 @@ define ["operators", "parse"], (operators, parse) ->
 					mul = parse.stringToExpression("3 * x * 1")
 					expect(mul.expand().toString()).toBe("(1 * 3 * x)")
 
+			it "simplify", ->
+				mul = parse.stringToExpression("1 * x")
+				expect(mul.simplify().toString()).toBe("x")
+				mul = parse.stringToExpression("1 * x * 1")
+				expect(mul.simplify().toString()).toBe("x")
+				mul = parse.stringToExpression("x * x")
+				expect(mul.simplify().toString()).toBe("(x ** 2)")
+
 		describe "representing powers", ->
 
 			it "represent powers", ->
@@ -90,6 +108,20 @@ define ["operators", "parse"], (operators, parse) ->
 				expect(pow.expand().toString()).toBe("((1 * 1) + (1 * x) + (1 * x) + (x * x))")
 				pow = parse.stringToExpression("(a * b * c)**d")
 				expect(pow.expand().toString()).toBe("((a ** d) * (b ** d) * (c ** d))")
+
+			it "simplify", ->
+				pow = parse.stringToExpression("x ** 2")
+				expect(pow.simplify().toString()).toBe("(x ** 2)")
+				pow = parse.stringToExpression("((2 * x) + (3 * x))**2")
+				expect(pow.simplify().toString()).toBe("((5 * x) ** 2)")
+				pow = parse.stringToExpression("2**((2 * x) + (3 * x))")
+				expect(pow.simplify().toString()).toBe("(2 ** (5 * x))")
+				pow = parse.stringToExpression("((2 * x) + (3 * x))**((2 * x) + (3 * x))")
+				expect(pow.simplify().toString()).toBe("((5 * x) ** (5 * x))")
+				pow = parse.stringToExpression("(x ** 1)")
+				expect(pow.simplify().toString()).toBe("x")
+				pow = parse.stringToExpression("(4 ** 0.5)")
+				expect(pow.simplify().toString()).toBe("2")
 
 		it "can be formed into a tree", ->
 

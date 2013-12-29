@@ -40,6 +40,20 @@ define ["parse"], (parse) ->
 			else
 				return 1
 
+		multiply: (b) ->
+			# Multiply by another constant and return the result.
+			return new Constant(@numerator * b.numerator, @denominator * b.denominator)
+
+		add: (b) ->
+			# Add another constant and return the result.
+			return new Constant(b.denominator * @numerator + @denominator * b.numerator, @denominator * b.denominator)
+
+		equals: (b) ->
+			# Test equality between this object and another.
+			unless b instanceof Constant
+				return false
+			return @evaluate() == b.evaluate()
+
 		toString: ->
 			unless @denominator == 1
 				return "#{@numerator}/#{@denominator}"
@@ -65,6 +79,11 @@ define ["parse"], (parse) ->
 		evaluate: ->
 			@value
 
+		equals: (b) ->
+			unless b instanceof SymbolicConstant
+				return false
+			return @label == b.label and @value == b.value
+
 	class Variable extends Terminal
 		# Variables in the equation tree, e.g. m
 		constructor: (@label) ->
@@ -81,6 +100,12 @@ define ["parse"], (parse) ->
 				return 0
 			else
 				return 1
+
+		equals: (b) ->
+			# Check equality between this and some other object.
+			unless b instanceof Variable
+				return false
+			return b.label == @label
 
 	return {
 

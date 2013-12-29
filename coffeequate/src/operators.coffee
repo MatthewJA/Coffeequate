@@ -34,7 +34,7 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 		# Represent addition.
 		constructor: (args...) ->
 			# Check validity of arguments.
-			if args.length < 2
+			if args.length < 1
 				throw new Error("Add nodes must have at least one child.")
 
 			@cmp = -1
@@ -89,6 +89,119 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 			for child in @children
 				child.sort?()
 			@children.sort(compare)
+
+		simplify: ->
+			terms = []
+			for child in @children
+				if child.simplify?
+					child = child.simplify()
+				else if child.copy?
+					child = child.copy()
+
+				terms.push(child)
+			
+			# Collect like terms into multiplication.
+			liketerms = []
+			constantterm = null
+			i = 0
+			while i < terms.length
+				term = terms[i]
+				if term instanceof Add
+					terms.splice(i, 1)
+					# Pull the children into this node (this flattens the addition tree).
+					for c in term.children
+						terms.push(c)
+					i -= 1 # Rewind the loop slightly.
+				else if term instanceof terminals.Constant
+					if constantterm?
+						constantterm = constantterm.add(term)
+					else
+						constantterm = term.copy()
+				else if term instanceof Mul # Might need to expand Mul nodes.
+					constanttermmul = null
+					variabletermmul = null
+					for child in term.children
+						if child instanceof terminals.Constant
+							if constanttermmul?
+								constanttermmul = constanttermmul.multiply(child)
+							else
+								constanttermmul = child.copy()
+						else
+							if variabletermmul?
+								variabletermmul.children.push(child)
+							else
+								variabletermmul = new Mul(child)
+
+					if variabletermmul.length == 1
+						variabletermmul = variabletermmul.children[0]
+
+					if constanttermmul? and (not variabletermmul?)
+						if constantterm?
+							constantterm = constantterm.add(constanttermmul)
+						else
+							constantterm = constanttermmul.copy()
+					else
+						unless constanttermmul?
+							constanttermmul = new terminals.Constant("1")
+
+						# Find the var in liketerms.
+						# If we find it, add the constant to the total.
+						# If we can't find it, add [var, const] to liketerms.
+						found = false
+						for liketerm, index in liketerms
+							if liketerm[0].equals?
+								if liketerm[0].equals(variabletermmul)
+									liketerms[index][1] = new Add(liketerm[1], constanttermmul)
+									liketerms[index][1] = liketerms[index][1].simplify()
+									found = true
+							else if liketerm[0] == variabletermmul
+								liketerms[index][1] = new Add(liketerm[1], constanttermmul)
+								liketerms[index][1] = liketerms[index][1].simplify()
+								found = true
+						unless found
+							liketerms.push([variabletermmul, constanttermmul])
+
+				else
+					# A unique term. Do we have a copy of it already?
+					found = false
+					for liketerm, index in liketerms
+						if liketerm[0].equals?
+							if liketerm[0].equals(term)
+								liketerms[index][1] = new Add(liketerm[1], new terminals.Constant("1"))
+								liketerms[index][1] = liketerms[index][1].simplify()
+								found = true
+						else if liketerm[0] == term
+							liketerms[index][1] = new Add(liketerm[1], new terminals.Constant("1"))
+							liketerms[index][1] = liketerms[index][1].simplify()
+							found = true
+					unless found
+						liketerms.push([term, new terminals.Constant("1")])
+
+				i += 1
+
+			newAdd = null
+			for liketerm in liketerms
+				if liketerm[0].children? and liketerm[0].children.length == 1
+					liketerm[0] = liketerm[0].children[0]
+				if liketerm[1].evaluate?() != 1
+					newMul = new Mul(liketerm[0], liketerm[1])
+				else
+					newMul = liketerm[0]
+				if newAdd?
+					newAdd.children.push(newMul)
+				else
+					newAdd = new Add(newMul)
+
+			unless newAdd?
+				return constantterm
+
+			if constantterm? and constantterm.evaluate() != 0
+				newAdd.children.push(constantterm)
+
+			newAdd.sort()
+
+			return newAdd unless newAdd.children.length == 1
+			return newAdd.children[0]
 
 	class Mul extends nodes.RoseNode
 		# Represent multiplication.
@@ -219,21 +332,102 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 			return term[0]
 
 		simplify: ->
-			if @children.left.simplify?
-				left = @children.left.simplify()
-			else if @children.left.copy?
-				left = @children.left.copy()
-			else
-				left = @children.left
+			terms = []
+			for child in @children
+				if child.simplify?
+					child = child.simplify()
+				else if child.copy?
+					child = child.copy()
 
-			if @children.right.simplify?
-				right = @children.right.simplify()
-			else if @children.right.copy?
-				right = @children.right.copy()
-			else
-				right = @children.right
+				terms.push(child)
+			
+			# Collect like terms into powers.
+			liketerms = []
+			constantterm = null
+			i = 0
+			while i < terms.length
+				term = terms[i]
+				if term instanceof Mul
+					child = terms.splice(i, 1)
+					# Pull the children into this node (this flattens the multiplication tree).
+					for c in child.children
+						terms.push(c)
+					i -= 1 # Rewind the loop slightly.
+				else if term instanceof terminals.Constant
+					if constantterm?
+						constantterm = constantterm.multiply(term)
+					else
+						constantterm = term.copy()
+				else if term instanceof Pow # Might need to expand Pow nodes.
+					base = term.children.left
+					power = term.children.right
+					# Find the base in liketerms.
+					# If we find the base, add power to the power.
+					# If we can't find the base, add [base, power] to liketerms.
+					found = false
+					for liketerm, index in liketerms
+						if liketerm[0].equals?
+							if liketerm[0].equals(base)
+								liketerms[index][1] = new Add(liketerm[1], power)
+								liketerms[index][1] = liketerms[index][1].simplify()
+								if liketerms[index][1].children?.length == 1
+									liketerms[index][1] = liketerms[index][1].children[0]
+								found = true
+						else if liketerm[0] == base
+							liketerms[index][1] = new Add(liketerm[1], power)
+							liketerms[index][1] = liketerms[index][1].simplify()
+							if liketerms[index][1].children?.length == 1
+								liketerms[index][1] = liketerms[index][1].children[0]
+							found = true
+					unless found
+						liketerms.push([base, power])
 
-			return new Pow(left, right)
+				else
+					# A unique term. Do we have a copy of it already?
+					found = false
+					for liketerm, index in liketerms
+						if liketerm[0].equals?
+							if liketerm[0].equals(term)
+								liketerms[index][1] = new Add(liketerm[1], new terminals.Constant("1"))
+								liketerms[index][1] = liketerms[index][1].simplify()
+								if liketerms[index][1].children?.length == 1
+									liketerms[index][1] = liketerms[index][1].children[0]
+								found = true
+						else if liketerm[0] == term
+							liketerms[index][1] = new Add(liketerm[1], new terminals.Constant("1"))
+							liketerms[index][1] = liketerms[index][1].simplify()
+							if liketerms[index][1].children?.length == 1
+								liketerms[index][1] = liketerms[index][1].children[0]
+							found = true
+					unless found
+						liketerms.push([term, new terminals.Constant("1")])
+
+				i += 1
+
+			if constantterm?.evaluate?() == 0
+				return new terminals.Constant("0")
+
+			newMul = null
+			for liketerm in liketerms
+				if liketerm[1].evaluate?() != 1
+					newPow = new Pow(liketerm[0], liketerm[1])
+				else
+					newPow = liketerm[0]
+				if newMul?
+					newMul.children.push(newPow)
+				else
+					newMul = new Mul(newPow)
+
+			unless newMul?
+				return constantterm
+
+			if constantterm? and constantterm.evaluate() != 1
+				newMul.children.push(constantterm)
+
+			newMul.sort()
+
+			return newMul unless newMul.children.length == 1
+			return newMul.children[0]
 
 		sort: ->
 			# Sort this node.
@@ -317,10 +511,10 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 				return left
 			else
 				# Can't expand any more!
-				console.log(left, right)
 				return new Pow(left, right)
 
 		simplify: ->
+			# Simplify all the children.
 			if @children.left.simplify?
 				left = @children.left.simplify()
 			else if @children.left.copy?
@@ -335,7 +529,10 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 			else
 				right = @children.right
 
-			return new Pow(left, right)
+			if right.evaluate?() == 1
+				return left
+			else
+				return new Pow(left, right)
 
 
 	compare = (a, b) ->
