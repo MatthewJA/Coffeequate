@@ -25,7 +25,6 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 			else if arg instanceof terminals.Terminal or arg instanceof nodes.BasicNode or arg.isTerminal?
 				outArgs.push(arg)
 			else
-				console.log(arg)
 				throw new Error("Invalid argument #{arg}, (#{typeof(arg)}), (#{arg.toString()})")
 
 		return outArgs
@@ -164,7 +163,6 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 						# If we can't find it, add [var, const] to liketerms.
 						found = false
 						for liketerm, index in liketerms
-							console.log(liketerm[0])
 							if liketerm[0].equals?
 								if liketerm[0].equals(variabletermmul)
 									liketerms[index][1] = new Add(liketerm[1], constanttermmul)
@@ -624,8 +622,14 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 			else if right.evaluate?() == 0
 				return new terminals.Constant("1")
 			else
+				console.log(left, right)
 				if right instanceof terminals.Constant and left instanceof terminals.Constant
-					return Math.pow(left.evaluate(), right.evaluate())
+					return new terminals.Constant(Math.pow(left.evaluate(), right.evaluate()))
+				else if left instanceof Pow
+					power = new Mul(left.children.right, right)
+					newPow = new Pow(left.children.left, power)
+					newPow = newPow.simplify()
+					return newPow
 				else
 					return new Pow(left, right)
 
