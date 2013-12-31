@@ -220,6 +220,9 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 			return newAdd unless newAdd.children.length == 1
 			return newAdd.children[0]
 
+		expandAndSimplify: ->
+			@expand().simplify()
+
 	class Mul extends nodes.RoseNode
 		# Represent multiplication.
 		constructor: (args...) ->
@@ -498,6 +501,9 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 				child.sort?()
 			@children.sort(compare)
 
+		expandAndSimplify: ->
+			@expand().simplify()
+
 	class Pow extends nodes.BinaryNode
 		# Represent powers.
 		constructor: (base, power, args...) ->
@@ -622,6 +628,9 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 					return Math.pow(left.evaluate(), right.evaluate())
 				else
 					return new Pow(left, right)
+
+		expandAndSimplify: ->
+			@expand().simplify()
 
 
 	compare = (a, b) ->
