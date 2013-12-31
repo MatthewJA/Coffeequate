@@ -146,6 +146,10 @@ define ["operators", "parse"], (operators, parse) ->
 				expect(pow.simplify().toString()).toBe("1")
 				pow = parse.stringToExpression("(x ** -1 * x ** 1")
 				expect(pow.simplify().toString()).toBe("1")
+				pow = parse.stringToExpression("(x ** 2) ** 0.5")
+				expect(pow.simplify().toString()).toBe("x")
+				pow = parse.stringToExpression("(x ** 2) ** y")
+				expect(pow.simplify().toString()).toBe("(x ** (2 * y))")
 
 		it "can be formed into a tree", ->
 
