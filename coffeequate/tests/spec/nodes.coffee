@@ -101,6 +101,14 @@ define ["operators", "parse"], (operators, parse) ->
 				mul = parse.stringToExpression("x * 1 * y * 1 ** 1")
 				expect(mul.simplify().toString()).toBe("(x * y)")
 
+				add = parse.stringToExpression("(3*x+-2)*(4*y**2+7)*(x+2*y)**-1")
+				expect(add.expand().simplify().toString()).toBe("0")
+
+				console.log("woop")
+				add = parse.stringToExpression("(a * b)*(2*x + 1)")
+				expect(add.expand().simplify().toString()).toBe("0")
+				console.log("/woop")
+
 		describe "representing powers", ->
 
 			it "represent powers", ->

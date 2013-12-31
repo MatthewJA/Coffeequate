@@ -201,6 +201,7 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 					liketerm[0] = liketerm[0].children[0]
 				if liketerm[1].evaluate?() != 1
 					newMul = new Mul(liketerm[0], liketerm[1])
+					newMul = newMul.simplify()
 				else
 					newMul = liketerm[0]
 				if newAdd?
