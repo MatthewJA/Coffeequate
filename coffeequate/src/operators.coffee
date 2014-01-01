@@ -3,8 +3,8 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 	# Defines operator nodes of the expression tree.	
 
 	class AlgebraError extends Error
-		constructor: (expr, variable) ->
-			super("Unsolvable: #{expr} for #{variable}")
+		constructor: (expr, variable, postscript=null) ->
+			super("Unsolvable: #{expr} for #{variable}#{if postscript then ";" + postscript else ""}")
 
 	prettyPrint = (array) ->
 		out = []
@@ -224,6 +224,155 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 
 		expandAndSimplify: ->
 			@expand().simplify()
+
+		solve: (variable) ->
+			expr = @expandAndSimplify()
+
+			# Sort the expression into terms containing v, and terms not containing v.
+			# Since we expanded, every term we deal with should be either a Mul with v as a direct
+			# child, a Pow with v as the left child, or the latter in a Mul.
+
+			termsContainingVariable = []
+			termsNotContainingVariable = []
+
+			for term in expr.children
+				if term.copy?
+					term = term.copy()
+
+				if term instanceof Pow
+					if term.children.left instanceof terminals.Variable and term.children.left.label == variable
+						termsContainingVariable.push(term)
+					else
+						termsNotContainingVariable.push(term)
+				else if term instanceof Mul
+					added = false
+					for subterm in term.children
+						if subterm instanceof terminals.Variable and subterm.label == variable
+							termsContainingVariable.push(term)
+							added = true
+							break
+						else if (
+							subterm instanceof Pow and
+							subterm.children.left instanceof terminals.Variable and
+							subterm.children.left.label == variable)
+							termsContainingVariable.push(term)
+							added = true
+							break
+
+					unless added
+						termsNotContainingVariable.push(term)
+				else if term instanceof terminals.Variable and term.label == variable
+					termsContainingVariable.push(term)
+				else
+					termsNotContainingVariable.push(term)
+
+			# The rest of the terms need to be manipulated to solve the equation.
+			# (a * v) + (b * v) -> ((a + b) * v)
+			# (a * v) + (b * v) + (c * (v ** 2)) -> ((a + b) * v) + (c * (v ** 2))
+			# If we detect a power > 2, reject the equation.
+
+			factorised = [] # (a + b) in the above example.
+			factorisedSquares = [] # c in the above example.
+
+			for term in termsContainingVariable
+				if term instanceof terminals.Variable
+					factorised.push(new terminals.Constant("1"))
+				else if term instanceof Pow
+					unless term.children.right instanceof terminals.Constant
+						throw new AlgebraError(expr.toString(), variable)
+					power = term.children.right.evaluate()
+					if power == 1
+						factorised.push(new terminals.Constant("1"))
+					else if power == 2
+						factorisedSquares.push(new terminals.Constant("1"))
+					else
+						throw new AlgebraError(expr.toString(), variable, "polynomials of degree > 2 not supported")
+				else if term instanceof Mul
+					subterms = [] # Non-variable terms.
+					quadratic = false
+					for subterm in term.children
+						if term instanceof terminals.Variable and term.label == variable then # pass
+						else if term instanceof Pow
+							unless term.children.right instanceof terminals.Constant
+								throw new AlgebraError(expr.toString(), variable)
+							power = term.children.right.evaluate()
+							if power == 1 then # pass
+							else if power == 2
+								quadratic = true # We operate on the assumption that there's only one term with our target variable in it here.
+								# This should be possibly due to expandAndSimplify.
+							else
+								throw new AlgebraError(expr.toString(), variable, "polynomials of degree > 2 not supported")
+						else
+							subterms.push(subterm)
+
+					factorisedTerm = new Mul(subterms...)
+					unless quadratic
+						factorised.push(factorisedTerm)
+					else
+						factorisedSquares.push(factorisedTerm)
+
+			negatedTerms = []
+			# Terms not containing the variable need to be negated. They will form part of the returned result.
+			for term in termsNotContainingVariable
+				newMul = new Mul("-1", term)
+				newMul = newMul.simplify()
+				negatedTerms.push(newMul)
+
+			negatedTermsEquatable = new Add(negatedTerms...) unless negatedTerms.length == 0
+			factorisedEquatable = new Add(factorised...) unless factorised.length == 0
+			factorisedSquaresEquatable = new Add(factorisedSquares...) unless factorisedSquares.length == 0
+
+			if factorisedSquares.length == 0
+				# We now have terms on the other side of the equation (negatedTermsEquatable) and
+				# terms factorised out from this side of the equation (factorisedEquatable).
+				# (factorisedEquatable * v) = negatedTermsEquatable
+				# Hence the solution is simply (negatedTermsEquatable * (factorisedEquatable ** -1)).
+				if factorised.length > 0
+					newPow = new Pow(factorisedEquatable, "-1")
+					newPow = newPow.simplify()
+					if negatedTermsEquatable?
+						newMul = new Mul(negatedTermsEquatable, newPow)
+						newMul = newMul.simplify()
+						return [newMul]
+					else
+						return [newPow]
+				else
+					throw new AlgebraError(expr.toString(), variable)
+			else if factorised.length == 0
+				# We now have terms on the other side of the equation (negatedTermsEquatable) and
+				# terms factorised out from this side of the equation (factorisedSquaresEquatable).
+				# (factorisedSquaresEquatable * (v ** 2)) = negatedTermsEquatable
+				# Hence the solution is simply \pm ((negatedTermsEquatable * (factorisedSquaresEquatable ** -1)) ** 1/2).
+				if factorisedSquares.length > 0
+					newPow = new Pow(factorisedSquaresEquatable, "-1")
+					newPow = newPow.simplify()
+					if negatedTermsEquatable?
+						newMul = new Mul(negatedTermsEquatable, newPow)
+						newerPow = new Pow(newMul, "1/2")
+						negatedNewerPow = new Mul("-1", newerPow)
+						negatedNewerPow = negatedNewerPow.simplify()
+						newerPow = newerPow.simplify()
+						return [newerPow, negatedNewerPow]
+					else
+						newerPow = new Pow(newPow, "1/2")
+						negatedNewerPow = new Mul("-1", newerPow)
+						negatedNewerPow = negatedNewerPow.simplify()
+						newerPow = newerPow.simplify()
+						return [newerPow, negatedNewerPow]
+				else
+					throw new AlgebraError(expr.toString(), variable)
+			else
+				# We have a quadratic equation.
+				# ((factorisedSquaresEquatable) * (v ** 2)) + (factorisedEquatable * v) + (nonNegatedTerms) = 0
+				nonNegatedTermsEquatable = new Add(termsNotContainingVariable...) unless termsNotContainingVariable.length == 0
+				if nonNegatedTermsEquatable?
+
+				else
+					# (((fSE * v) + fE) * v) = 0
+					# v = 0
+					# v = (-1 * (fE * (fSE ** -1)))
+					newPow = new Pow(factorisedSquaresEquatable, "-1")
+
 
 	class Mul extends nodes.RoseNode
 		# Represent multiplication.
