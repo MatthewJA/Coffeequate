@@ -101,6 +101,20 @@ define ["operators", "parse"], (operators, parse) ->
 				mul = parse.stringToExpression("x * 1 * y * 1 ** 1")
 				expect(mul.simplify().toString()).toBe("(x * y)")
 
+			it "can be solved", ->
+				mul = parse.stringToExpression("x * y * z")
+				expect(mul.solve("y")[0].evaluate()).toEqual(0)
+				expect(mul.solve("y").length).toEqual(1)
+				mul = parse.stringToExpression("x * y * (z ** 2)")
+				expect(mul.solve("z")[0].evaluate()).toEqual(0)
+				expect(mul.solve("z").length).toEqual(1)
+
+			describe "throw sensible errors when", ->
+
+				it "trying to solve for a non-existant variable", ->
+					pow = parse.stringToExpression("x * z")
+					expect(-> pow.solve("y")).toThrow(new operators.AlgebraError("Unsolvable: (x * z) for y"))
+
 		it "expand and simplify into reasonably-canonical forms", ->
 			add = parse.stringToExpression("(a * b)*(2*x + 1)")
 			expect(add.expandAndSimplify().toString()).toBe("((2 * a * b * x) + (a * b))")
@@ -108,6 +122,7 @@ define ["operators", "parse"], (operators, parse) ->
 			expect(add.expand().simplify().toString()).toBe("(14 + (8 * (y ** 2)) + (12 * x * (y ** 2)) + (21 * x))")
 			add = parse.stringToExpression("(3*x+2)*(4*y**2+7)*(x+2*y)**-1")
 			expect(add.expand().simplify().toString()).toBe("(((x + (2 * y)) ** -1) * (14 + (8 * (y ** 2)) + (12 * x * (y ** 2)) + (21 * x)))")
+
 
 		describe "representing powers", ->
 
@@ -150,9 +165,30 @@ define ["operators", "parse"], (operators, parse) ->
 				expect(pow.simplify().toString()).toBe("x")
 				pow = parse.stringToExpression("(x ** 2) ** y")
 				expect(pow.simplify().toString()).toBe("(x ** (2 * y))")
+				pow = parse.stringToExpression("(1 ** 2)")
+				expect(pow.simplify().toString()).toBe("1")
+				pow = parse.stringToExpression("(1 ** x)")
+				expect(pow.simplify().toString()).toBe("1")
+				pow = parse.stringToExpression("(0 ** 0)")
+				expect(pow.simplify().toString()).toBe("1")
+
+			it "can be solved", ->
+				pow = parse.stringToExpression("x ** 2")
+				expect(pow.solve("x")[0].evaluate()).toEqual(0)
+				expect(pow.solve("x").length).toEqual(1)
+
+			describe "throw sensible errors when", ->
+
+				it "trying to solve for a non-existant variable", ->
+					pow = parse.stringToExpression("x ** 2")
+					expect(-> pow.solve("y")).toThrow(new operators.AlgebraError("Unsolvable: (x ** 2) for y"))
+
+				it "trying to solve for a variable in the exponent", ->
+					pow = parse.stringToExpression("x ** y")
+					expect(-> pow.solve("y")).toThrow(new operators.AlgebraError("Unsolvable: (x ** y) for y"))
+
 
 		it "can be formed into a tree", ->
-
 			# (+ 1 (* 2 3))
 			expect((new operators.Add(1, new operators.Mul(2, 3))).toString()).toBe("(1 + (2 * 3))")
 			# (* m (** c 2))

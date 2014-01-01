@@ -2,6 +2,10 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 
 	# Defines operator nodes of the expression tree.	
 
+	class AlgebraError extends Error
+		constructor: (expr, variable) ->
+			super("Unsolvable: #{expr} for #{variable}")
+
 	prettyPrint = (array) ->
 		out = []
 		for i in array
@@ -502,6 +506,28 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 		expandAndSimplify: ->
 			@expand().simplify()
 
+		solve: (variable) ->
+			expr = @expandAndSimplify()
+
+			# If one of the children is either
+			# - v
+			# - (v ** p)
+			# then return 0 or solve the latter, respectively.
+			# Else unsolvable.
+
+			for child in expr.children
+				if child instanceof terminals.Variable and child.label == variable
+					return [new terminals.Constant("0")]
+				else if child instanceof Pow
+					try
+						return child.solve(variable)
+					catch error
+						if error instanceof AlgebraError
+							continue
+						else
+							throw error
+			throw new AlgebraError(expr.toString(), variable)
+
 	class Pow extends nodes.BinaryNode
 		# Represent powers.
 		constructor: (base, power, args...) ->
@@ -619,10 +645,11 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 
 			if right.evaluate?() == 1
 				return left
+			else if left.evaluate?() == 1
+				return left
 			else if right.evaluate?() == 0
 				return new terminals.Constant("1")
 			else
-				console.log(left, right)
 				if right instanceof terminals.Constant and left instanceof terminals.Constant
 					return new terminals.Constant(Math.pow(left.evaluate(), right.evaluate()))
 				else if left instanceof Pow
@@ -636,6 +663,39 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 		expandAndSimplify: ->
 			@expand().simplify()
 
+		solve: (variable) ->
+			# variable: The label of the variable to solve for. Return an array of solutions.
+
+			expr = @expandAndSimplify()
+
+			if expr.children.left instanceof terminals.Variable
+				return [new terminals.Constant("0")] if expr.children.left.label == variable # 0 = v; v = 0
+				throw new AlgebraError(expr.toString(), variable)
+			else if expr.children.left instanceof terminals.Terminal
+				throw new AlgebraError(expr.toString(), variable)
+			else
+				try
+					solutions = expr.children.left.solve(variable) # Root the 0 on the other side of the equation.
+				catch error
+					throw error # Acknowledging that this solving could fail and we do want it to.
+
+				# This will lose some solutions, if we have something like x ** x, but we can't solve
+				# a ** x anyway with this program, so losing a solution to x ** x doesn't bother me.
+				if expr.children.right.evaluate? and expr.children.right.evaluate() % 2 == 0
+					returnables = []
+					for solution in solutions
+						negative = (new Mul(-1, solution)).simplify()
+						if negative.equals?
+							unless negative.equals(solution)
+								returnables.push(negative)
+							returnables.push(solution)
+						else
+							unless negative == solution
+								returnables.push(negative)
+							returnables.push(solution)
+					return returnables
+				else
+					return solutions
 
 	compare = (a, b) ->
 		# Compare two values to get an order.
@@ -669,5 +729,7 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 		Pow: Pow
 
 		compare: compare
+
+		AlgebraError: AlgebraError
 
 	}
