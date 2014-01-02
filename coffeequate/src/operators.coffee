@@ -223,7 +223,10 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 			return newAdd.children[0]
 
 		expandAndSimplify: ->
-			@expand().simplify()
+			expr = @expand()
+			if expr.simplify?
+				return expr.simplify()
+			return expr
 
 		solve: (variable) ->
 			expr = @expandAndSimplify()
@@ -234,6 +237,15 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 
 			termsContainingVariable = []
 			termsNotContainingVariable = []
+
+			if expr instanceof terminals.Terminal
+				if expr instanceof terminals.Variable and expr.label == variable
+					return [new terminals.Constant("0")]
+				else
+					throw new AlgebraError(expr.toString(), variable)
+
+			unless expr instanceof Add
+				return expr.solve(variable)
 
 			for term in expr.children
 				if term.copy?
@@ -266,6 +278,9 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 				else
 					termsNotContainingVariable.push(term)
 
+			if termsContainingVariable.length == 0
+				throw new AlgebraError(expr.toString(), variable)
+
 			# The rest of the terms need to be manipulated to solve the equation.
 			# (a * v) + (b * v) -> ((a + b) * v)
 			# (a * v) + (b * v) + (c * (v ** 2)) -> ((a + b) * v) + (c * (v ** 2))
@@ -291,7 +306,7 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 					subterms = [] # Non-variable terms.
 					quadratic = false
 					for subterm in term.children
-						if term instanceof terminals.Variable and term.label == variable then # pass
+						if subterm instanceof terminals.Variable and subterm.label == variable then # pass
 						else if term instanceof Pow
 							unless term.children.right instanceof terminals.Constant
 								throw new AlgebraError(expr.toString(), variable)
@@ -314,7 +329,7 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 			negatedTerms = []
 			# Terms not containing the variable need to be negated. They will form part of the returned result.
 			for term in termsNotContainingVariable
-				newMul = new Mul("-1", term)
+				newMul = new Mul("-1", (if term.copy? then term.copy() else term))
 				newMul = newMul.simplify()
 				negatedTerms.push(newMul)
 
@@ -366,13 +381,43 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 				# ((factorisedSquaresEquatable) * (v ** 2)) + (factorisedEquatable * v) + (nonNegatedTerms) = 0
 				nonNegatedTermsEquatable = new Add(termsNotContainingVariable...) unless termsNotContainingVariable.length == 0
 				if nonNegatedTermsEquatable?
-
+					# a = fSE
+					# b = fE
+					# c = nonNegatedTermsEquatable
+					# d = ((b ** 2) + (-4 * a * c))
+					# rd = (d ** 1/2)
+					# v = ((-1 * b) + rd) * ((2 * a) ** -1)
+					# v = (-1 * (b + rd)) * ((2 * a) ** -1)
+					a = factorisedSquaresEquatable
+					b = factorisedEquatable
+					c = nonNegatedTermsEquatable
+					d = new Add(
+							new Pow(b, "2"),
+							new Mul("-4", a, c)
+						)
+					rd = new Pow(d, "1/2")
+					v1 = new Mul(
+							new Add(
+								new Mul("-1", b),
+								rd),
+							new Pow(
+								new Mul("2", a),
+								"-1")
+						)
+					v2 = new Mul("-1", new Add(b, rd), new Pow(new Mul("2", a), "-1"))
+					v1 = v1.expandAndSimplify()
+					v2 = v2.expandAndSimplify()
+					if v1.equals? and v1.equals(v2)
+						return [v1]
+					return [v1, v2]
 				else
 					# (((fSE * v) + fE) * v) = 0
 					# v = 0
-					# v = (-1 * (fE * (fSE ** -1)))
+					# v = (-1 * fE * (fSE ** -1)))
 					newPow = new Pow(factorisedSquaresEquatable, "-1")
-
+					newMul = new Mul("-1", factorisedEquatable, newPow)
+					newMul = newMul.simplify()
+					return [0, newMul]
 
 	class Mul extends nodes.RoseNode
 		# Represent multiplication.
@@ -653,7 +698,10 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 			@children.sort(compare)
 
 		expandAndSimplify: ->
-			@expand().simplify()
+			expr = @expand()
+			if expr.simplify?
+				return expr.simplify()
+			return expr
 
 		solve: (variable) ->
 			expr = @expandAndSimplify()
@@ -663,6 +711,15 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 			# - (v ** p)
 			# then return 0 or solve the latter, respectively.
 			# Else unsolvable.
+
+			if expr instanceof terminals.Terminal
+				if expr instanceof terminals.Variable and expr.label == variable
+					return [new terminals.Constant("0")]
+				else
+					throw new AlgebraError(expr.toString(), variable)
+
+			unless expr instanceof Mul
+				return expr.solve(variable)
 
 			for child in expr.children
 				if child instanceof terminals.Variable and child.label == variable
@@ -760,7 +817,7 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 				else if left instanceof Add
 					# Convert this into a multiplication of addition nodes, if the power is an integer.
 					# Otherwise, leave it.
-					if right instanceof terminals.Constant and right.evaluate() % 1 == 0
+					if right instanceof terminals.Constant and right.evaluate() % 1 == 0 and right.evaluate() > 0
 						# Expand!
 						children = []
 						for i in [1..right.evaluate()]
@@ -810,41 +867,53 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 					return new Pow(left, right)
 
 		expandAndSimplify: ->
-			@expand().simplify()
+			expr = @expand()
+			if expr.simplify?
+				return expr.simplify()
+			return expr
 
 		solve: (variable) ->
 			# variable: The label of the variable to solve for. Return an array of solutions.
 
 			expr = @expandAndSimplify()
 
-			if expr.children.left instanceof terminals.Variable
-				return [new terminals.Constant("0")] if expr.children.left.label == variable # 0 = v; v = 0
-				throw new AlgebraError(expr.toString(), variable)
-			else if expr.children.left instanceof terminals.Terminal
-				throw new AlgebraError(expr.toString(), variable)
-			else
-				try
-					solutions = expr.children.left.solve(variable) # Root the 0 on the other side of the equation.
-				catch error
-					throw error # Acknowledging that this solving could fail and we do want it to.
-
-				# This will lose some solutions, if we have something like x ** x, but we can't solve
-				# a ** x anyway with this program, so losing a solution to x ** x doesn't bother me.
-				if expr.children.right.evaluate? and expr.children.right.evaluate() % 2 == 0
-					returnables = []
-					for solution in solutions
-						negative = (new Mul(-1, solution)).simplify()
-						if negative.equals?
-							unless negative.equals(solution)
-								returnables.push(negative)
-							returnables.push(solution)
-						else
-							unless negative == solution
-								returnables.push(negative)
-							returnables.push(solution)
-					return returnables
+			if expr instanceof terminals.Terminal
+				if expr instanceof terminals.Variable and expr.label == variable
+					return [new terminals.Constant("0")]
 				else
-					return solutions
+					throw new AlgebraError(expr.toString(), variable)
+
+			if expr instanceof Pow
+				if expr.children.left instanceof terminals.Variable
+					return [new terminals.Constant("0")] if expr.children.left.label == variable # 0 = v; v = 0
+					throw new AlgebraError(expr.toString(), variable)
+				else if expr.children.left instanceof terminals.Terminal
+					throw new AlgebraError(expr.toString(), variable)
+				else
+					try
+						solutions = expr.children.left.solve(variable) # Root the 0 on the other side of the equation.
+					catch error
+						throw error # Acknowledging that this solving could fail and we do want it to.
+
+					# This will lose some solutions, if we have something like x ** x, but we can't solve
+					# a ** x anyway with this program, so losing a solution to x ** x doesn't bother me.
+					if expr.children.right.evaluate? and expr.children.right.evaluate() % 2 == 0
+						returnables = []
+						for solution in solutions
+							negative = (new Mul(-1, solution)).simplify()
+							if negative.equals?
+								unless negative.equals(solution)
+									returnables.push(negative)
+								returnables.push(solution)
+							else
+								unless negative == solution
+									returnables.push(negative)
+								returnables.push(solution)
+						return returnables
+					else
+						return solutions
+			else
+				return expr.solve(variable)
 
 	compare = (a, b) ->
 		# Compare two values to get an order.

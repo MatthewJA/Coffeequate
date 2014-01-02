@@ -48,6 +48,35 @@ define ["operators", "parse"], (operators, parse) ->
 				add = parse.stringToExpression("(-1 + 1**1)")
 				expect(add.simplify().toString()).toBe("0")
 
+			it "can be solved", ->
+				add = new operators.Add("x") # 0 = x
+				expect(add.solve("x")[0].evaluate()).toEqual(0)
+				add = parse.stringToExpression("x + -1") # 1 = x
+				expect(add.solve("x")[0].evaluate()).toEqual(1)
+				add = parse.stringToExpression("x + -y") # y = x
+				expect(add.solve("x")[0].toString()).toEqual("y")
+				add = parse.stringToExpression("x + y + 2") # y = x
+				expect(add.solve("x")[0].toString()).toEqual("(-2 + (-1 * y))")
+
+				# Works so far. Let's try some multiplication.
+				add = parse.stringToExpression("2 * x + -y") # x = y/2
+				expect(add.solve("x")[0].toString()).toEqual("(0.5 * y)")
+
+				# Quadratics?
+				add = parse.stringToExpression("-4 + x ** 2") # Simple quadratic.
+				expect(add.solve("x")[0].toString()).toEqual("2")
+				expect(add.solve("x")[1].toString()).toEqual("-2")
+				add = parse.stringToExpression("-4 * x + x ** 2") # Slightly more complex quadratic.
+				expect(add.solve("x")[0].toString()).toEqual("0")
+				expect(add.solve("x")[1].toString()).toEqual("4")
+				add = parse.stringToExpression("(x + 3)**2")
+				expect(add.solve("x")[0].toString()).toEqual("-3")
+				expect(add.solve("x").length).toEqual(1)
+				add = parse.stringToExpression("(x + 3) * (x + -2)")
+
+				expect(add.solve("x")[0].toString()).toEqual("2")
+				expect(add.solve("x")[1].toString()).toEqual("-3")
+
 		describe "representing multiplication", ->
 
 			it "represent multiplication", ->
@@ -108,6 +137,8 @@ define ["operators", "parse"], (operators, parse) ->
 				mul = parse.stringToExpression("x * y * (z ** 2)")
 				expect(mul.solve("z")[0].evaluate()).toEqual(0)
 				expect(mul.solve("z").length).toEqual(1)
+				mul = new operators.Mul("x") # 0 = x
+				expect(mul.solve("x")[0].evaluate()).toEqual(0)
 
 			describe "throw sensible errors when", ->
 
@@ -171,6 +202,8 @@ define ["operators", "parse"], (operators, parse) ->
 				expect(pow.simplify().toString()).toBe("1")
 				pow = parse.stringToExpression("(0 ** 0)")
 				expect(pow.simplify().toString()).toBe("1")
+				pow = new operators.Pow(new operators.Add("2", "0"), "-1")
+				expect(pow.expandAndSimplify().toString()).toBe("0.5")
 
 			it "can be solved", ->
 				pow = parse.stringToExpression("x ** 2")
