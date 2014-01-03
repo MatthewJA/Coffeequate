@@ -73,9 +73,12 @@ define ["operators", "parse"], (operators, parse) ->
 				expect(add.solve("x")[0].toString()).toEqual("-3")
 				expect(add.solve("x").length).toEqual(1)
 				add = parse.stringToExpression("(x + 3) * (x + -2)")
-
 				expect(add.solve("x")[0].toString()).toEqual("2")
 				expect(add.solve("x")[1].toString()).toEqual("-3")
+
+				# Projectile motion for t?
+				add = parse.stringToExpression("u * t + a * t ** 2 * 0.5 + -s")
+				console.log(add.solve("t").toString())
 
 		describe "representing multiplication", ->
 
