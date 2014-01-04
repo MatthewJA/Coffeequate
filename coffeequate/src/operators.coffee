@@ -307,10 +307,11 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 					quadratic = false
 					for subterm in term.children
 						if subterm instanceof terminals.Variable and subterm.label == variable then # pass
-						else if term instanceof Pow
-							unless term.children.right instanceof terminals.Constant
+						else if subterm instanceof Pow
+							console.log("found pow #{subterm}")
+							unless subterm.children.right instanceof terminals.Constant
 								throw new AlgebraError(expr.toString(), variable)
-							power = term.children.right.evaluate()
+							power = subterm.children.right.evaluate()
 							if power == 1 then # pass
 							else if power == 2
 								quadratic = true # We operate on the assumption that there's only one term with our target variable in it here.

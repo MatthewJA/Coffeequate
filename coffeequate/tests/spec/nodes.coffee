@@ -77,8 +77,10 @@ define ["operators", "parse"], (operators, parse) ->
 				expect(add.solve("x")[1].toString()).toEqual("-3")
 
 				# Projectile motion for t?
+				console.log("beginning")
 				add = parse.stringToExpression("u * t + a * t ** 2 * 0.5 + -s")
-				console.log(add.solve("t").toString())
+				expect(add.solve("t").toString()).toEqual(
+					"((a ** -1) * ((((u ** 2) + (2 * a * s)) ** 1/2) + (-1 * u))),((a ** -1) * ((-1 * u) + (-1 * (((u ** 2) + (2 * a * s)) ** 1/2))))")
 
 		describe "representing multiplication", ->
 
