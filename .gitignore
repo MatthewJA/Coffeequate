@@ -1,5 +1,6 @@
 ### Compiled Source ###
 *.js
+!coffeequate/src/build.js
 
 ### Editor Specific ###
 *.sublime-workspace
