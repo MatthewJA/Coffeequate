@@ -432,6 +432,18 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 
 			return html + "<mrow>" + @children.map((child) -> child.toMathML()).join("<mo>+</mo>") + "</mrow>" + closingHTML
 
+		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
+			# Return an HTML string representing this node.
+			[mathClass, mathID, html] = generateInfo.getHTMLInfo(equationID, expression, equality)
+
+			unless topLevel
+				html = ""
+				closingHTML = ""
+			else
+				closingHTML = "</div>"
+
+			return html + @children.map((child) -> child.toHTML()).join("+") + closingHTML
+
 	class Mul extends nodes.RoseNode
 		# Represent multiplication.
 		constructor: (args...) ->
@@ -759,6 +771,18 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 
 			return html + "<mrow>" + @children.map((child) -> child.toMathML()).join("<mo>&cdot;</mo>") + "</mrow>" + closingHTML
 
+		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
+			# Return an HTML string representing this node.
+			[mathClass, mathID, html] = generateInfo.getHTMLInfo(equationID, expression, equality)
+
+			unless topLevel
+				html = ""
+				closingHTML = ""
+			else
+				closingHTML = "</div>"
+
+			return html + @children.map((child) -> child.toHTML()).join("&cdot;") + closingHTML
+
 	class Pow extends nodes.BinaryNode
 		# Represent powers.
 		constructor: (base, power, args...) ->
@@ -958,7 +982,32 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else if @children.right.evaluate?() == 0
 				return html + "<mn>1</mn>" + closingHTML
 			else
-				return html + "<msup>#{@children.left.toMathML()}#{@children.right.toMathML()}</msup>" + closingHTML
+				innerHTML = "#{@children.left.toMathML()}#{@children.right.toMathML()}"
+				innerHTML = "<msup>#{innerHTML}</msup>"
+				if @children.right.evaluate?() < 0
+					right = @children.right.copy()
+					right = Mul("-1", right)
+					right = right.simplify()
+					innerHTML = "<mfrac><mn>1</mn>#{innerHTML}</mfrac>"
+				return html + innerHTML + closingHTML
+
+		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
+			# Return an HTML string representing this node.
+			[mathClass, mathID, html] = generateInfo.getHTMLInfo(equationID, expression, equality)
+
+			unless topLevel
+				html = ""
+				closingHTML = ""
+			else
+				closingHTML = "</div>"
+
+			if @children.right.evaluate?() == 1
+				return html + @children.left.toHTML() + closingHTML
+			else if @children.right.evaluate?() == 0
+				return html + "1" + closingHTML
+			else
+				innerHTML = "(#{@children.left.toHTML()}) ** (#{@children.right.toHTML()})"
+				return html + innerHTML + closingHTML
 
 	compare = (a, b) ->
 		# Compare two values to get an order.

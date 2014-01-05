@@ -81,10 +81,6 @@ define ["operators", "parse"], (operators, parse) ->
 				expect(add.solve("t").toString()).toEqual(
 					"((a ** -1) * ((((u ** 2) + (2 * a * s)) ** 1/2) + (-1 * u))),((a ** -1) * ((-1 * u) + (-1 * (((u ** 2) + (2 * a * s)) ** 1/2))))")
 
-			it "output as MathML", ->
-				add = parse.stringToExpression("1/2 * m * v ** 2")
-				console.log add.toMathML(null, false, "Ek", true)
-
 		describe "representing multiplication", ->
 
 			it "represent multiplication", ->
