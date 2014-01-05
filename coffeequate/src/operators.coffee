@@ -420,6 +420,22 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					newMul = newMul.simplify()
 					return [0, newMul]
 
+		getAllVariables: ->
+			variables = {}
+			for child in @children
+				if child instanceof terminals.Variable
+					variables[child.label] = true
+				else if child.getAllVariables?
+					childVariables = child.getAllVariables()
+					for variable in childVariables
+						variables[variable] = true
+
+			outVariables = []
+			for variable of variables
+				outVariables.push(variable)
+
+			return outVariables
+
 		sub: (substitutions) ->
 			# subtitutions: {variable: value}
 			# variable is a label, value is any object - if it is a node,
@@ -787,6 +803,22 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 							throw error
 			throw new AlgebraError(expr.toString(), variable)
 
+		getAllVariables: ->
+			variables = {}
+			for child in @children
+				if child instanceof terminals.Variable
+					variables[child.label] = true
+				else if child.getAllVariables?
+					childVariables = child.getAllVariables()
+					for variable in childVariables
+						variables[variable] = true
+
+			outVariables = []
+			for variable of variables
+				outVariables.push(variable)
+
+			return outVariables
+
 		sub: (substitutions) ->
 			# subtitutions: {variable: value}
 			# variable is a label, value is any object - if it is a node,
@@ -1049,6 +1081,28 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			newPow = new Pow(left, right)
 			newPow = newPow.expandAndSimplify()
 			return newPow
+
+		getAllVariables: ->
+			variables = {}
+
+			if @children.left instanceof terminals.Variable
+				variables[@children.left.label] = true
+			else if @children.left.getAllVariables?
+				leftVariables = @children.left.getAllVariables()
+				for variable in leftVariables
+					variables[variable] = true
+			if @children.right instanceof terminals.Variable
+				variables[@children.right.label] = true
+			else if @children.right.getAllVariables?
+				rightVariables = @children.right.getAllVariables()
+				for variable in rightVariables
+					variables[variable] = true
+
+			outVariables = []
+			for variable of variables
+				outVariables.push(variable)
+
+			return outVariables
 
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return a MathML string representing this node.

@@ -97,6 +97,14 @@ define ["operators", "parse"], (operators, parse) ->
 				)
 				expect(add.evaluate()).toEqual(610)
 
+			it "can return an array of all contained variables", ->
+				pow = parse.stringToExpression("(a + b) + c")
+				vars = pow.getAllVariables()
+				console.log(vars)
+				expect("a" in vars).toBe(true)
+				expect("b" in vars).toBe(true)
+				expect("c" in vars).toBe(true)
+
 		describe "representing multiplication", ->
 
 			it "represent multiplication", ->
@@ -181,6 +189,14 @@ define ["operators", "parse"], (operators, parse) ->
 					c: 30
 				)
 				expect(mul.evaluate()).toEqual(900)
+
+			it "can return an array of all contained variables", ->
+				pow = parse.stringToExpression("(a * b) * c")
+				vars = pow.getAllVariables()
+				console.log(vars)
+				expect("a" in vars).toBe(true)
+				expect("b" in vars).toBe(true)
+				expect("c" in vars).toBe(true)
 
 		it "expand and simplify into reasonably-canonical forms", ->
 			add = parse.stringToExpression("(a * b)*(2*x + 1)")
@@ -270,6 +286,14 @@ define ["operators", "parse"], (operators, parse) ->
 					c: 3
 				)
 				expect(pow.evaluate()).toEqual(27000)
+
+			it "can return an array of all contained variables", ->
+				pow = parse.stringToExpression("(a + b)**c")
+				vars = pow.getAllVariables()
+				console.log(vars)
+				expect("a" in vars).toBe(true)
+				expect("b" in vars).toBe(true)
+				expect("c" in vars).toBe(true)
 
 
 		it "can be formed into a tree", ->
