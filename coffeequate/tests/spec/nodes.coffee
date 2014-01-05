@@ -81,6 +81,22 @@ define ["operators", "parse"], (operators, parse) ->
 				expect(add.solve("t").toString()).toEqual(
 					"((a ** -1) * ((((u ** 2) + (2 * a * s)) ** 1/2) + (-1 * u))),((a ** -1) * ((-1 * u) + (-1 * (((u ** 2) + (2 * a * s)) ** 1/2))))")
 
+			it "substitute values", ->
+				add = parse.stringToExpression("a + b + c")
+				add = add.sub(
+					a: 10,
+					b: 20,
+					c: 30
+				)
+				expect(add.evaluate()).toEqual(60)
+				add = parse.stringToExpression("a + b * c")
+				add = add.sub(
+					a: 10,
+					b: 20,
+					c: 30
+				)
+				expect(add.evaluate()).toEqual(610)
+
 		describe "representing multiplication", ->
 
 			it "represent multiplication", ->
@@ -149,6 +165,22 @@ define ["operators", "parse"], (operators, parse) ->
 				it "trying to solve for a non-existant variable", ->
 					pow = parse.stringToExpression("x * z")
 					expect(-> pow.solve("y")).toThrow(new operators.AlgebraError("Unsolvable: (x * z) for y"))
+
+			it "substitute values", ->
+				mul = parse.stringToExpression("a * b * c")
+				mul = mul.sub(
+					a: 10,
+					b: 20,
+					c: 30
+				)
+				expect(mul.evaluate()).toEqual(6000)
+				mul = parse.stringToExpression("(a + b) * c")
+				mul = mul.sub(
+					a: 10,
+					b: 20,
+					c: 30
+				)
+				expect(mul.evaluate()).toEqual(900)
 
 		it "expand and simplify into reasonably-canonical forms", ->
 			add = parse.stringToExpression("(a * b)*(2*x + 1)")
@@ -222,6 +254,22 @@ define ["operators", "parse"], (operators, parse) ->
 				it "trying to solve for a variable in the exponent", ->
 					pow = parse.stringToExpression("x ** y")
 					expect(-> pow.solve("y")).toThrow(new operators.AlgebraError("Unsolvable: (x ** y) for y"))
+
+			it "substitute values", ->
+				pow = parse.stringToExpression("a ** b ** c")
+				pow = pow.sub(
+					a: 2,
+					b: 3,
+					c: 1
+				)
+				expect(pow.evaluate()).toEqual(8)
+				pow = parse.stringToExpression("(a + b) ** c")
+				pow = pow.sub(
+					a: 10,
+					b: 20,
+					c: 3
+				)
+				expect(pow.evaluate()).toEqual(27000)
 
 
 		it "can be formed into a tree", ->

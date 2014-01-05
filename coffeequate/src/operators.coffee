@@ -420,6 +420,30 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					newMul = newMul.simplify()
 					return [0, newMul]
 
+		sub: (substitutions) ->
+			# subtitutions: {variable: value}
+			# variable is a label, value is any object - if it is a node,
+			# it will be substituted in; otherwise it is interpreted as a
+			# constant (and any exceptions that might cause will be thrown).
+
+			# Interpret substitutions.
+			for variable of substitutions
+				unless substitutions[variable] instanceof terminals.Terminal or substitutions[variable] instanceof nodes.BasicNode
+					substitutions[variable] = new terminals.Constant(substitutions[variable])
+
+			children = []
+			for child in @children
+				if child instanceof terminals.Variable and child.label of substitutions
+					children.push(substitutions[child.label].copy())
+				else if child.sub?
+					children.push(child.sub(substitutions))
+				else
+					children.push(child.copy())
+
+			newAdd = new Add(children...)
+			newAdd = newAdd.expandAndSimplify()
+			return newAdd
+
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return a MathML string representing this node.
 			[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
@@ -763,6 +787,30 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 							throw error
 			throw new AlgebraError(expr.toString(), variable)
 
+		sub: (substitutions) ->
+			# subtitutions: {variable: value}
+			# variable is a label, value is any object - if it is a node,
+			# it will be substituted in; otherwise it is interpreted as a
+			# constant (and any exceptions that might cause will be thrown).
+
+			# Interpret substitutions.
+			for variable of substitutions
+				unless substitutions[variable] instanceof terminals.Terminal or substitutions[variable] instanceof nodes.BasicNode
+					substitutions[variable] = new terminals.Constant(substitutions[variable])
+
+			children = []
+			for child in @children
+				if child instanceof terminals.Variable and child.label of substitutions
+					children.push(substitutions[child.label].copy())
+				else if child.sub?
+					children.push(child.sub(substitutions))
+				else
+					children.push(child.copy())
+
+			newMul = new Mul(children...)
+			newMul = newMul.expandAndSimplify()
+			return newMul
+
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return a MathML string representing this node.
 			[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
@@ -971,6 +1019,36 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 						return solutions
 			else
 				return expr.solve(variable)
+
+		sub: (substitutions) ->
+			# subtitutions: {variable: value}
+			# variable is a label, value is any object - if it is a node,
+			# it will be substituted in; otherwise it is interpreted as a
+			# constant (and any exceptions that might cause will be thrown).
+
+			# Interpret substitutions.
+			for variable of substitutions
+				unless substitutions[variable] instanceof terminals.Terminal or substitutions[variable] instanceof nodes.BasicNode
+					substitutions[variable] = new terminals.Constant(substitutions[variable])
+
+			left = null
+			right = null
+			if @children.left instanceof terminals.Variable and @children.left.label of substitutions
+				left = substitutions[@children.left.label].copy()
+			else if @children.left.sub?
+				left = @children.left.sub(substitutions)
+			else
+				left = @children.left.copy()
+			if @children.right instanceof terminals.Variable and @children.right.label of substitutions
+				right = substitutions[@children.right.label].copy()
+			else if @children.right.sub?
+				right = @children.right.sub(substitutions)
+			else
+				right = @children.right.copy()
+
+			newPow = new Pow(left, right)
+			newPow = newPow.expandAndSimplify()
+			return newPow
 
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return a MathML string representing this node.
