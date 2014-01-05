@@ -1,4 +1,4 @@
-define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
+define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals, generateInfo) ->
 
 	# Defines operator nodes of the expression tree.	
 
@@ -420,6 +420,18 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 					newMul = newMul.simplify()
 					return [0, newMul]
 
+		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
+			# Return a MathML string representing this node.
+			[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
+
+			unless topLevel
+				html = ""
+				closingHTML = ""
+			else
+				closingHTML = "</math></div>"
+
+			return html + "<mrow>" + @children.map((child) -> child.toMathML()).join("<mo>+</mo>") + "</mrow>" + closingHTML
+
 	class Mul extends nodes.RoseNode
 		# Represent multiplication.
 		constructor: (args...) ->
@@ -735,6 +747,18 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 							throw error
 			throw new AlgebraError(expr.toString(), variable)
 
+		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
+			# Return a MathML string representing this node.
+			[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
+
+			unless topLevel
+				html = ""
+				closingHTML = ""
+			else
+				closingHTML = "</math></div>"
+
+			return html + "<mrow>" + @children.map((child) -> child.toMathML()).join("<mo>&cdot;</mo>") + "</mrow>" + closingHTML
+
 	class Pow extends nodes.BinaryNode
 		# Represent powers.
 		constructor: (base, power, args...) ->
@@ -915,6 +939,26 @@ define ["nodes", "parse", "terminals"], (nodes, parse, terminals) ->
 						return solutions
 			else
 				return expr.solve(variable)
+
+		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
+			# Return a MathML string representing this node.
+			# This code was partially lifted from the (delightfully uncommented) predecessor
+			# to Coffeequate, MatthewJA/JS-Algebra.
+			# There's a few peculiarities, but for the most part it seems to work.
+			[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
+
+			unless topLevel
+				html = ""
+				closingHTML = ""
+			else
+				closingHTML = "</math></div>"
+
+			if @children.right.evaluate?() == 1
+				return html + @children.left.toMathML() + closingHTML
+			else if @children.right.evaluate?() == 0
+				return html + "<mn>1</mn>" + closingHTML
+			else
+				return html + "<msup>#{@children.left.toMathML()}#{@children.right.toMathML()}</msup>" + closingHTML
 
 	compare = (a, b) ->
 		# Compare two values to get an order.

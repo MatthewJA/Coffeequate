@@ -1,4 +1,4 @@
-define ["parse"], (parse) ->
+define ["parse", "generateInfo"], (parse, generateInfo) ->
 
 	# Terminals for the equation tree.
 
@@ -54,8 +54,15 @@ define ["parse"], (parse) ->
 				return false
 			return @evaluate() == b.evaluate()
 
-		toMathML: ->
+		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return this constant as a MathML string.
+			if topLevel
+				[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression)
+				closingHTML = "</math></div>"
+			else
+				html = ""
+				closingHTML = ""
+
 			if @denominator == 1
 				return "<mn>#{@numerator}</mn>"
 			return "<mfrac><mrow><mn>#{@numerator}</mn></mrow><mrow><mn>#{@denominator}</mn></mrow</mfrac>"
@@ -105,8 +112,15 @@ define ["parse"], (parse) ->
 		toHTML: ->
 			@toString()
 
-		toMathML: ->
-			"<mn>#{@label}</mn>"
+		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
+			if topLevel
+				[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression)
+				closingHTML = "</math></div>"
+			else
+				html = ""
+				closingHTML = ""
+
+			"#{html}<mn>#{@label}</mn>#{closingHTML}"
 
 		toLaTeX: ->
 			@toString()
@@ -134,16 +148,23 @@ define ["parse"], (parse) ->
 				return false
 			return b.label == @label
 
-		toMathML: ->
+		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return the variable as a MathML string.
+			if topLevel
+				[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression)
+				closingHTML = "</math></div>"
+			else
+				html = ""
+				closingHTML = ""
+
 			# Strip the ID off of the variable, if it has one.
 			labelArray = @label.split("-")
 			label = labelArray[0]
 			labelID = if labelArray[1]? then 'id="variable-' + @label + '"' else ""
 			if label.length > 1
-				return '<msub class="variable"' + labelID + '><mi>' + label[0] + '</mi><mi>' + label[1..] + "</mi></msub>"
+				return html + '<msub class="variable"' + labelID + '><mi>' + label[0] + '</mi><mi>' + label[1..] + "</mi></msub>" + closingHTML
 			else
-				return '<mi class="variable"' + labelID + '>' + label + '</mi>'
+				return html + '<mi class="variable"' + labelID + '>' + label + '</mi>' + closingHTML
 
 		toHTML: ->
 			# Return an HTML string representing the variable.
