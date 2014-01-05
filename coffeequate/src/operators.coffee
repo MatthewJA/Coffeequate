@@ -465,6 +465,16 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			newAdd = newAdd.expandAndSimplify()
 			return newAdd
 
+		substituteExpression: (sourceExpression, variable, equivalencies=null) ->
+			children = []
+			for child in @children
+				if child instanceof terminals.Variable and child.label == variable
+					children.push(sourceExpression.copy())
+				else if child.substituteExpression?
+					children.push(substituteExpression(sourcex, variable, equivalencies))
+				else
+					children.push(child.copy())
+
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return a MathML string representing this node.
 			[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
@@ -853,6 +863,16 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			newMul = newMul.expandAndSimplify()
 			return newMul
 
+		substituteExpression: (sourceExpression, variable, equivalencies=null) ->
+			children = []
+			for child in @children
+				if child instanceof terminals.Variable and child.label == variable
+					children.push(sourceExpression.copy())
+				else if child.substituteExpression?
+					children.push(substituteExpression(sourcex, variable, equivalencies))
+				else
+					children.push(child.copy())
+
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return a MathML string representing this node.
 			[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
@@ -1120,6 +1140,25 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 				@children.left.label = replacements[@children.left.label]
 			if @children.right instanceof terminals.Variable and @children.right.label of replacements
 				@children.right.label = replacements[@children.right.label]
+
+		substituteExpression: (sourceExpression, variable, equivalencies=null) ->
+			# variable = sourceExpression
+			left = @children.left.copy()
+			right = @children.right.copy()
+			
+			if @children.left instanceof terminals.Variable and @children.left.label == variable
+				left = sourceExpression.copy()
+			else if not (@children.left instanceof terminals.Terminal)
+				left = @children.left.substituteExpression(sourceExpression, variable, equivalencies)
+
+			if @children.right instanceof terminals.Variable and @children.right.label == variable
+				right = sourceExpression.copy()
+			else if not (@children.right instanceof terminals.Terminal)
+				right = @children.right.substituteExpression(sourceExpression, variable, equivalencies)
+
+			newPow = new Pow(left, right)
+			newPow = newPow.expandAndSimplify()
+			return newPow
 
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return a MathML string representing this node.
