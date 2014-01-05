@@ -436,6 +436,11 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 
 			return outVariables
 
+		replaceVariables: (replacements) ->
+			for child, index in @children
+				if child instanceof terminals.Variable and child.label of replacements
+					@children[index] = replacements[child.label]
+
 		sub: (substitutions) ->
 			# subtitutions: {variable: value}
 			# variable is a label, value is any object - if it is a node,
@@ -819,6 +824,11 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 
 			return outVariables
 
+		replaceVariables: (replacements) ->
+			for child, index in @children
+				if child instanceof terminals.Variable and child.label of replacements
+					@children[index] = replacements[child.label]
+
 		sub: (substitutions) ->
 			# subtitutions: {variable: value}
 			# variable is a label, value is any object - if it is a node,
@@ -1103,6 +1113,13 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 				outVariables.push(variable)
 
 			return outVariables
+
+		replaceVariables: (replacements) ->
+			# {variableLabel: replacementLabel}
+			if @children.left instanceof terminals.Variable and @children.left.label of replacements
+				@children.left.label = replacements[@children.left.label]
+			if @children.right instanceof terminals.Variable and @children.right.label of replacements
+				@children.right.label = replacements[@children.right.label]
 
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return a MathML string representing this node.
