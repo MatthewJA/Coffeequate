@@ -430,7 +430,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else
 				closingHTML = "</math></div>"
 
-			return html + "<mrow>" + @children.map((child) -> child.toMathML()).join("<mo>+</mo>") + "</mrow>" + closingHTML
+			return html + "<mrow>" + @children.map((child) -> "<mfenced>" + child.toMathML() + "<mfenced>").join("<mo>+</mo>") + "</mrow>" + closingHTML
 
 		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return an HTML string representing this node.
@@ -442,7 +442,11 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else
 				closingHTML = "</div>"
 
-			return html + @children.map((child) -> child.toHTML()).join("+") + closingHTML
+			return html + @children.map((child) -> "(" + child.toHTML() + ")").join("+") + closingHTML
+
+		toLaTeX: ->
+			# Return a LaTeX string representing this node.
+			return @children.map((child) -> "\\left(" + child.toLaTeX() + "\\right)").join("+")
 
 	class Mul extends nodes.RoseNode
 		# Represent multiplication.
@@ -769,7 +773,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else
 				closingHTML = "</math></div>"
 
-			return html + "<mrow>" + @children.map((child) -> child.toMathML()).join("<mo>&cdot;</mo>") + "</mrow>" + closingHTML
+			return html + "<mrow>" + @children.map((child) -> + "<mfenced>" + child.toMathML() + "<mfenced>").join("<mo>&cdot;</mo>") + "</mrow>" + closingHTML
 
 		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return an HTML string representing this node.
@@ -781,7 +785,11 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else
 				closingHTML = "</div>"
 
-			return html + @children.map((child) -> child.toHTML()).join("&cdot;") + closingHTML
+			return html + @children.map((child) -> "(" + child.toHTML() + ")").join("&cdot;") + closingHTML
+
+		toLaTeX: ->
+			# Return a LaTeX string representing this node.
+			return @children.map((child) -> "\\left(" + child.toLaTeX() + "\\right)").join("\\cdot")
 
 	class Pow extends nodes.BinaryNode
 		# Represent powers.
@@ -982,11 +990,11 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else if @children.right.evaluate?() == 0
 				return html + "<mn>1</mn>" + closingHTML
 			else
-				innerHTML = "#{@children.left.toMathML()}#{@children.right.toMathML()}"
+				innerHTML = "<mfenced>#{@children.left.toMathML()}</mfenced>#{@children.right.toMathML()}"
 				innerHTML = "<msup>#{innerHTML}</msup>"
 				if @children.right.evaluate?() < 0
 					right = @children.right.copy()
-					right = Mul("-1", right)
+					right = new Mul("-1", right)
 					right = right.simplify()
 					innerHTML = "<mfrac><mn>1</mn>#{innerHTML}</mfrac>"
 				return html + innerHTML + closingHTML
@@ -1008,6 +1016,21 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else
 				innerHTML = "(#{@children.left.toHTML()}) ** (#{@children.right.toHTML()})"
 				return html + innerHTML + closingHTML
+
+		toLaTeX: ->
+			# Return a LaTeX string representing this node.
+			if @children.right.evaluate?() == 1
+				return @children.left.toLaTeX()
+			else if @children.right.evaluate?() == 0
+				return "1"
+			else
+				innerLaTeX = "\\left(#{@children.left.toLaTeX()}\\right)^{#{@children.right.toLaTeX()}}"
+				if @children.right.evaluate?() < 0
+					right = @children.right.copy()
+					right = new Mul("-1", right)
+					right = right.simplify()
+					innerLaTeX = "\\frac{1}{#{innerLaTeX}}"
+				return innerLaTeX
 
 	compare = (a, b) ->
 		# Compare two values to get an order.
