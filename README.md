@@ -28,10 +28,10 @@ You also have at your disposal:
 - `.copy()` to return a copy of the node.
 - `.equals(b)` to compare the node with some object b.
 - `.toMathML(equationID, expression=false, equality="0", topLevel=false)` to return a MathML string representing the expression. It takes some options:
--- `equationID`: used to uniquely identify the expression if you so wish.
--- `expression`: whether this is an expression or an equation - mainly used in an interface with another project.
--- `equality`: What the expression should be shown as being equated to in the output. Doesn't actually change what it is equated to, however.
--- `topLevel`: Whether to output the node as a complete MathML snippet with `<math>` tags and everything, or to just output MathML code to be inserted into such a snippet.
+	- `equationID`: used to uniquely identify the expression if you so wish.
+	- `expression`: whether this is an expression or an equation - mainly used in an interface with another project.
+	- `equality`: What the expression should be shown as being equated to in the output. Doesn't actually change what it is equated to, however.
+	- `topLevel`: Whether to output the node as a complete MathML snippet with `<math>` tags and everything, or to just output MathML code to be inserted into such a snippet.
 - `.toLaTeX()` to output as LaTeX code.
 - `.toHTML(equationID, expression=false, equality="0", topLevel=false)` to output similarly to the `.toMathML()` method, but without actually using MathML.
 
