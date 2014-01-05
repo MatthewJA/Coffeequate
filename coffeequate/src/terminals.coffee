@@ -54,6 +54,24 @@ define ["parse"], (parse) ->
 				return false
 			return @evaluate() == b.evaluate()
 
+		toMathML: ->
+			# Return this constant as a MathML string.
+			if @denominator == 1
+				return "<mn>#{@numerator}</mn>"
+			return "<mfrac><mrow><mn>#{@numerator}</mn></mrow><mrow><mn>#{@denominator}</mn></mrow</mfrac>"
+
+		toHTML: ->
+			# Return this constant as an HTML string.
+			if @denominator == 1
+				return "#{@numerator}"
+			return "(#{@numerator}/#{@denominator})"
+
+		toLaTeX: ->
+			# Return this constant as a LaTeX string.
+			if @denominator == 1
+				return "#{@numerator}"
+			return "\\frac{#{@numerator}}{#{@denominator}}"
+
 		toString: ->
 			unless @denominator == 1
 				return "#{@numerator}/#{@denominator}"
@@ -84,6 +102,15 @@ define ["parse"], (parse) ->
 				return false
 			return @label == b.label and @value == b.value
 
+		toHTML: ->
+			@toString()
+
+		toMathML: ->
+			"<mn>#{@label}</mn>"
+
+		toLaTeX: ->
+			@toString()
+
 	class Variable extends Terminal
 		# Variables in the equation tree, e.g. m
 		constructor: (@label) ->
@@ -106,6 +133,28 @@ define ["parse"], (parse) ->
 			unless b instanceof Variable
 				return false
 			return b.label == @label
+
+		toMathML: ->
+			# Return the variable as a MathML string.
+			# Strip the ID off of the variable, if it has one.
+			labelArray = @label.split("-")
+			label = labelArray[0]
+			labelID = if labelArray[1]? then 'id="variable-' + @label + '"' else ""
+			if label.length > 1
+				return '<msub class="variable"' + labelID + '><mi>' + label[0] + '</mi><mi>' + label[1..] + "</mi></msub>"
+			else
+				return '<mi class="variable"' + labelID + '>' + label + '</mi>'
+
+		toHTML: ->
+			# Return an HTML string representing the variable.
+			# Strip the ID off of the variable, if it has one.
+			labelArray = @label.split("-")
+			label = labelArray[0]
+			labelID = if labelArray[1]? then 'id="variable-' + @label + '"' else ""
+			return '<span class="variable"' + labelID + '>' + label + '</span>'
+
+		toLaTeX: ->
+			@toString()
 
 	return {
 

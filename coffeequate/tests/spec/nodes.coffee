@@ -159,7 +159,6 @@ define ["operators", "parse"], (operators, parse) ->
 			add = parse.stringToExpression("(3*x+2)*(4*y**2+7)*(x+2*y)**-1")
 			expect(add.expand().simplify().toString()).toBe("(((x + (2 * y)) ** -1) * (14 + (8 * (y ** 2)) + (12 * x * (y ** 2)) + (21 * x)))")
 
-
 		describe "representing powers", ->
 
 			it "represent powers", ->
