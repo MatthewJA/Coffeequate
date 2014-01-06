@@ -438,7 +438,9 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 		replaceVariables: (replacements) ->
 			for child, index in @children
 				if child instanceof terminals.Variable and child.label of replacements
-					@children[index] = replacements[child.label]
+					@children[index].label = replacements[child.label]
+				else if child.replaceVariables?
+					child.replaceVariables(replacements)
 
 		sub: (substitutions) ->
 			# subtitutions: {variable: value}
@@ -484,7 +486,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else
 				closingHTML = "</math></div>"
 
-			return html + "<mrow>" + @children.map((child) -> "<mfenced>" + child.toMathML() + "</mfenced>").join("<mo>+</mo>") + "</mrow>" + closingHTML
+			return html + "<mrow>" + @children.map((child) -> "<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>").join("<mo>+</mo>") + "</mrow>" + closingHTML
 
 		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return an HTML string representing this node.
@@ -836,7 +838,9 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 		replaceVariables: (replacements) ->
 			for child, index in @children
 				if child instanceof terminals.Variable and child.label of replacements
-					@children[index] = replacements[child.label]
+					@children[index].label = replacements[child.label]
+				else if child.replaceVariables?
+					child.replaceVariables(replacements)
 
 		sub: (substitutions) ->
 			# subtitutions: {variable: value}
@@ -882,7 +886,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else
 				closingHTML = "</math></div>"
 
-			return html + "<mrow>" + @children.map((child) -> "<mfenced>" + child.toMathML() + "</mfenced>").join("<mo>&middot;</mo>") + "</mrow>" + closingHTML
+			return html + "<mrow>" + @children.map((child) -> "<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>").join("<mo>&middot;</mo>") + "</mrow>" + closingHTML
 
 		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return an HTML string representing this node.
@@ -1137,8 +1141,12 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			# {variableLabel: replacementLabel}
 			if @children.left instanceof terminals.Variable and @children.left.label of replacements
 				@children.left.label = replacements[@children.left.label]
+			else if @children.left.replaceVariables?
+				@children.left.replaceVariables(replacements)
 			if @children.right instanceof terminals.Variable and @children.right.label of replacements
 				@children.right.label = replacements[@children.right.label]
+			else if @children.right.replaceVariables?
+				@children.right.replaceVariables(replacements)
 
 		substituteExpression: (sourceExpression, variable, equivalencies=null) ->
 			# variable = sourceExpression
@@ -1173,11 +1181,11 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 				closingHTML = "</math></div>"
 
 			if @children.right.evaluate?() == 1
-				return html + @children.left.toMathML() + closingHTML
+				return html + @children.left.toMathML(equationID, expression) + closingHTML
 			else if @children.right.evaluate?() == 0
 				return html + "<mn>1</mn>" + closingHTML
 			else
-				innerHTML = "<mfenced>#{@children.left.toMathML()}</mfenced>#{@children.right.toMathML()}"
+				innerHTML = "<mfenced>#{@children.left.toMathML(equationID, expression)}</mfenced>#{@children.right.toMathML(equationID, expression)}"
 				innerHTML = "<msup>#{innerHTML}</msup>"
 				if @children.right.evaluate?() < 0
 					right = @children.right.copy()

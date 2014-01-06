@@ -2,12 +2,13 @@
 
 ({
   "baseUrl": "./",
-  "name": "coffeequate",
+  "name": "lib/almond",
   "paths": {
   	"requireLib": "lib/require"
   },
   "include": [
-    "requireLib"
+    "coffeequate"
+    // "requireLib"
    ],
   "exclude": [],
   "optimize": "uglify2",
@@ -15,5 +16,8 @@
   "insertRequire": [
     "coffeequate"
   ],
-  "keepBuildDir": true
+  startFile: 'start.frag',
+  endFile: 'end.frag',
+  "keepBuildDir": true,
+  "wrap": true
 })

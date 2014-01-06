@@ -157,10 +157,13 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 				html = ""
 				closingHTML = ""
 
+			# The ID of the variable will wind up being variable-equation/expression-equationID-@label
+			# E.g. variable-expression-1-p-0
+
 			# Strip the ID off of the variable, if it has one.
 			labelArray = @label.split("-")
 			label = labelArray[0]
-			labelID = if labelArray[1]? then 'id="variable-' + @label + '"' else ""
+			labelID = if labelArray[1]? then 'id="variable-' + (if expression then "expression" else "equation") + "-#{equationID}-" + @label + '"' else ""
 			if label.length > 1
 				return html + '<msub class="variable"' + labelID + '><mi>' + label[0] + '</mi><mi>' + label[1..] + "</mi></msub>" + closingHTML
 			else
