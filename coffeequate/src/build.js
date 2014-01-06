@@ -7,8 +7,8 @@
   	"requireLib": "lib/require"
   },
   "include": [
-    "coffeequate",
-    "requireLib"
+    "coffeequate"
+    // "requireLib"
    ],
   "exclude": [],
   "optimize": "none",
@@ -16,8 +16,9 @@
   "insertRequire": [
     "coffeequate"
   ],
-  startFile: 'start.frag',
-  endFile: 'end.frag',
   "keepBuildDir": true,
-  "wrap": true
+  "wrap": {
+    startFile: 'start.frag',
+    endFile: 'end.frag'
+  }
 })
