@@ -308,7 +308,6 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					for subterm in term.children
 						if subterm instanceof terminals.Variable and subterm.label == variable then # pass
 						else if subterm instanceof Pow
-							console.log("found pow #{subterm}")
 							unless subterm.children.right instanceof terminals.Constant
 								throw new AlgebraError(expr.toString(), variable)
 							power = subterm.children.right.evaluate()
@@ -485,7 +484,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else
 				closingHTML = "</math></div>"
 
-			return html + "<mrow>" + @children.map((child) -> "<mfenced>" + child.toMathML() + "<mfenced>").join("<mo>+</mo>") + "</mrow>" + closingHTML
+			return html + "<mrow>" + @children.map((child) -> "<mfenced>" + child.toMathML() + "</mfenced>").join("<mo>+</mo>") + "</mrow>" + closingHTML
 
 		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return an HTML string representing this node.
@@ -883,7 +882,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else
 				closingHTML = "</math></div>"
 
-			return html + "<mrow>" + @children.map((child) -> + "<mfenced>" + child.toMathML() + "<mfenced>").join("<mo>&cdot;</mo>") + "</mrow>" + closingHTML
+			return html + "<mrow>" + @children.map((child) -> "<mfenced>" + child.toMathML() + "</mfenced>").join("<mo>&middot;</mo>") + "</mrow>" + closingHTML
 
 		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return an HTML string representing this node.
@@ -895,7 +894,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else
 				closingHTML = "</div>"
 
-			return html + @children.map((child) -> "(" + child.toHTML() + ")").join("&cdot;") + closingHTML
+			return html + @children.map((child) -> "(" + child.toHTML() + ")").join("&middot;") + closingHTML
 
 		toLaTeX: ->
 			# Return a LaTeX string representing this node.

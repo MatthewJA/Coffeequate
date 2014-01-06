@@ -973,7 +973,6 @@ define("requireLib", function(){});
               if (subterm instanceof terminals.Variable && subterm.label === variable) {
 
               } else if (subterm instanceof Pow) {
-                console.log("found pow " + subterm);
                 if (!(subterm.children.right instanceof terminals.Constant)) {
                   throw new AlgebraError(expr.toString(), variable);
                 }
@@ -1201,7 +1200,7 @@ define("requireLib", function(){});
           closingHTML = "</math></div>";
         }
         return html + "<mrow>" + this.children.map(function(child) {
-          return "<mfenced>" + child.toMathML() + "<mfenced>";
+          return "<mfenced>" + child.toMathML() + "</mfenced>";
         }).join("<mo>+</mo>") + "</mrow>" + closingHTML;
       };
 
@@ -1729,8 +1728,8 @@ define("requireLib", function(){});
           closingHTML = "</math></div>";
         }
         return html + "<mrow>" + this.children.map(function(child) {
-          return +"<mfenced>" + child.toMathML() + "<mfenced>";
-        }).join("<mo>&cdot;</mo>") + "</mrow>" + closingHTML;
+          return "<mfenced>" + child.toMathML() + "</mfenced>";
+        }).join("<mo>&middot;</mo>") + "</mrow>" + closingHTML;
       };
 
       Mul.prototype.toHTML = function(equationID, expression, equality, topLevel) {
@@ -1753,7 +1752,7 @@ define("requireLib", function(){});
         }
         return html + this.children.map(function(child) {
           return "(" + child.toHTML() + ")";
-        }).join("&cdot;") + closingHTML;
+        }).join("&middot;") + closingHTML;
       };
 
       Mul.prototype.toLaTeX = function() {
