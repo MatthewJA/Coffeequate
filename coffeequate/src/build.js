@@ -10,9 +10,10 @@
     "requireLib"
    ],
   "exclude": [],
-  "optimize": "uglify2",
+  "optimize": "none",
   "out": "../build/coffeequate.js",
   "insertRequire": [
     "coffeequate"
-  ]
+  ],
+  "keepBuildDir": true
 })
