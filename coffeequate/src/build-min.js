@@ -16,8 +16,9 @@
   "insertRequire": [
     "coffeequate"
   ],
-  startFile: 'start.frag',
-  endFile: 'end.frag',
   "keepBuildDir": true,
-  "wrap": true
+  "wrap": {
+    startFile: 'start.frag',
+    endFile: 'end.frag'
+  }
 })
