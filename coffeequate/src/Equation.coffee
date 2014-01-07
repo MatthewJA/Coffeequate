@@ -1,4 +1,4 @@
-define ["terminals", "nodes", "parse"], (terminals, nodes, parse) ->
+define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operators, parse) ->
 
 	# Equation object to represent (terminal = expression).
 
