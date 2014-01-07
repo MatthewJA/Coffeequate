@@ -54,6 +54,18 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 				return false
 			return @evaluate() == b.evaluate()
 
+		replaceVariables: (replacements) ->
+			@copy() # Does nothing - this is a constant.
+
+		getAllVariables: ->
+			[]
+
+		sub: (substitutions) ->
+			@copy()
+
+		substituteExpression: (sourceExpression, variable, equivalencies) ->
+			@copy()
+
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return this constant as a MathML string.
 			if topLevel
@@ -109,6 +121,18 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 				return false
 			return @label == b.label and @value == b.value
 
+		replaceVariables: (replacements) ->
+			@copy() # Does nothing - this is a constant.
+
+		getAllVariables: ->
+			[]
+
+		sub: (substitutions) ->
+			@copy()
+
+		substituteExpression: (sourceExpression, variable, equivalencies) ->
+			@copy()
+
 		toHTML: ->
 			@toString()
 
@@ -147,6 +171,29 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 			unless b instanceof Variable
 				return false
 			return b.label == @label
+
+		replaceVariables: (replacements) ->
+			if @label of replacements
+				@label = replacements[@label]
+
+		getAllVariables: ->
+			[@label]
+
+		sub: (substitutions) ->
+			if @label of substitutions
+				substitute = substitutions[@label]
+				if substitute.copy?
+					return substitute.copy()
+				else
+					return new Constant(substitute)
+			else
+				return @copy()
+
+		substituteExpression: (sourceExpression, variable, equivalencies) ->
+			if @label == variable
+				return sourceExpression.copy()
+			else
+				return @copy()
 
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return the variable as a MathML string.

@@ -685,6 +685,22 @@ define("lib/almond", function(){});
         return this.evaluate() === b.evaluate();
       };
 
+      Constant.prototype.replaceVariables = function(replacements) {
+        return this.copy();
+      };
+
+      Constant.prototype.getAllVariables = function() {
+        return [];
+      };
+
+      Constant.prototype.sub = function(substitutions) {
+        return this.copy();
+      };
+
+      Constant.prototype.substituteExpression = function(sourceExpression, variable, equivalencies) {
+        return this.copy();
+      };
+
       Constant.prototype.toMathML = function(equationID, expression, equality, topLevel) {
         var closingHTML, html, mathClass, mathID, _ref;
         if (expression == null) {
@@ -767,6 +783,22 @@ define("lib/almond", function(){});
         return this.label === b.label && this.value === b.value;
       };
 
+      SymbolicConstant.prototype.replaceVariables = function(replacements) {
+        return this.copy();
+      };
+
+      SymbolicConstant.prototype.getAllVariables = function() {
+        return [];
+      };
+
+      SymbolicConstant.prototype.sub = function(substitutions) {
+        return this.copy();
+      };
+
+      SymbolicConstant.prototype.substituteExpression = function(sourceExpression, variable, equivalencies) {
+        return this.copy();
+      };
+
       SymbolicConstant.prototype.toHTML = function() {
         return this.toString();
       };
@@ -826,6 +858,38 @@ define("lib/almond", function(){});
           return false;
         }
         return b.label === this.label;
+      };
+
+      Variable.prototype.replaceVariables = function(replacements) {
+        if (this.label in replacements) {
+          return this.label = replacements[this.label];
+        }
+      };
+
+      Variable.prototype.getAllVariables = function() {
+        return [this.label];
+      };
+
+      Variable.prototype.sub = function(substitutions) {
+        var substitute;
+        if (this.label in substitutions) {
+          substitute = substitutions[this.label];
+          if (substitute.copy != null) {
+            return substitute.copy();
+          } else {
+            return new Constant(substitute);
+          }
+        } else {
+          return this.copy();
+        }
+      };
+
+      Variable.prototype.substituteExpression = function(sourceExpression, variable, equivalencies) {
+        if (this.label === variable) {
+          return sourceExpression.copy();
+        } else {
+          return this.copy();
+        }
       };
 
       Variable.prototype.toMathML = function(equationID, expression, equality, topLevel) {
@@ -1092,7 +1156,7 @@ define("lib/almond", function(){});
       };
 
       Equation.prototype.toString = function() {
-        return "" + left + " = " + right;
+        return "" + this.left + " = " + this.right;
       };
 
       return Equation;
