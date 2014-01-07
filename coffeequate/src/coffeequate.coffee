@@ -1,9 +1,14 @@
+### Coffeequate - http://github.com/MatthewJA/Coffeequate ###
+
 require.config
     baseUrl: "./"
 
-define ["operators", "parse", "terminals"], (operators, parse, terminals) ->
+define ["Equation", "operators", "terminals", "parse"], (Equation, operators, terminals, parse) ->
 	return {
-		operators: operators
+		# Public interface for Coffeequate.
+		Equation: Equation
+		tree:
+			operators: operators
+			terminals: terminals
 		parse: parse
-		terminals: terminals
 	}
