@@ -45,7 +45,7 @@ define ["terminals", "nodes", "parse"], (terminals, nodes, parse) ->
 					throw new Error("Too many arguments.")
 
 		solve: (variable) ->
-			expr = new Add(@right, new Mul("-1", @left))
+			expr = new operators.Add(@right, new operators.Mul("-1", @left))
 			return new Equation(variable, expr.solve(variable))
 
 		replaceVariables: (replacements) ->
@@ -61,14 +61,14 @@ define ["terminals", "nodes", "parse"], (terminals, nodes, parse) ->
 
 		sub: (substitutions) ->
 			if @left instanceof terminals.Variable and @left.label of substitutions
-				expr = new Add(@right, new Mul("-1", @left))
+				expr = new operators.Add(@right, new operators.Mul("-1", @left))
 				return new Equation(expr.sub(substitutions))
 			else
 				return new Equation(@left, @right.sub(substitutions))
 
 		substituteExpression: (source, variable, equivalencies) ->
 			if @left instanceof terminals.Variable and @left.label of substitutions
-				expr = new Add(@right, new Mul("-1", @left))
+				expr = new operators.Add(@right, new operators.Mul("-1", @left))
 				return new Equation(expr.substituteExpression(source, variable, equivalencies))
 			else
 				return new Equation(@left, @right.substituteExpression(source, variable, equivalencies))

@@ -1080,7 +1080,7 @@ define("lib/almond", function(){});
 
       Equation.prototype.solve = function(variable) {
         var expr;
-        expr = new Add(this.right, new Mul("-1", this.left));
+        expr = new operators.Add(this.right, new operators.Mul("-1", this.left));
         return new Equation(variable, expr.solve(variable));
       };
 
@@ -1108,7 +1108,7 @@ define("lib/almond", function(){});
       Equation.prototype.sub = function(substitutions) {
         var expr;
         if (this.left instanceof terminals.Variable && this.left.label in substitutions) {
-          expr = new Add(this.right, new Mul("-1", this.left));
+          expr = new operators.Add(this.right, new operators.Mul("-1", this.left));
           return new Equation(expr.sub(substitutions));
         } else {
           return new Equation(this.left, this.right.sub(substitutions));
@@ -1118,7 +1118,7 @@ define("lib/almond", function(){});
       Equation.prototype.substituteExpression = function(source, variable, equivalencies) {
         var expr;
         if (this.left instanceof terminals.Variable && this.left.label in substitutions) {
-          expr = new Add(this.right, new Mul("-1", this.left));
+          expr = new operators.Add(this.right, new operators.Mul("-1", this.left));
           return new Equation(expr.substituteExpression(source, variable, equivalencies));
         } else {
           return new Equation(this.left, this.right.substituteExpression(source, variable, equivalencies));
