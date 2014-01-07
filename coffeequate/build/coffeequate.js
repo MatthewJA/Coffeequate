@@ -1091,6 +1091,10 @@ define("lib/almond", function(){});
         return "" + (this.left.toLaTeX()) + " = " + (this.right.toLaTeX());
       };
 
+      Equation.prototype.toString = function() {
+        return "" + left + " = " + right;
+      };
+
       return Equation;
 
     })();

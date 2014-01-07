@@ -84,4 +84,7 @@ define ["terminals", "nodes", "parse"], (terminals, nodes, parse) ->
 		toLaTeX: ->
 			return "#{@left.toLaTeX()} = #{@right.toLaTeX()}"
 
+		toString: ->
+			return "#{left} = #{right}"
+
 	return Equation
