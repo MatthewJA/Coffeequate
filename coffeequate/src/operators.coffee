@@ -1290,12 +1290,16 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else if @children.right.evaluate?() == 0
 				return html + "<mn>1</mn>" + closingHTML
 			else
-				innerHTML = "<mfenced>#{@children.left.toMathML(equationID, expression)}</mfenced>#{@children.right.toMathML(equationID, expression)}"
-				innerHTML = "<msup>#{innerHTML}</msup>"
 				if @children.right.evaluate?() < 0
 					right = @children.right.copy()
 					right = new Mul("-1", right)
-					right = right.simplify()
+					right = right.expandAndSimplify()
+				else
+					right = @children.right.copy()
+				innerHTML = "<mfenced>#{@children.left.toMathML(equationID, expression)}</mfenced>"
+				unless right.evaluate?() == 1
+					innerHTML = "<msup>#{innerHTML}#{right.toMathML(equationID, expression)}</msup>"
+				if @children.right.evaluate?() < 0
 					innerHTML = "<mfrac><mn>1</mn>#{innerHTML}</mfrac>"
 				return html + innerHTML + closingHTML
 

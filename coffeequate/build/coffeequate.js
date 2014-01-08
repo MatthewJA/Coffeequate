@@ -2588,7 +2588,7 @@ define("lib/almond", function(){});
       };
 
       Pow.prototype.toMathML = function(equationID, expression, equality, topLevel) {
-        var closingHTML, html, innerHTML, mathClass, mathID, right, _base, _base1, _base2, _ref;
+        var closingHTML, html, innerHTML, mathClass, mathID, right, _base, _base1, _base2, _base3, _ref;
         if (expression == null) {
           expression = false;
         }
@@ -2610,12 +2610,18 @@ define("lib/almond", function(){});
         } else if ((typeof (_base1 = this.children.right).evaluate === "function" ? _base1.evaluate() : void 0) === 0) {
           return html + "<mn>1</mn>" + closingHTML;
         } else {
-          innerHTML = "<mfenced>" + (this.children.left.toMathML(equationID, expression)) + "</mfenced>" + (this.children.right.toMathML(equationID, expression));
-          innerHTML = "<msup>" + innerHTML + "</msup>";
           if ((typeof (_base2 = this.children.right).evaluate === "function" ? _base2.evaluate() : void 0) < 0) {
             right = this.children.right.copy();
             right = new Mul("-1", right);
-            right = right.simplify();
+            right = right.expandAndSimplify();
+          } else {
+            right = this.children.right.copy();
+          }
+          innerHTML = "<mfenced>" + (this.children.left.toMathML(equationID, expression)) + "</mfenced>";
+          if ((typeof right.evaluate === "function" ? right.evaluate() : void 0) !== 1) {
+            innerHTML = "<msup>" + innerHTML + (right.toMathML(equationID, expression)) + "</msup>";
+          }
+          if ((typeof (_base3 = this.children.right).evaluate === "function" ? _base3.evaluate() : void 0) < 0) {
             innerHTML = "<mfrac><mn>1</mn>" + innerHTML + "</mfrac>";
           }
           return html + innerHTML + closingHTML;
