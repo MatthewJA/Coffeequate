@@ -458,7 +458,8 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					if inversedSquares.length == 0
 						# There are no inversed squares, so there is only squared terms.
 						# -a = b v**2
-						answer = new Mul(factorisedSquaresEquatable, new Pow(negatedTermsEquatable, "1/2"))
+						# v**2 = -a / b
+						answer = new Pow(new Mul(negatedTermsEquatable, new Pow(factorisedSquaresEquatable, "-1")), "1/2")
 						a1 = new Mul("-1", answer.copy())
 						a1 = a1.expandAndSimplify()
 						a2 = answer.expandAndSimplify()

@@ -1568,7 +1568,7 @@ define("lib/almond", function(){});
         } else if (factorised.length === 0) {
           if (inversed.length === 0) {
             if (inversedSquares.length === 0) {
-              answer = new Mul(factorisedSquaresEquatable, new Pow(negatedTermsEquatable, "1/2"));
+              answer = new Pow(new Mul(negatedTermsEquatable, new Pow(factorisedSquaresEquatable, "-1")), "1/2");
               a1 = new Mul("-1", answer.copy());
               a1 = a1.expandAndSimplify();
               a2 = answer.expandAndSimplify();
