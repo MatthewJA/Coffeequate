@@ -359,52 +359,120 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 				negatedTerms.push(newMul)
 
 			negatedTermsEquatable = new Add(negatedTerms...) unless negatedTerms.length == 0
+			nonNegatedTermsEquatable = new Add(termsNotContainingVariable...) unless termsNotContainingVariable.length == 0
 			factorisedEquatable = new Add(factorised...) unless factorised.length == 0
 			factorisedSquaresEquatable = new Add(factorisedSquares...) unless factorisedSquares.length == 0
+			inversedEquatable = new Add(inversed...) unless inversed.length == 0
+			inversedSquaresEquatable = new Add(inversedSquares...) unless inversedSquares.length == 0
+
+			# Let's just... enumerate everything. That will probably work.
+
+			if negatedTerms.length == 0
+				negatedTermsEquatable = new terminals.Constant("0")
 
 			if factorisedSquares.length == 0
+				## Outdated comment follows:
 				# We now have terms on the other side of the equation (negatedTermsEquatable) and
 				# terms factorised out from this side of the equation (factorisedEquatable).
 				# (factorisedEquatable * v) = negatedTermsEquatable
 				# Hence the solution is simply (negatedTermsEquatable * (factorisedEquatable ** -1)).
-				if factorised.length > 0
-					newPow = new Pow(factorisedEquatable, "-1")
-					newPow = newPow.simplify()
-					if negatedTermsEquatable?
-						newMul = new Mul(negatedTermsEquatable, newPow)
-						newMul = newMul.simplify()
-						return [newMul]
+				## Saved for posterity. New comment follows:
+				# There are no squares in the equation.
+				if factorised.length == 0
+					# There are no standalone variables in the equation.
+					if inversed.length == 0
+						# There are no standalones or squares or inversed variables.
+						if inversedSquares.length == 0
+							# There is nothing. There is nothing here. All is lost.
+							throw new AlgebraError(expr.toString(), variable)
+						else
+							# We have only inversed squares.
+							# -a = b/v**2
+							# v = +/(b/-a)**1/2
+							answer = new Mul(new Pow(inversedSquaresEquatable, "1/2"), new Pow(negatedTermsEquatable, "-1/2"))
+							a1 = new Mul(-1, answer.copy())
+							a1 = a1.expandAndSimplify()
+							a2 = answer.expandAndSimplify()
+							if a1.equals?(a2)
+								return [a1]
+							else
+								return [a1, a2]
 					else
-						return [newPow]
+						# There are no standalones, but there are inversed variables.
+						if inversedSquares.length == 0
+							# We only have inversed variables.
+							# -a = b/v
+							# v = b/-a
+							answer = new Mul(inversedEquatable, negatedTermsEquatable)
+							return [answer.expandAndSimplify()]
+						else
+							# We have inversed variables and inversed squares.
+							# -a = b/v + c/v**2
+							# Ewwwww
+							# Ewwwwwwwwwwwwwwwwwww
+							# 0 = a + b/v + c/v**2
+							# 0 = a v**2 + b v + c
+							newAdd = new Add(new Mul(nonNegatedTermsEquatable, new Pow(new terminals.Variable(variable), 2)),
+								new Mul(inversedEquatable, new terminals.Variable(variable)),
+								inversedSquaresEquatable)
+							console.log("Recursing into Add.solve with (#{newAdd})")
+							return newAdd.solve(variable)
+				else if inversed.length == 0
+					# There are standalone variables, but there aren't any inversed ones.
+					if inversedSquares.length == 0
+						# There are no inversed squares, so there are just standalone variables.
+						# -a = b v
+						# v = -a / b
+						answer = new Mul(negatedTermsEquatable, new Pow(factorisedEquatable, "-1"))
+						return [answer.expandAndSimplify()]
+					else
+						# There are inversed squares and standalone variables.
+						# That's a cubic, c'mon.
+						# Technically, this is solvable if negatedTerms.length == 0, but
+						# is that ever likely to actually happen?
+						## FIXME
+						throw new AlgebraError(expr.toString(), variable, " (not supported)")
+				# else if inversedSquares.length == 0
+					# There are standalone variables and inversed variables, but there aren't any
+					# inversed squares.
+					# This actually exhausts all possibilities, so I'll comment this else out for clarity.
 				else
-					throw new AlgebraError(expr.toString(), variable)
+					# There are standalone variables and inversed variables and inversed squares,
+					# so this is unsolvable.
+					throw new AlgebraError(expr.toString(), variable, " (not supported)")
 			else if factorised.length == 0
-				# We now have terms on the other side of the equation (negatedTermsEquatable) and
-				# terms factorised out from this side of the equation (factorisedSquaresEquatable).
-				# (factorisedSquaresEquatable * (v ** 2)) = negatedTermsEquatable
-				# Hence the solution is simply \pm ((negatedTermsEquatable * (factorisedSquaresEquatable ** -1)) ** 1/2).
-				if factorisedSquares.length > 0
-					newPow = new Pow(factorisedSquaresEquatable, "-1")
-					newPow = newPow.simplify()
-					if negatedTermsEquatable?
-						newMul = new Mul(negatedTermsEquatable, newPow)
-						newerPow = new Pow(newMul, "1/2")
-						negatedNewerPow = new Mul("-1", newerPow)
-						negatedNewerPow = negatedNewerPow.simplify()
-						newerPow = newerPow.simplify()
-						return [newerPow, negatedNewerPow]
+				# We have squared terms, but no standalone terms.
+				if inversed.length == 0
+					# We have squared terms, but no standalone terms or inversed terms.
+					if inversedSquares.length == 0
+						# There are no inversed squares, so there is only squared terms.
+						# -a = v**2
+						answer = new Pow(negatedTermsEquatable, "1/2")
+						a1 = new Mul("-1", answer.copy())
+						a1 = a1.expandAndSimplify()
+						a2 = answer.expandAndSimplify()
+						if a1.equals?(a2)
+							return [a1]
+						else
+							return [a1, a2]
 					else
-						newerPow = new Pow(newPow, "1/2")
-						negatedNewerPow = new Mul("-1", newerPow)
-						negatedNewerPow = negatedNewerPow.simplify()
-						newerPow = newerPow.simplify()
-						return [newerPow, negatedNewerPow]
+						# We have squared terms and inverse squared terms.
+						# That is a quartic, and as quartics are a danger to the very moral fabric of our
+						# society, we don't solve them here.
+						## FIXME: This is solvable if negatedTerms.length == 0.
+						throw new AlgebraError(expr.toString(), variable, " (not supported)")
 				else
-					throw new AlgebraError(expr.toString(), variable)
+					# We have squares and we have inversed variables, so this is usually unsolvable, except if
+					# inversed squares and negated terms are both of 0 length.
+					## FIXME: Deal with that situation.
+					throw new AlgebraError(expr.toString(), variable, " (not supported)")	
 			else
+				# There are squares and standalone variables. Unsolvable if we have any inverses whatsoever.
+				if inversed.length > 0 or inversedSquares.length > 0
+					throw new AlgebraError(expr.toString(), variable, " (not supported)")	
+
 				# We have a quadratic equation.
 				# ((factorisedSquaresEquatable) * (v ** 2)) + (factorisedEquatable * v) + (nonNegatedTerms) = 0
-				nonNegatedTermsEquatable = new Add(termsNotContainingVariable...) unless termsNotContainingVariable.length == 0
 				if nonNegatedTermsEquatable?
 					# a = fSE
 					# b = fE
