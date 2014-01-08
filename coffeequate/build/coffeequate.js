@@ -1344,7 +1344,7 @@ define("lib/almond", function(){});
       };
 
       Add.prototype.solve = function(variable) {
-        var a, added, b, c, d, expr, factorised, factorisedEquatable, factorisedSquares, factorisedSquaresEquatable, factorisedTerm, negatedNewerPow, negatedTerms, negatedTermsEquatable, newMul, newPow, newerPow, nonNegatedTermsEquatable, power, quadratic, rd, subterm, subterms, term, termsContainingVariable, termsNotContainingVariable, v1, v2, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2;
+        var a, a1, a2, added, answer, b, c, d, expr, factorised, factorisedEquatable, factorisedSquares, factorisedSquaresEquatable, factorisedTerm, inv, invSquare, inversed, inversedEquatable, inversedSquares, inversedSquaresEquatable, negatedTerms, negatedTermsEquatable, newAdd, newMul, newPow, nonNegatedTermsEquatable, power, quadratic, rd, subterm, subterms, term, termsContainingVariable, termsNotContainingVariable, v1, v2, _i, _j, _k, _l, _len, _len1, _len2, _len3, _len4, _m, _ref, _ref1, _ref2;
         expr = this.expandAndSimplify();
         termsContainingVariable = [];
         termsNotContainingVariable = [];
@@ -1397,8 +1397,11 @@ define("lib/almond", function(){});
         if (termsContainingVariable.length === 0) {
           throw new AlgebraError(expr.toString(), variable);
         }
+        console.log("Solving " + this + " for " + variable + ": Terms containing are (" + termsContainingVariable + "), terms not are (" + termsNotContainingVariable + ")");
         factorised = [];
         factorisedSquares = [];
+        inversed = [];
+        inversedSquares = [];
         for (_k = 0, _len2 = termsContainingVariable.length; _k < _len2; _k++) {
           term = termsContainingVariable[_k];
           if (term instanceof terminals.Variable) {
@@ -1408,17 +1411,26 @@ define("lib/almond", function(){});
               throw new AlgebraError(expr.toString(), variable);
             }
             power = term.children.right.evaluate();
-            if (power === 1) {
-              factorised.push(new terminals.Constant("1"));
-            } else if (power === 2) {
-              factorisedSquares.push(new terminals.Constant("1"));
+            if (term.children.left instanceof terminals.Variable && term.children.left.label === variable) {
+              if (power === 1) {
+                factorised.push(new terminals.Constant("1"));
+              } else if (power === 2) {
+                factorisedSquares.push(new terminals.Constant("1"));
+              } else if (power === -1) {
+                inversed.push(new terminals.Constant("1"));
+              } else if (power === -2) {
+                inversedSquares.push(new terminals.Constant("1"));
+              } else {
+                throw new AlgebraError(expr.toString(), variable, " (not supported)");
+              }
             } else {
-              console.log("error 1");
-              throw new AlgebraError(expr.toString(), variable, "polynomials of degree > 2 not supported");
+              throw new AlgebraError(expr.toString(), variable, " (this shouldn't happen)");
             }
           } else if (term instanceof Mul) {
             subterms = [];
             quadratic = false;
+            inv = false;
+            invSquare = false;
             _ref2 = term.children;
             for (_l = 0, _len3 = _ref2.length; _l < _len3; _l++) {
               subterm = _ref2[_l];
@@ -1429,13 +1441,20 @@ define("lib/almond", function(){});
                   throw new AlgebraError(expr.toString(), variable);
                 }
                 power = subterm.children.right.evaluate();
-                if (power === 1) {
+                if (subterm.children.left instanceof terminals.Variable && subterm.children.left.label === variable) {
+                  if (power === 1) {
 
-                } else if (power === 2) {
-                  quadratic = true;
+                  } else if (power === 2) {
+                    quadratic = true;
+                  } else if (power === -1) {
+                    inv = true;
+                  } else if (power === -2) {
+                    invSquare = true;
+                  } else {
+                    throw new AlgebraError(expr.toString(), variable, " (not supported)");
+                  }
                 } else {
-                  console.log("error 2");
-                  throw new AlgebraError(expr.toString(), variable, "polynomials of degree > 2 not supported");
+                  subterms.push(subterm);
                 }
               } else {
                 subterms.push(subterm);
@@ -1446,10 +1465,14 @@ define("lib/almond", function(){});
               var child = new ctor, result = func.apply(child, args);
               return Object(result) === result ? result : child;
             })(Mul, subterms, function(){}) : new terminals.Constant("1");
-            if (!quadratic) {
-              factorised.push(factorisedTerm);
-            } else {
+            if (quadratic) {
               factorisedSquares.push(factorisedTerm);
+            } else if (inv) {
+              inversed.push(factorisedTerm);
+            } else if (invSquare) {
+              inversedSquares.push(factorisedTerm);
+            } else {
+              factorised.push(factorisedTerm);
             }
           }
         }
@@ -1467,6 +1490,13 @@ define("lib/almond", function(){});
             return Object(result) === result ? result : child;
           })(Add, negatedTerms, function(){});
         }
+        if (termsNotContainingVariable.length !== 0) {
+          nonNegatedTermsEquatable = (function(func, args, ctor) {
+            ctor.prototype = func.prototype;
+            var child = new ctor, result = func.apply(child, args);
+            return Object(result) === result ? result : child;
+          })(Add, termsNotContainingVariable, function(){});
+        }
         if (factorised.length !== 0) {
           factorisedEquatable = (function(func, args, ctor) {
             ctor.prototype = func.prototype;
@@ -1481,48 +1511,81 @@ define("lib/almond", function(){});
             return Object(result) === result ? result : child;
           })(Add, factorisedSquares, function(){});
         }
+        if (inversed.length !== 0) {
+          inversedEquatable = (function(func, args, ctor) {
+            ctor.prototype = func.prototype;
+            var child = new ctor, result = func.apply(child, args);
+            return Object(result) === result ? result : child;
+          })(Add, inversed, function(){});
+        }
+        if (inversedSquares.length !== 0) {
+          inversedSquaresEquatable = (function(func, args, ctor) {
+            ctor.prototype = func.prototype;
+            var child = new ctor, result = func.apply(child, args);
+            return Object(result) === result ? result : child;
+          })(Add, inversedSquares, function(){});
+        }
+        console.log("Sorted terms. Negated: " + negatedTerms + "; Factorised: " + factorised + "; Squares: " + factorisedSquares + "; Inversed: " + inversed + "; Inversed Squares: " + inversedSquares);
+        if (negatedTerms.length === 0) {
+          negatedTermsEquatable = new terminals.Constant("0");
+        }
         if (factorisedSquares.length === 0) {
-          if (factorised.length > 0) {
-            newPow = new Pow(factorisedEquatable, "-1");
-            newPow = newPow.simplify();
-            if (negatedTermsEquatable != null) {
-              newMul = new Mul(negatedTermsEquatable, newPow);
-              newMul = newMul.simplify();
-              return [newMul];
+          if (factorised.length === 0) {
+            if (inversed.length === 0) {
+              if (inversedSquares.length === 0) {
+                throw new AlgebraError(expr.toString(), variable);
+              } else {
+                answer = new Mul(new Pow(inversedSquaresEquatable, "1/2"), new Pow(negatedTermsEquatable, "-1/2"));
+                a1 = new Mul(-1, answer.copy());
+                a1 = a1.expandAndSimplify();
+                a2 = answer.expandAndSimplify();
+                if (typeof a1.equals === "function" ? a1.equals(a2) : void 0) {
+                  return [a1];
+                } else {
+                  return [a1, a2];
+                }
+              }
             } else {
-              return [newPow];
+              if (inversedSquares.length === 0) {
+                answer = new Mul(inversedEquatable, negatedTermsEquatable);
+                return [answer.expandAndSimplify()];
+              } else {
+                newAdd = new Add(new Mul(nonNegatedTermsEquatable, new Pow(new terminals.Variable(variable), 2)), new Mul(inversedEquatable, new terminals.Variable(variable)), inversedSquaresEquatable);
+                console.log("Recursing into Add.solve with (" + newAdd + ")");
+                return newAdd.solve(variable);
+              }
+            }
+          } else if (inversed.length === 0) {
+            if (inversedSquares.length === 0) {
+              answer = new Mul(negatedTermsEquatable, new Pow(factorisedEquatable, "-1"));
+              return [answer.expandAndSimplify()];
+            } else {
+              throw new AlgebraError(expr.toString(), variable, " (not supported)");
             }
           } else {
-            throw new AlgebraError(expr.toString(), variable);
+            throw new AlgebraError(expr.toString(), variable, " (not supported)");
           }
         } else if (factorised.length === 0) {
-          if (factorisedSquares.length > 0) {
-            newPow = new Pow(factorisedSquaresEquatable, "-1");
-            newPow = newPow.simplify();
-            if (negatedTermsEquatable != null) {
-              newMul = new Mul(negatedTermsEquatable, newPow);
-              newerPow = new Pow(newMul, "1/2");
-              negatedNewerPow = new Mul("-1", newerPow);
-              negatedNewerPow = negatedNewerPow.simplify();
-              newerPow = newerPow.simplify();
-              return [newerPow, negatedNewerPow];
+          if (inversed.length === 0) {
+            if (inversedSquares.length === 0) {
+              answer = new Mul(factorisedSquaresEquatable, new Pow(negatedTermsEquatable, "1/2"));
+              a1 = new Mul("-1", answer.copy());
+              a1 = a1.expandAndSimplify();
+              a2 = answer.expandAndSimplify();
+              if (typeof a1.equals === "function" ? a1.equals(a2) : void 0) {
+                return [a1];
+              } else {
+                return [a1, a2];
+              }
             } else {
-              newerPow = new Pow(newPow, "1/2");
-              negatedNewerPow = new Mul("-1", newerPow);
-              negatedNewerPow = negatedNewerPow.simplify();
-              newerPow = newerPow.simplify();
-              return [newerPow, negatedNewerPow];
+              throw new AlgebraError(expr.toString(), variable, " (not supported)");
             }
           } else {
-            throw new AlgebraError(expr.toString(), variable);
+            throw new AlgebraError(expr.toString(), variable, " (not supported)");
           }
         } else {
-          if (termsNotContainingVariable.length !== 0) {
-            nonNegatedTermsEquatable = (function(func, args, ctor) {
-              ctor.prototype = func.prototype;
-              var child = new ctor, result = func.apply(child, args);
-              return Object(result) === result ? result : child;
-            })(Add, termsNotContainingVariable, function(){});
+          if (inversed.length > 0 || inversedSquares.length > 0) {
+            throw new AlgebraError(expr.toString(), variable, " (not supported)");
           }
           if (nonNegatedTermsEquatable != null) {
             a = factorisedSquaresEquatable;

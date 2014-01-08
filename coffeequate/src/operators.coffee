@@ -281,6 +281,8 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			if termsContainingVariable.length == 0
 				throw new AlgebraError(expr.toString(), variable)
 
+			console.log("Solving #{@} for #{variable}: Terms containing are (#{termsContainingVariable}), terms not are (#{termsNotContainingVariable})")
+
 			# The rest of the terms need to be manipulated to solve the equation.
 			# (a * v) + (b * v) -> ((a + b) * v)
 			# (a * v) + (b * v) + (c * (v ** 2)) -> ((a + b) * v) + (c * (v ** 2))
@@ -307,16 +309,20 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					unless term.children.right instanceof terminals.Constant
 						throw new AlgebraError(expr.toString(), variable)
 					power = term.children.right.evaluate()
-					if power == 1
-						factorised.push(new terminals.Constant("1"))
-					else if power == 2
-						factorisedSquares.push(new terminals.Constant("1"))
-					else if power == -1
-						inversed.push(new terminals.Constant("1"))
-					else if power == -2
-						inversedSquares.push(new terminals.Constant("1"))
+					if term.children.left instanceof terminals.Variable and term.children.left.label == variable
+						if power == 1
+							factorised.push(new terminals.Constant("1"))
+						else if power == 2
+							factorisedSquares.push(new terminals.Constant("1"))
+						else if power == -1
+							inversed.push(new terminals.Constant("1"))
+						else if power == -2
+							inversedSquares.push(new terminals.Constant("1"))
+						else
+							throw new AlgebraError(expr.toString(), variable, " (not supported)")
 					else
-						throw new AlgebraError(expr.toString(), variable, " (not supported)")
+						# I don't think this should happen, ever?
+						throw new AlgebraError(expr.toString(), variable, " (this shouldn't happen)")
 				else if term instanceof Mul
 					subterms = [] # Non-variable terms.
 					quadratic = false
@@ -328,16 +334,19 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 							unless subterm.children.right instanceof terminals.Constant
 								throw new AlgebraError(expr.toString(), variable)
 							power = subterm.children.right.evaluate()
-							if power == 1 then # pass
-							else if power == 2
-								quadratic = true # We operate on the assumption that there's only one term with our target variable in it here.
-								# This should be possible due to expandAndSimplify.
-							else if power == -1
-								inv = true
-							else if power == -2
-								invSquare = true
+							if subterm.children.left instanceof terminals.Variable and subterm.children.left.label == variable
+								if power == 1 then # pass
+								else if power == 2
+									quadratic = true # We operate on the assumption that there's only one term with our target variable in it here.
+									# This should be possible due to expandAndSimplify.
+								else if power == -1
+									inv = true
+								else if power == -2
+									invSquare = true
+								else
+									throw new AlgebraError(expr.toString(), variable, " (not supported)")
 							else
-								throw new AlgebraError(expr.toString(), variable, " (not supported)")
+								subterms.push(subterm)
 						else
 							subterms.push(subterm)
 
@@ -364,6 +373,8 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			factorisedSquaresEquatable = new Add(factorisedSquares...) unless factorisedSquares.length == 0
 			inversedEquatable = new Add(inversed...) unless inversed.length == 0
 			inversedSquaresEquatable = new Add(inversedSquares...) unless inversedSquares.length == 0
+
+			console.log("Sorted terms. Negated: #{negatedTerms}; Factorised: #{factorised}; Squares: #{factorisedSquares}; Inversed: #{inversed}; Inversed Squares: #{inversedSquares}")
 
 			# Let's just... enumerate everything. That will probably work.
 
@@ -446,8 +457,8 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					# We have squared terms, but no standalone terms or inversed terms.
 					if inversedSquares.length == 0
 						# There are no inversed squares, so there is only squared terms.
-						# -a = v**2
-						answer = new Pow(negatedTermsEquatable, "1/2")
+						# -a = b v**2
+						answer = new Mul(factorisedSquaresEquatable, new Pow(negatedTermsEquatable, "1/2"))
 						a1 = new Mul("-1", answer.copy())
 						a1 = a1.expandAndSimplify()
 						a2 = answer.expandAndSimplify()
