@@ -591,7 +591,11 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else
 				closingHTML = "</math></div>"
 
-			return html + "<mrow>" + @children.map((child) -> "<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>").join("<mo>+</mo>") + "</mrow>" + closingHTML
+			return html + "<mrow>" + @children.map(
+				(child) ->
+					# Don't fence addition nodes.
+					child.toMathML(equationID, expression)
+				).join("<mo>+</mo>") + "</mrow>" + closingHTML
 
 		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return an HTML string representing this node.
@@ -603,11 +607,11 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else
 				closingHTML = "</div>"
 
-			return html + @children.map((child) -> "(" + child.toHTML() + ")").join("+") + closingHTML
+			return html + @children.map((child) -> child.toHTML()).join("+") + closingHTML
 
 		toLaTeX: ->
 			# Return a LaTeX string representing this node.
-			return @children.map((child) -> "\\left(" + child.toLaTeX() + "\\right)").join("+")
+			return @children.map((child) -> child.toLaTeX()).join("+")
 
 	class Mul extends nodes.RoseNode
 		# Represent multiplication.
@@ -991,7 +995,14 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else
 				closingHTML = "</math></div>"
 
-			return html + "<mrow>" + @children.map((child) -> "<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>").join("<mo>&middot;</mo>") + "</mrow>" + closingHTML
+			return html + "<mrow>" + @children.map(
+				(child) -> 
+					# Fence nodes with lower precedence - that is, addition nodes.
+					if child instanceof Add
+						"<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>"
+					else
+						child.toMathML(equationID, expression)
+				).join("<mo>&middot;</mo>") + "</mrow>" + closingHTML
 
 		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return an HTML string representing this node.
@@ -1003,11 +1014,23 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else
 				closingHTML = "</div>"
 
-			return html + @children.map((child) -> "(" + child.toHTML() + ")").join("&middot;") + closingHTML
+			return html + @children.map(
+				(child) ->
+					if child instanceof Add
+						"(" + child.toHTML() + ")"
+					else
+						child.toHTML()
+				).join("&middot;") + closingHTML
 
 		toLaTeX: ->
 			# Return a LaTeX string representing this node.
-			return @children.map((child) -> "\\left(" + child.toLaTeX() + "\\right)").join("\\cdot")
+			return @children.map(
+				(child) ->
+					if child instanceof Add
+						"\\left(" + child.toLaTeX() + "\\right)"
+					else
+						child.toLaTeX()
+				).join("\\cdot")
 
 	class Pow extends nodes.BinaryNode
 		# Represent powers.
@@ -1296,7 +1319,12 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					right = right.expandAndSimplify()
 				else
 					right = @children.right.copy()
-				innerHTML = "<mfenced>#{@children.left.toMathML(equationID, expression)}</mfenced>"
+
+				# Fence if lower precedence, i.e. Add or Mul.
+				if @children.left instanceof Add or @children.left instanceof Mul
+					innerHTML = "<mfenced>#{@children.left.toMathML(equationID, expression)}</mfenced>"
+				else
+					innerHTML = "#{@children.left.toMathML(equationID, expression)}"
 				unless right.evaluate?() == 1
 					innerHTML = "<msup>#{innerHTML}#{right.toMathML(equationID, expression)}</msup>"
 				if @children.right.evaluate?() < 0
@@ -1318,7 +1346,17 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else if @children.right.evaluate?() == 0
 				return html + "1" + closingHTML
 			else
-				innerHTML = "(#{@children.left.toHTML()}) ** (#{@children.right.toHTML()})"
+				# Fence if terminals.
+				if @children.left instanceof terminals.Terminal
+					leftSide = @children.left.toHTML()
+				else
+					leftSide = "(#{@children.left.toHTML()})"
+				if @children.right instanceof terminals.Terminal
+					rightSide = @children.right.toHTML()
+				else
+					rightSide = "(#{@children.right.toHTML()})"
+
+				innerHTML = "#{leftSide} ** #{rightSide}"
 				return html + innerHTML + closingHTML
 
 		toLaTeX: ->
@@ -1328,7 +1366,10 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else if @children.right.evaluate?() == 0
 				return "1"
 			else
-				innerLaTeX = "\\left(#{@children.left.toLaTeX()}\\right)^{#{@children.right.toLaTeX()}}"
+				if @children.left instanceof Add or @children.left instanceof Mul
+					innerLaTeX = "\\left(#{@children.left.toLaTeX()}\\right)^{#{@children.right.toLaTeX()}}"
+				else
+					innerLaTeX = "#{@children.left.toLaTeX()}^{#{@children.right.toLaTeX()}}"
 				if @children.right.evaluate?() < 0
 					right = @children.right.copy()
 					right = new Mul("-1", right)

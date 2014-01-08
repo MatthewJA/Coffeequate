@@ -722,7 +722,7 @@ define("lib/almond", function(){});
         if (this.denominator === 1) {
           return "<mn>" + this.numerator + "</mn>";
         }
-        return "<mfrac><mrow><mn>" + this.numerator + "</mn></mrow><mrow><mn>" + this.denominator + "</mn></mrow</mfrac>";
+        return "<mfrac><mrow><mn>" + this.numerator + "</mn></mrow><mrow><mn>" + this.denominator + "</mn></mrow></mfrac>";
       };
 
       Constant.prototype.toHTML = function() {
@@ -1718,7 +1718,7 @@ define("lib/almond", function(){});
           closingHTML = "</math></div>";
         }
         return html + "<mrow>" + this.children.map(function(child) {
-          return "<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>";
+          return child.toMathML(equationID, expression);
         }).join("<mo>+</mo>") + "</mrow>" + closingHTML;
       };
 
@@ -1741,13 +1741,13 @@ define("lib/almond", function(){});
           closingHTML = "</div>";
         }
         return html + this.children.map(function(child) {
-          return "(" + child.toHTML() + ")";
+          return child.toHTML();
         }).join("+") + closingHTML;
       };
 
       Add.prototype.toLaTeX = function() {
         return this.children.map(function(child) {
-          return "\\left(" + child.toLaTeX() + "\\right)";
+          return child.toLaTeX();
         }).join("+");
       };
 
@@ -2248,7 +2248,11 @@ define("lib/almond", function(){});
           closingHTML = "</math></div>";
         }
         return html + "<mrow>" + this.children.map(function(child) {
-          return "<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>";
+          if (child instanceof Add) {
+            return "<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>";
+          } else {
+            return child.toMathML(equationID, expression);
+          }
         }).join("<mo>&middot;</mo>") + "</mrow>" + closingHTML;
       };
 
@@ -2271,13 +2275,21 @@ define("lib/almond", function(){});
           closingHTML = "</div>";
         }
         return html + this.children.map(function(child) {
-          return "(" + child.toHTML() + ")";
+          if (child instanceof Add) {
+            return "(" + child.toHTML() + ")";
+          } else {
+            return child.toHTML();
+          }
         }).join("&middot;") + closingHTML;
       };
 
       Mul.prototype.toLaTeX = function() {
         return this.children.map(function(child) {
-          return "\\left(" + child.toLaTeX() + "\\right)";
+          if (child instanceof Add) {
+            return "\\left(" + child.toLaTeX() + "\\right)";
+          } else {
+            return child.toLaTeX();
+          }
         }).join("\\cdot");
       };
 
@@ -2617,7 +2629,11 @@ define("lib/almond", function(){});
           } else {
             right = this.children.right.copy();
           }
-          innerHTML = "<mfenced>" + (this.children.left.toMathML(equationID, expression)) + "</mfenced>";
+          if (this.children.left instanceof Add || this.children.left instanceof Mul) {
+            innerHTML = "<mfenced>" + (this.children.left.toMathML(equationID, expression)) + "</mfenced>";
+          } else {
+            innerHTML = "" + (this.children.left.toMathML(equationID, expression));
+          }
           if ((typeof right.evaluate === "function" ? right.evaluate() : void 0) !== 1) {
             innerHTML = "<msup>" + innerHTML + (right.toMathML(equationID, expression)) + "</msup>";
           }
@@ -2629,7 +2645,7 @@ define("lib/almond", function(){});
       };
 
       Pow.prototype.toHTML = function(equationID, expression, equality, topLevel) {
-        var closingHTML, html, innerHTML, mathClass, mathID, _base, _base1, _ref;
+        var closingHTML, html, innerHTML, leftSide, mathClass, mathID, rightSide, _base, _base1, _ref;
         if (expression == null) {
           expression = false;
         }
@@ -2651,7 +2667,17 @@ define("lib/almond", function(){});
         } else if ((typeof (_base1 = this.children.right).evaluate === "function" ? _base1.evaluate() : void 0) === 0) {
           return html + "1" + closingHTML;
         } else {
-          innerHTML = "(" + (this.children.left.toHTML()) + ") ** (" + (this.children.right.toHTML()) + ")";
+          if (this.children.left instanceof terminals.Terminal) {
+            leftSide = this.children.left.toHTML();
+          } else {
+            leftSide = "(" + (this.children.left.toHTML()) + ")";
+          }
+          if (this.children.right instanceof terminals.Terminal) {
+            rightSide = this.children.right.toHTML();
+          } else {
+            rightSide = "(" + (this.children.right.toHTML()) + ")";
+          }
+          innerHTML = "" + leftSide + " ** " + rightSide;
           return html + innerHTML + closingHTML;
         }
       };

@@ -77,7 +77,7 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 
 			if @denominator == 1
 				return "<mn>#{@numerator}</mn>"
-			return "<mfrac><mrow><mn>#{@numerator}</mn></mrow><mrow><mn>#{@denominator}</mn></mrow</mfrac>"
+			return "<mfrac><mrow><mn>#{@numerator}</mn></mrow><mrow><mn>#{@denominator}</mn></mrow></mfrac>"
 
 		toHTML: ->
 			# Return this constant as an HTML string.
