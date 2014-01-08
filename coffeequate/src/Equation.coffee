@@ -18,35 +18,40 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 							when 1
 								@left = new terminals.Constant("0")
 								@right = parse.stringToExpression(sides[0])
+								@right = @right.simplify()
 							when 2
 								@left = parse.stringToTerminal(sides[0])
 								@right = parse.stringToExpression(sides[1])
+								@right = @right.simplify()
 							else
 								throw new Error("Too many '=' signs.")
 					else if args[0] instanceof terminals.Terminal or args[0] instanceof nodes.BasicNode
 						@left = new terminals.Constant("0")
 						@right = args[0].copy()
 					else
-						throw new Error("Argument must be a String, Terminal, or Node.")
+						throw new Error("Argument #{args[0]} must be a String, Terminal, or Node.")
 				when 2
 					if args[0] instanceof String or typeof args[0] == "string"
 						@left = parse.stringToTerminal(args[0])
 					else if args[0] instanceof terminals.Terminal or args[0] instanceof nodes.BasicNode
 						@left = args[0].copy()
 					else
-						throw new Error("Argument must be a String, Terminal, or Node.")
+						throw new Error("Argument #{args[0]} must be a String, Terminal, or Node.")
 					if args[1] instanceof String or typeof args[1] == "string"
 						@right = parse.stringToExpression(args[1])
+						@right = @right.simplify()
 					else if args[1] instanceof terminals.Terminal or args[1] instanceof nodes.BasicNode
 						@right = args[1].copy()
 					else
-						throw new Error("Argument must be a String, Terminal, or Node.")
+						throw new Error("Argument #{args[1]} must be a String, Terminal, or Node.")
 				else
 					throw new Error("Too many arguments.")
 
 		solve: (variable) ->
 			expr = new operators.Add(@right, new operators.Mul("-1", @left))
-			return new Equation(variable, expr.solve(variable))
+			solutions = expr.solve(variable)
+			console.log(variable, parse.stringToTerminal(variable))
+			return solutions.map((solution) -> new Equation(variable, solution))
 
 		replaceVariables: (replacements) ->
 			@left.replaceVariables(replacements)
@@ -58,6 +63,7 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 			for variable in leftVars
 				unless variable in rightVars
 					rightVars.unshift(variable)
+			return rightVars
 
 		sub: (substitutions) ->
 			if @left instanceof terminals.Variable and @left.label of substitutions

@@ -450,7 +450,7 @@ define("lib/almond", function(){});
     stringToTerminal = function(string) {
       var terminals;
       terminals = require("terminals");
-      if (/\d+(\.\d+)?/.test(string) || /\d+(\.\d+)?\/\d+(\.\d+)?/.test(string)) {
+      if (/^-?\d+(\.\d+)?$/.test(string) || /^-?\d+(\.\d+)?\/\d+(\.\d+)?$/.test(string)) {
         return new terminals.Constant(string);
       } else if (/[a-zA-Z][a-zA-Z_\-\d]*/.test(string)) {
         return new terminals.Variable(string);
@@ -1413,6 +1413,7 @@ define("lib/almond", function(){});
             } else if (power === 2) {
               factorisedSquares.push(new terminals.Constant("1"));
             } else {
+              console.log("error 1");
               throw new AlgebraError(expr.toString(), variable, "polynomials of degree > 2 not supported");
             }
           } else if (term instanceof Mul) {
@@ -1433,17 +1434,18 @@ define("lib/almond", function(){});
                 } else if (power === 2) {
                   quadratic = true;
                 } else {
+                  console.log("error 2");
                   throw new AlgebraError(expr.toString(), variable, "polynomials of degree > 2 not supported");
                 }
               } else {
                 subterms.push(subterm);
               }
             }
-            factorisedTerm = (function(func, args, ctor) {
+            factorisedTerm = subterms.length > 0 ? (function(func, args, ctor) {
               ctor.prototype = func.prototype;
               var child = new ctor, result = func.apply(child, args);
               return Object(result) === result ? result : child;
-            })(Mul, subterms, function(){});
+            })(Mul, subterms, function(){}) : new terminals.Constant("1");
             if (!quadratic) {
               factorised.push(factorisedTerm);
             } else {
@@ -2657,10 +2659,12 @@ define("lib/almond", function(){});
                 case 1:
                   this.left = new terminals.Constant("0");
                   this.right = parse.stringToExpression(sides[0]);
+                  this.right = this.right.simplify();
                   break;
                 case 2:
                   this.left = parse.stringToTerminal(sides[0]);
                   this.right = parse.stringToExpression(sides[1]);
+                  this.right = this.right.simplify();
                   break;
                 default:
                   throw new Error("Too many '=' signs.");
@@ -2669,7 +2673,7 @@ define("lib/almond", function(){});
               this.left = new terminals.Constant("0");
               this.right = args[0].copy();
             } else {
-              throw new Error("Argument must be a String, Terminal, or Node.");
+              throw new Error("Argument " + args[0] + " must be a String, Terminal, or Node.");
             }
             break;
           case 2:
@@ -2678,14 +2682,15 @@ define("lib/almond", function(){});
             } else if (args[0] instanceof terminals.Terminal || args[0] instanceof nodes.BasicNode) {
               this.left = args[0].copy();
             } else {
-              throw new Error("Argument must be a String, Terminal, or Node.");
+              throw new Error("Argument " + args[0] + " must be a String, Terminal, or Node.");
             }
             if (args[1] instanceof String || typeof args[1] === "string") {
               this.right = parse.stringToExpression(args[1]);
+              this.right = this.right.simplify();
             } else if (args[1] instanceof terminals.Terminal || args[1] instanceof nodes.BasicNode) {
               this.right = args[1].copy();
             } else {
-              throw new Error("Argument must be a String, Terminal, or Node.");
+              throw new Error("Argument " + args[1] + " must be a String, Terminal, or Node.");
             }
             break;
           default:
@@ -2694,9 +2699,13 @@ define("lib/almond", function(){});
       }
 
       Equation.prototype.solve = function(variable) {
-        var expr;
+        var expr, solutions;
         expr = new operators.Add(this.right, new operators.Mul("-1", this.left));
-        return new Equation(variable, expr.solve(variable));
+        solutions = expr.solve(variable);
+        console.log(variable, parse.stringToTerminal(variable));
+        return solutions.map(function(solution) {
+          return new Equation(variable, solution);
+        });
       };
 
       Equation.prototype.replaceVariables = function(replacements) {
@@ -2705,19 +2714,16 @@ define("lib/almond", function(){});
       };
 
       Equation.prototype.getAllVariables = function() {
-        var leftVars, rightVars, variable, _i, _len, _results;
+        var leftVars, rightVars, variable, _i, _len;
         leftVars = this.left.getAllVariables();
         rightVars = this.right.getAllVariables();
-        _results = [];
         for (_i = 0, _len = leftVars.length; _i < _len; _i++) {
           variable = leftVars[_i];
           if (__indexOf.call(rightVars, variable) < 0) {
-            _results.push(rightVars.unshift(variable));
-          } else {
-            _results.push(void 0);
+            rightVars.unshift(variable);
           }
         }
-        return _results;
+        return rightVars;
       };
 
       Equation.prototype.sub = function(substitutions) {

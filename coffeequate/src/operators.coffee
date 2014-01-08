@@ -286,8 +286,19 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			# (a * v) + (b * v) + (c * (v ** 2)) -> ((a + b) * v) + (c * (v ** 2))
 			# If we detect a power > 2, reject the equation.
 
+			# Not everything can be solved this way. At this point we could have
+			# one of these:
+			# 0 = a + b / v + c / (v ** 2)
+			# 0 = a + b / v
+			# 0 = a + b / (v ** 2)
+			# 0 = a + v + b / v
+			# 0 = a + v ** 2 + b / v (not solvable)
+			# 0 = a + v + v ** 2 + 1 / v (not solvable)
+
 			factorised = [] # (a + b) in the above example.
 			factorisedSquares = [] # c in the above example.
+			inversed = [] # Handles 1/v and v**-1.
+			inversedSquares = [] # Handles 1/v**2 and v**-2.
 
 			for term in termsContainingVariable
 				if term instanceof terminals.Variable
@@ -300,11 +311,17 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 						factorised.push(new terminals.Constant("1"))
 					else if power == 2
 						factorisedSquares.push(new terminals.Constant("1"))
+					else if power == -1
+						inversed.push(new terminals.Constant("1"))
+					else if power == -2
+						inversedSquares.push(new terminals.Constant("1"))
 					else
-						throw new AlgebraError(expr.toString(), variable, "polynomials of degree > 2 not supported")
+						throw new AlgebraError(expr.toString(), variable, " (not supported)")
 				else if term instanceof Mul
 					subterms = [] # Non-variable terms.
 					quadratic = false
+					inv = false
+					invSquare = false
 					for subterm in term.children
 						if subterm instanceof terminals.Variable and subterm.label == variable then # pass
 						else if subterm instanceof Pow
@@ -314,17 +331,25 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 							if power == 1 then # pass
 							else if power == 2
 								quadratic = true # We operate on the assumption that there's only one term with our target variable in it here.
-								# This should be possibly due to expandAndSimplify.
+								# This should be possible due to expandAndSimplify.
+							else if power == -1
+								inv = true
+							else if power == -2
+								invSquare = true
 							else
-								throw new AlgebraError(expr.toString(), variable, "polynomials of degree > 2 not supported")
+								throw new AlgebraError(expr.toString(), variable, " (not supported)")
 						else
 							subterms.push(subterm)
 
-					factorisedTerm = new Mul(subterms...)
-					unless quadratic
-						factorised.push(factorisedTerm)
-					else
+					factorisedTerm = if subterms.length > 0 then new Mul(subterms...) else new terminals.Constant("1")
+					if quadratic
 						factorisedSquares.push(factorisedTerm)
+					else if inv
+						inversed.push(factorisedTerm)
+					else if invSquare
+						inversedSquares.push(factorisedTerm)
+					else
+						factorised.push(factorisedTerm)
 
 			negatedTerms = []
 			# Terms not containing the variable need to be negated. They will form part of the returned result.

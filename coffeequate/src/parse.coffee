@@ -13,7 +13,7 @@ define ["require"], (require) ->
 		# E.g. "2" -> Constant(2)
 		# E.g. "v" -> Variable(2)
 		terminals = require("terminals")
-		if /\d+(\.\d+)?/.test(string) or /\d+(\.\d+)?\/\d+(\.\d+)?/.test(string)
+		if /^-?\d+(\.\d+)?$/.test(string) or /^-?\d+(\.\d+)?\/\d+(\.\d+)?$/.test(string)
 			return new terminals.Constant(string)
 		else if /[a-zA-Z][a-zA-Z_\-\d]*/.test(string)
 			return new terminals.Variable(string)
