@@ -1547,7 +1547,7 @@ define("lib/almond", function(){});
               }
             } else {
               if (inversedSquares.length === 0) {
-                answer = new Mul(inversedEquatable, negatedTermsEquatable);
+                answer = new Mul(inversedEquatable, new Pow(negatedTermsEquatable, "-1"));
                 return [answer.expandAndSimplify()];
               } else {
                 newAdd = new Add(new Mul(nonNegatedTermsEquatable, new Pow(new terminals.Variable(variable), 2)), new Mul(inversedEquatable, new terminals.Variable(variable)), inversedSquaresEquatable);
@@ -2689,7 +2689,11 @@ define("lib/almond", function(){});
         } else if ((typeof (_base1 = this.children.right).evaluate === "function" ? _base1.evaluate() : void 0) === 0) {
           return "1";
         } else {
-          innerLaTeX = "\\left(" + (this.children.left.toLaTeX()) + "\\right)^{" + (this.children.right.toLaTeX()) + "}";
+          if (this.children.left instanceof Add || this.children.left instanceof Mul) {
+            innerLaTeX = "\\left(" + (this.children.left.toLaTeX()) + "\\right)^{" + (this.children.right.toLaTeX()) + "}";
+          } else {
+            innerLaTeX = "" + (this.children.left.toLaTeX()) + "^{" + (this.children.right.toLaTeX()) + "}";
+          }
           if ((typeof (_base2 = this.children.right).evaluate === "function" ? _base2.evaluate() : void 0) < 0) {
             right = this.children.right.copy();
             right = new Mul("-1", right);

@@ -414,7 +414,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 							# We only have inversed variables.
 							# -a = b/v
 							# v = b/-a
-							answer = new Mul(inversedEquatable, negatedTermsEquatable)
+							answer = new Mul(inversedEquatable, new Pow(negatedTermsEquatable, "-1"))
 							return [answer.expandAndSimplify()]
 						else
 							# We have inversed variables and inversed squares.
