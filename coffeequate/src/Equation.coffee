@@ -73,7 +73,10 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 				return new Equation(@left, @right.sub(substitutions))
 
 		substituteExpression: (source, variable, equivalencies) ->
-			if @left instanceof terminals.Variable and @left.label of substitutions
+			# Convert source to an expression if it is an equation.
+			if source instanceof Equation
+				source = new operators.Add(source.right, new operators.Mul("-1", source.left))
+			if @left instanceof terminals.Variable and @left.label == variable
 				expr = new operators.Add(@right, new operators.Mul("-1", @left))
 				return new Equation(expr.substituteExpression(source, variable, equivalencies))
 			else

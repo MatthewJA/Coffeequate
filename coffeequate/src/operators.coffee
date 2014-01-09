@@ -577,9 +577,11 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 				if child instanceof terminals.Variable and child.label == variable
 					children.push(sourceExpression.copy())
 				else if child.substituteExpression?
-					children.push(substituteExpression(sourcex, variable, equivalencies))
+					children.push(child.substituteExpression(sourceExpression, variable, equivalencies))
 				else
 					children.push(child.copy())
+			newAdd = new Add(children...)
+			return newAdd.expandAndSimplify()
 
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return a MathML string representing this node.
@@ -981,9 +983,11 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 				if child instanceof terminals.Variable and child.label == variable
 					children.push(sourceExpression.copy())
 				else if child.substituteExpression?
-					children.push(substituteExpression(sourcex, variable, equivalencies))
+					children.push(child.substituteExpression(sourceExpression, variable, equivalencies))
 				else
 					children.push(child.copy())
+			newMul = new Mul(children...)
+			return newMul.expandAndSimplify()
 
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return a MathML string representing this node.

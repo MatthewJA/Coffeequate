@@ -216,12 +216,12 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 			else
 				return html + '<mi class="variable"' + labelID + '>' + label + '</mi>' + closingHTML
 
-		toHTML: ->
+		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return an HTML string representing the variable.
 			# Strip the ID off of the variable, if it has one.
 			labelArray = @label.split("-")
 			label = labelArray[0]
-			labelID = if labelArray[1]? then 'id="variable-' + @label + '"' else ""
+			labelID = if labelArray[1]? then 'id="variable-' + (if expression then "expression" else "equation") + "-#{equationID}-" + @label + '"' else ""
 			return '<span class="variable"' + labelID + '>' + label + '</span>'
 
 		toLaTeX: ->

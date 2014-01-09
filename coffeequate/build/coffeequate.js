@@ -920,11 +920,20 @@ define("lib/almond", function(){});
         }
       };
 
-      Variable.prototype.toHTML = function() {
+      Variable.prototype.toHTML = function(equationID, expression, equality, topLevel) {
         var label, labelArray, labelID;
+        if (expression == null) {
+          expression = false;
+        }
+        if (equality == null) {
+          equality = "0";
+        }
+        if (topLevel == null) {
+          topLevel = false;
+        }
         labelArray = this.label.split("-");
         label = labelArray[0];
-        labelID = labelArray[1] != null ? 'id="variable-' + this.label + '"' : "";
+        labelID = labelArray[1] != null ? 'id="variable-' + (expression ? "expression" : "equation") + ("-" + equationID + "-") + this.label + '"' : "";
         return '<span class="variable"' + labelID + '>' + label + '</span>';
       };
 
@@ -1679,24 +1688,28 @@ define("lib/almond", function(){});
       };
 
       Add.prototype.substituteExpression = function(sourceExpression, variable, equivalencies) {
-        var child, children, _i, _len, _ref, _results;
+        var child, children, newAdd, _i, _len, _ref;
         if (equivalencies == null) {
           equivalencies = null;
         }
         children = [];
         _ref = this.children;
-        _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           child = _ref[_i];
           if (child instanceof terminals.Variable && child.label === variable) {
-            _results.push(children.push(sourceExpression.copy()));
+            children.push(sourceExpression.copy());
           } else if (child.substituteExpression != null) {
-            _results.push(children.push(substituteExpression(sourcex, variable, equivalencies)));
+            children.push(child.substituteExpression(sourceExpression, variable, equivalencies));
           } else {
-            _results.push(children.push(child.copy()));
+            children.push(child.copy());
           }
         }
-        return _results;
+        newAdd = (function(func, args, ctor) {
+          ctor.prototype = func.prototype;
+          var child = new ctor, result = func.apply(child, args);
+          return Object(result) === result ? result : child;
+        })(Add, children, function(){});
+        return newAdd.expandAndSimplify();
       };
 
       Add.prototype.toMathML = function(equationID, expression, equality, topLevel) {
@@ -2209,24 +2222,28 @@ define("lib/almond", function(){});
       };
 
       Mul.prototype.substituteExpression = function(sourceExpression, variable, equivalencies) {
-        var child, children, _i, _len, _ref, _results;
+        var child, children, newMul, _i, _len, _ref;
         if (equivalencies == null) {
           equivalencies = null;
         }
         children = [];
         _ref = this.children;
-        _results = [];
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
           child = _ref[_i];
           if (child instanceof terminals.Variable && child.label === variable) {
-            _results.push(children.push(sourceExpression.copy()));
+            children.push(sourceExpression.copy());
           } else if (child.substituteExpression != null) {
-            _results.push(children.push(substituteExpression(sourcex, variable, equivalencies)));
+            children.push(child.substituteExpression(sourceExpression, variable, equivalencies));
           } else {
-            _results.push(children.push(child.copy()));
+            children.push(child.copy());
           }
         }
-        return _results;
+        newMul = (function(func, args, ctor) {
+          ctor.prototype = func.prototype;
+          var child = new ctor, result = func.apply(child, args);
+          return Object(result) === result ? result : child;
+        })(Mul, children, function(){});
+        return newMul.expandAndSimplify();
       };
 
       Mul.prototype.toMathML = function(equationID, expression, equality, topLevel) {
@@ -2837,7 +2854,10 @@ define("lib/almond", function(){});
 
       Equation.prototype.substituteExpression = function(source, variable, equivalencies) {
         var expr;
-        if (this.left instanceof terminals.Variable && this.left.label in substitutions) {
+        if (source instanceof Equation) {
+          source = new operators.Add(source.right, new operators.Mul("-1", source.left));
+        }
+        if (this.left instanceof terminals.Variable && this.left.label === variable) {
           expr = new operators.Add(this.right, new operators.Mul("-1", this.left));
           return new Equation(expr.substituteExpression(source, variable, equivalencies));
         } else {
