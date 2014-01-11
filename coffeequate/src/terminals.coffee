@@ -69,21 +69,29 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return this constant as a MathML string.
 			if topLevel
-				[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression)
+				[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
 				closingHTML = "</math></div>"
 			else
 				html = ""
 				closingHTML = ""
 
 			if @denominator == 1
-				return "<mn>#{@numerator}</mn>"
-			return "<mfrac><mrow><mn>#{@numerator}</mn></mrow><mrow><mn>#{@denominator}</mn></mrow></mfrac>"
+				return html + "<mn>#{@numerator}</mn>" + closingHTML
+			return html + "<mfrac><mrow><mn>#{@numerator}</mn></mrow><mrow><mn>#{@denominator}</mn></mrow></mfrac>" + closingHTML
 
-		toHTML: ->
+		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return this constant as an HTML string.
+			[mathClass, mathID, html] = generateInfo.getHTMLInfo(equationID, expression, equality)
+
+			unless topLevel
+				html = ""
+				closingHTML = ""
+			else
+				closingHTML = "</div>"
+
 			if @denominator == 1
-				return "#{@numerator}"
-			return "(#{@numerator}/#{@denominator})"
+				return html + "#{@numerator}" + closingHTML
+			return html + "(#{@numerator}/#{@denominator})" + closingHTML
 
 		toLaTeX: ->
 			# Return this constant as a LaTeX string.
@@ -133,12 +141,18 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 		substituteExpression: (sourceExpression, variable, equivalencies) ->
 			@copy()
 
-		toHTML: ->
-			@toString()
+		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
+			if topLevel
+				[mathClass, mathID, html] = generateInfo.getHTMLInfo(equationID, expression, equality)
+				closingHTML = "</div>"
+			else
+				html = ""
+				closingHTML = ""
+			return html + @toString() + closingHTML
 
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			if topLevel
-				[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression)
+				[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
 				closingHTML = "</math></div>"
 			else
 				html = ""
@@ -189,7 +203,11 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 			else
 				return @copy()
 
-		substituteExpression: (sourceExpression, variable, equivalencies) ->
+		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
+			# Replace all instances of a variable with an expression.
+			# Eliminate the target variable if set to do so.
+			if eliminate
+				sourceExpression = sourceExpression.solve(variable)[0]
 			if @label == variable
 				return sourceExpression.copy()
 			else
@@ -198,8 +216,8 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return the variable as a MathML string.
 			if topLevel
-				[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression)
-				closingHTML = "</math></div>"
+				[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
+				closingHTML = "</div>"
 			else
 				html = ""
 				closingHTML = ""
@@ -218,11 +236,18 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 
 		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return an HTML string representing the variable.
+			if topLevel
+				[mathClass, mathID, html] = generateInfo.getHTMLInfo(equationID, expression, equality)
+				closingHTML = "</div>"
+			else
+				html = ""
+				closingHTML = ""
+
 			# Strip the ID off of the variable, if it has one.
 			labelArray = @label.split("-")
 			label = labelArray[0]
 			labelID = if labelArray[1]? then 'id="variable-' + (if expression then "expression" else "equation") + "-#{equationID}-" + @label + '"' else ""
-			return '<span class="variable"' + labelID + '>' + label + '</span>'
+			return html + '<span class="variable"' + labelID + '>' + label + '</span>' + closingHTML
 
 		toLaTeX: ->
 			@toString()

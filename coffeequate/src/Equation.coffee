@@ -50,7 +50,6 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 		solve: (variable) ->
 			expr = new operators.Add(@right, new operators.Mul("-1", @left))
 			solutions = expr.solve(variable)
-			console.log(variable, parse.stringToTerminal(variable))
 			return solutions.map((solution) -> new Equation(variable, solution))
 
 		replaceVariables: (replacements) ->
@@ -72,10 +71,14 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 			else
 				return new Equation(@left, @right.sub(substitutions))
 
-		substituteExpression: (source, variable, equivalencies) ->
+		substituteExpression: (source, variable, equivalencies, eliminate=false) ->
+			# Substitute an equation or expression into a variable in this equation.
 			# Convert source to an expression if it is an equation.
 			if source instanceof Equation
 				source = new operators.Add(source.right, new operators.Mul("-1", source.left))
+			# Eliminate the target variable if necessary.
+			if eliminate
+				source = source.solve(variable)[0]
 			if @left instanceof terminals.Variable and @left.label == variable
 				expr = new operators.Add(@right, new operators.Mul("-1", @left))
 				return new Equation(expr.substituteExpression(source, variable, equivalencies))

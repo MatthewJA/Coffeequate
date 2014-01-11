@@ -281,8 +281,6 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			if termsContainingVariable.length == 0
 				throw new AlgebraError(expr.toString(), variable)
 
-			console.log("Solving #{@} for #{variable}: Terms containing are (#{termsContainingVariable}), terms not are (#{termsNotContainingVariable})")
-
 			# The rest of the terms need to be manipulated to solve the equation.
 			# (a * v) + (b * v) -> ((a + b) * v)
 			# (a * v) + (b * v) + (c * (v ** 2)) -> ((a + b) * v) + (c * (v ** 2))
@@ -374,8 +372,6 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			inversedEquatable = new Add(inversed...) unless inversed.length == 0
 			inversedSquaresEquatable = new Add(inversedSquares...) unless inversedSquares.length == 0
 
-			console.log("Sorted terms. Negated: #{negatedTerms}; Factorised: #{factorised}; Squares: #{factorisedSquares}; Inversed: #{inversed}; Inversed Squares: #{inversedSquares}")
-
 			# Let's just... enumerate everything. That will probably work.
 
 			if negatedTerms.length == 0
@@ -426,7 +422,6 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 							newAdd = new Add(new Mul(nonNegatedTermsEquatable, new Pow(new terminals.Variable(variable), 2)),
 								new Mul(inversedEquatable, new terminals.Variable(variable)),
 								inversedSquaresEquatable)
-							console.log("Recursing into Add.solve with (#{newAdd})")
 							return newAdd.solve(variable)
 				else if inversed.length == 0
 					# There are standalone variables, but there aren't any inversed ones.
@@ -571,7 +566,11 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			newAdd = newAdd.expandAndSimplify()
 			return newAdd
 
-		substituteExpression: (sourceExpression, variable, equivalencies=null) ->
+		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
+			# Replace all instances of a variable with an expression.
+			# Eliminate the target variable if set to do so.
+			if eliminate
+				sourceExpression = sourceExpression.solve(variable)[0]
 			children = []
 			for child in @children
 				if child instanceof terminals.Variable and child.label == variable
@@ -581,6 +580,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 				else
 					children.push(child.copy())
 			newAdd = new Add(children...)
+			console.log newAdd.toString()
 			return newAdd.expandAndSimplify()
 
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
@@ -977,7 +977,11 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			newMul = newMul.expandAndSimplify()
 			return newMul
 
-		substituteExpression: (sourceExpression, variable, equivalencies=null) ->
+		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
+			# Replace all instances of a variable with an expression.
+			# Eliminate the target variable if set to do so.
+			if eliminate
+				sourceExpression = sourceExpression.solve(variable)[0]
 			children = []
 			for child in @children
 				if child instanceof terminals.Variable and child.label == variable
@@ -1280,7 +1284,11 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else if @children.right.replaceVariables?
 				@children.right.replaceVariables(replacements)
 
-		substituteExpression: (sourceExpression, variable, equivalencies=null) ->
+		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
+			# Replace all instances of a variable with an expression.
+			# Eliminate the target variable if set to do so.
+			if eliminate
+				sourceExpression = sourceExpression.solve(variable)[0]
 			# variable = sourceExpression
 			left = @children.left.copy()
 			right = @children.right.copy()
