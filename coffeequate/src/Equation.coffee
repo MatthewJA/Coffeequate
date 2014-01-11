@@ -83,7 +83,7 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 				expr = new operators.Add(@right, new operators.Mul("-1", @left))
 				return new Equation(expr.substituteExpression(source, variable, equivalencies))
 			else
-				return new Equation(@left, @right.substituteExpression(source, variable, equivalencies))
+				return new Equation(@left, @right.substituteExpression(source, variable, equivalencies).simplify())
 
 		toMathML: (equationID, expression=false, equality=null, topLevel=false) ->
 			# equality is here for consistency and nothing else, so we ignore it.

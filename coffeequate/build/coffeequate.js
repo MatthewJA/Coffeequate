@@ -2932,7 +2932,7 @@ define("lib/almond", function(){});
           expr = new operators.Add(this.right, new operators.Mul("-1", this.left));
           return new Equation(expr.substituteExpression(source, variable, equivalencies));
         } else {
-          return new Equation(this.left, this.right.substituteExpression(source, variable, equivalencies));
+          return new Equation(this.left, this.right.substituteExpression(source, variable, equivalencies).simplify());
         }
       };
 
