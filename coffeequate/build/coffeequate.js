@@ -697,6 +697,18 @@ define("lib/almond", function(){});
         return this.copy();
       };
 
+      Constant.prototype.simplify = function() {
+        return this.copy();
+      };
+
+      Constant.prototype.expand = function() {
+        return this.copy();
+      };
+
+      Constant.prototype.expandAndSimplify = function() {
+        return this.copy();
+      };
+
       Constant.prototype.substituteExpression = function(sourceExpression, variable, equivalencies) {
         return this.copy();
       };
@@ -809,6 +821,18 @@ define("lib/almond", function(){});
       };
 
       SymbolicConstant.prototype.sub = function(substitutions) {
+        return this.copy();
+      };
+
+      SymbolicConstant.prototype.simplify = function() {
+        return this.copy();
+      };
+
+      SymbolicConstant.prototype.expand = function() {
+        return this.copy();
+      };
+
+      SymbolicConstant.prototype.expandAndSimplify = function() {
         return this.copy();
       };
 
@@ -933,6 +957,18 @@ define("lib/almond", function(){});
         } else {
           return this.copy();
         }
+      };
+
+      Variable.prototype.simplify = function() {
+        return this.copy();
+      };
+
+      Variable.prototype.expand = function() {
+        return this.copy();
+      };
+
+      Variable.prototype.expandAndSimplify = function() {
+        return this.copy();
       };
 
       Variable.prototype.toMathML = function(equationID, expression, equality, topLevel) {

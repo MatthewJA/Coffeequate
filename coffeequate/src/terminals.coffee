@@ -63,6 +63,15 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 		sub: (substitutions) ->
 			@copy()
 
+		simplify: ->
+			@copy()
+
+		expand: ->
+			@copy()
+
+		expandAndSimplify: ->
+			@copy()
+
 		substituteExpression: (sourceExpression, variable, equivalencies) ->
 			@copy()
 
@@ -136,6 +145,15 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 			[]
 
 		sub: (substitutions) ->
+			@copy()
+
+		simplify: ->
+			@copy()
+
+		expand: ->
+			@copy()
+
+		expandAndSimplify: ->
 			@copy()
 
 		substituteExpression: (sourceExpression, variable, equivalencies) ->
@@ -212,6 +230,15 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 				return sourceExpression.copy()
 			else
 				return @copy()
+
+		simplify: ->
+			@copy()
+
+		expand: ->
+			@copy()
+
+		expandAndSimplify: ->
+			@copy()
 
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return the variable as a MathML string.
