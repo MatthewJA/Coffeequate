@@ -47,9 +47,9 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 				else
 					throw new Error("Too many arguments.")
 
-		solve: (variable) ->
+		solve: (variable, equivalencies=null) ->
 			expr = new operators.Add(@right, new operators.Mul("-1", @left))
-			solutions = expr.solve(variable)
+			solutions = expr.solve(variable, equivalencies)
 			return solutions.map((solution) -> new Equation(variable, solution))
 
 		replaceVariables: (replacements) ->
@@ -76,14 +76,22 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 			# Convert source to an expression if it is an equation.
 			if source instanceof Equation
 				source = new operators.Add(source.right, new operators.Mul("-1", source.left))
+
+			# Generate an equivalencies index if necessary.
+			if not equivalencies?
+				equivalencies = {get: (variable) -> [variable]}
+
+			# Get equivalencies for the target variable.
+			variableEquivalencies = equivalencies.get(variable)
+
 			# Eliminate the target variable if necessary.
 			if eliminate
-				source = source.solve(variable)[0]
-			if @left instanceof terminals.Variable and @left.label == variable
+				source = source.solve(variable, equivalencies)[0]
+			if @left instanceof terminals.Variable and (@left.label == variable or @left.label in variableEquivalencies)
 				expr = new operators.Add(@right, new operators.Mul("-1", @left))
 				return new Equation(expr.substituteExpression(source, variable, equivalencies))
 			else
-				return new Equation(@left, @right.substituteExpression(source, variable, equivalencies).simplify())
+				return new Equation(@left, @right.substituteExpression(source, variable, equivalencies).expandAndSimplify(equivalencies))
 
 		toMathML: (equationID, expression=false, equality=null, topLevel=false) ->
 			# equality is here for consistency and nothing else, so we ignore it.

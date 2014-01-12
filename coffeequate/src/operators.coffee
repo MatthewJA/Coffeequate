@@ -93,7 +93,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 				child.sort?()
 			@children.sort(compare)
 
-		equals: (b) ->
+		equals: (b, equivalencies) ->
 			# Check equality between this and another object.
 			unless b instanceof Add
 				return false
@@ -101,18 +101,22 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 				return false
 			for child, index in @children
 				if child.equals?
-					unless child.equals(b.children[index])
+					unless child.equals(b.children[index], equivalencies)
 						return false
 				else
 					unless child == b.children[index]
 						return false
 			return true
 
-		simplify: ->
+		simplify: (equivalencies) ->
+
+			unless equivalencies?
+				equivalencies = {get: (variable) -> [variable]}
+
 			terms = []
 			for child in @children
 				if child.simplify?
-					child = child.simplify()
+					child = child.simplify(equivalencies)
 				else if child.copy?
 					child = child.copy()
 
@@ -168,13 +172,13 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 						found = false
 						for liketerm, index in liketerms
 							if liketerm[0].equals?
-								if liketerm[0].equals(variabletermmul)
+								if liketerm[0].equals(variabletermmul, equivalencies)
 									liketerms[index][1] = new Add(liketerm[1], constanttermmul)
-									liketerms[index][1] = liketerms[index][1].simplify()
+									liketerms[index][1] = liketerms[index][1].simplify(equivalencies)
 									found = true
 							else if liketerm[0] == variabletermmul
 								liketerms[index][1] = new Add(liketerm[1], constanttermmul)
-								liketerms[index][1] = liketerms[index][1].simplify()
+								liketerms[index][1] = liketerms[index][1].simplify(equivalencies)
 								found = true
 						unless found
 							liketerms.push([variabletermmul, constanttermmul])
@@ -184,13 +188,13 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					found = false
 					for liketerm, index in liketerms
 						if liketerm[0].equals?
-							if liketerm[0].equals(term)
+							if liketerm[0].equals(term, equivalencies)
 								liketerms[index][1] = new Add(liketerm[1], new terminals.Constant("1"))
-								liketerms[index][1] = liketerms[index][1].simplify()
+								liketerms[index][1] = liketerms[index][1].simplify(equivalencies)
 								found = true
 						else if liketerm[0] == term
 							liketerms[index][1] = new Add(liketerm[1], new terminals.Constant("1"))
-							liketerms[index][1] = liketerms[index][1].simplify()
+							liketerms[index][1] = liketerms[index][1].simplify(equivalencies)
 							found = true
 					unless found
 						liketerms.push([term, new terminals.Constant("1")])
@@ -203,7 +207,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					liketerm[0] = liketerm[0].children[0]
 				if liketerm[1].evaluate?() != 1
 					newMul = new Mul(liketerm[0], liketerm[1])
-					newMul = newMul.simplify()
+					newMul = newMul.simplify(equivalencies)
 				else
 					newMul = liketerm[0]
 				if newAdd?
@@ -222,14 +226,17 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			return newAdd unless newAdd.children.length == 1
 			return newAdd.children[0]
 
-		expandAndSimplify: ->
+		expandAndSimplify: (equivalencies) ->
 			expr = @expand()
 			if expr.simplify?
-				return expr.simplify()
+				return expr.simplify(equivalencies)
 			return expr
 
-		solve: (variable) ->
-			expr = @expandAndSimplify()
+		solve: (variable, equivalencies=null) ->
+			expr = @expandAndSimplify(equivalencies)
+
+			unless equivalencies?
+				equivalencies = {get: (variable) -> [variable]}
 
 			# Sort the expression into terms containing v, and terms not containing v.
 			# Since we expanded, every term we deal with should be either a Mul with v as a direct
@@ -239,41 +246,41 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			termsNotContainingVariable = []
 
 			if expr instanceof terminals.Terminal
-				if expr instanceof terminals.Variable and expr.label == variable
+				if expr instanceof terminals.Variable and (expr.label == variable or expr.label in equivalencies.get(variable))
 					return [new terminals.Constant("0")]
 				else
 					throw new AlgebraError(expr.toString(), variable)
 
 			unless expr instanceof Add
-				return expr.solve(variable)
+				return expr.solve(variable, equivalencies)
 
 			for term in expr.children
 				if term.copy?
 					term = term.copy()
 
 				if term instanceof Pow
-					if term.children.left instanceof terminals.Variable and term.children.left.label == variable
+					if term.children.left instanceof terminals.Variable and (term.children.left.label == variable or term.children.left.label in equivalencies.get(variable))
 						termsContainingVariable.push(term)
 					else
 						termsNotContainingVariable.push(term)
 				else if term instanceof Mul
 					added = false
 					for subterm in term.children
-						if subterm instanceof terminals.Variable and subterm.label == variable
+						if subterm instanceof terminals.Variable and (subterm.label == variable or subterm.label in equivalencies.get(variable))
 							termsContainingVariable.push(term)
 							added = true
 							break
 						else if (
 							subterm instanceof Pow and
 							subterm.children.left instanceof terminals.Variable and
-							subterm.children.left.label == variable)
+							(subterm.children.left.label == variable or subterm.children.left.label in equivalencies.get(variable)))
 							termsContainingVariable.push(term)
 							added = true
 							break
 
 					unless added
 						termsNotContainingVariable.push(term)
-				else if term instanceof terminals.Variable and term.label == variable
+				else if term instanceof terminals.Variable and (term.label == variable or term.label in equivalencies.get(variable))
 					termsContainingVariable.push(term)
 				else
 					termsNotContainingVariable.push(term)
@@ -307,7 +314,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					unless term.children.right instanceof terminals.Constant
 						throw new AlgebraError(expr.toString(), variable)
 					power = term.children.right.evaluate()
-					if term.children.left instanceof terminals.Variable and term.children.left.label == variable
+					if term.children.left instanceof terminals.Variable and (term.children.left.label == variable or term.children.left.label in equivalencies.get(variable))
 						if power == 1
 							factorised.push(new terminals.Constant("1"))
 						else if power == 2
@@ -327,12 +334,12 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					inv = false
 					invSquare = false
 					for subterm in term.children
-						if subterm instanceof terminals.Variable and subterm.label == variable then # pass
+						if subterm instanceof terminals.Variable and (subterm.label == variable or subterm.label in equivalencies.get(variable)) then # pass
 						else if subterm instanceof Pow
 							unless subterm.children.right instanceof terminals.Constant
 								throw new AlgebraError(expr.toString(), variable)
 							power = subterm.children.right.evaluate()
-							if subterm.children.left instanceof terminals.Variable and subterm.children.left.label == variable
+							if subterm.children.left instanceof terminals.Variable and (subterm.children.left.label == variable or subterm.children.left.label in equivalencies.get(variable))
 								if power == 1 then # pass
 								else if power == 2
 									quadratic = true # We operate on the assumption that there's only one term with our target variable in it here.
@@ -362,7 +369,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			# Terms not containing the variable need to be negated. They will form part of the returned result.
 			for term in termsNotContainingVariable
 				newMul = new Mul("-1", (if term.copy? then term.copy() else term))
-				newMul = newMul.simplify()
+				newMul = newMul.simplify(equivalencies)
 				negatedTerms.push(newMul)
 
 			negatedTermsEquatable = new Add(negatedTerms...) unless negatedTerms.length == 0
@@ -398,8 +405,8 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 							# v = +/(b/-a)**1/2
 							answer = new Mul(new Pow(inversedSquaresEquatable, "1/2"), new Pow(negatedTermsEquatable, "-1/2"))
 							a1 = new Mul(-1, answer.copy())
-							a1 = a1.expandAndSimplify()
-							a2 = answer.expandAndSimplify()
+							a1 = a1.expandAndSimplify(equivalencies)
+							a2 = answer.expandAndSimplify(equivalencies)
 							if a1.equals?(a2)
 								return [a1]
 							else
@@ -411,7 +418,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 							# -a = b/v
 							# v = b/-a
 							answer = new Mul(inversedEquatable, new Pow(negatedTermsEquatable, "-1"))
-							return [answer.expandAndSimplify()]
+							return [answer.expandAndSimplify(equivalencies)]
 						else
 							# We have inversed variables and inversed squares.
 							# -a = b/v + c/v**2
@@ -422,7 +429,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 							newAdd = new Add(new Mul(nonNegatedTermsEquatable, new Pow(new terminals.Variable(variable), 2)),
 								new Mul(inversedEquatable, new terminals.Variable(variable)),
 								inversedSquaresEquatable)
-							return newAdd.solve(variable)
+							return newAdd.solve(variable, equivalencies)
 				else if inversed.length == 0
 					# There are standalone variables, but there aren't any inversed ones.
 					if inversedSquares.length == 0
@@ -430,7 +437,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 						# -a = b v
 						# v = -a / b
 						answer = new Mul(negatedTermsEquatable, new Pow(factorisedEquatable, "-1"))
-						return [answer.expandAndSimplify()]
+						return [answer.expandAndSimplify(equivalencies)]
 					else
 						# There are inversed squares and standalone variables.
 						# That's a cubic, c'mon.
@@ -456,8 +463,8 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 						# v**2 = -a / b
 						answer = new Pow(new Mul(negatedTermsEquatable, new Pow(factorisedSquaresEquatable, "-1")), "1/2")
 						a1 = new Mul("-1", answer.copy())
-						a1 = a1.expandAndSimplify()
-						a2 = answer.expandAndSimplify()
+						a1 = a1.expandAndSimplify(equivalencies)
+						a2 = answer.expandAndSimplify(equivalencies)
 						if a1.equals?(a2)
 							return [a1]
 						else
@@ -505,8 +512,8 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 								"-1")
 						)
 					v2 = new Mul("-1", new Add(b, rd), new Pow(new Mul("2", a), "-1"))
-					v1 = v1.expandAndSimplify()
-					v2 = v2.expandAndSimplify()
+					v1 = v1.expandAndSimplify(equivalencies)
+					v2 = v2.expandAndSimplify(equivalencies)
 					if v1.equals? and v1.equals(v2)
 						return [v1]
 					return [v1, v2]
@@ -516,7 +523,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					# v = (-1 * fE * (fSE ** -1)))
 					newPow = new Pow(factorisedSquaresEquatable, "-1")
 					newMul = new Mul("-1", factorisedEquatable, newPow)
-					newMul = newMul.simplify()
+					newMul = newMul.simplify(equivalencies)
 					return [0, newMul]
 
 		getAllVariables: ->
@@ -542,7 +549,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 				else if child.replaceVariables?
 					child.replaceVariables(replacements)
 
-		sub: (substitutions) ->
+		sub: (substitutions, equivalencies=null) ->
 			# subtitutions: {variable: value}
 			# variable is a label, value is any object - if it is a node,
 			# it will be substituted in; otherwise it is interpreted as a
@@ -563,17 +570,24 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					children.push(child.copy())
 
 			newAdd = new Add(children...)
-			newAdd = newAdd.expandAndSimplify()
+			newAdd = newAdd.expandAndSimplify(equivalencies)
 			return newAdd
 
 		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
 			# Replace all instances of a variable with an expression.
 			# Eliminate the target variable if set to do so.
 			if eliminate
-				sourceExpression = sourceExpression.solve(variable)[0]
+				sourceExpression = sourceExpression.solve(variable, equivalencies)[0]
+
+			# Generate an equivalencies index if necessary.
+			if not equivalencies?
+				equivalencies = {get: (variable) -> [variable]}
+
+			variableEquivalencies = equivalencies.get(variable)
+
 			children = []
 			for child in @children
-				if child instanceof terminals.Variable and child.label == variable
+				if child instanceof terminals.Variable and (child.label == variable or child.label in variableEquivalencies)
 					children.push(sourceExpression.copy())
 				else if child.substituteExpression?
 					children.push(child.substituteExpression(sourceExpression, variable, equivalencies))
@@ -581,7 +595,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					children.push(child.copy())
 			newAdd = new Add(children...)
 			console.log newAdd.toString()
-			return newAdd.expandAndSimplify()
+			return newAdd.expandAndSimplify(equivalencies)
 
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return a MathML string representing this node.
@@ -694,7 +708,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			newAdd = newAdd.expand()
 			return newAdd
 
-		equals: (b) ->
+		equals: (b, equivalencies) ->
 			# Check equality between this and another object.
 			unless b instanceof Mul
 				return false
@@ -702,7 +716,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 				return false
 			for child, index in @children
 				if child.equals?
-					unless child.equals(b.children[index])
+					unless child.equals(b.children[index], equivalencies)
 						return false
 				else
 					unless child == b.children[index]
@@ -778,11 +792,16 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 
 			return term[0]
 
-		simplify: ->
+		simplify: (equivalencies) ->
+
+			# Generate an equivalencies index if necessary.
+			if not equivalencies?
+				equivalencies = {get: (variable) -> [variable]}
+
 			terms = []
 			for child in @children
 				if child.simplify?
-					child = child.simplify()
+					child = child.simplify(equivalencies)
 				else if child.copy?
 					child = child.copy()
 
@@ -814,15 +833,15 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					found = false
 					for liketerm, index in liketerms
 						if liketerm[0].equals?
-							if liketerm[0].equals(base)
+							if liketerm[0].equals(base, equivalencies)
 								liketerms[index][1] = new Add(liketerm[1], power)
-								liketerms[index][1] = liketerms[index][1].simplify()
+								liketerms[index][1] = liketerms[index][1].simplify(equivalencies)
 								if liketerms[index][1].children?.length == 1
 									liketerms[index][1] = liketerms[index][1].children[0]
 								found = true
 						else if liketerm[0] == base
 							liketerms[index][1] = new Add(liketerm[1], power)
-							liketerms[index][1] = liketerms[index][1].simplify()
+							liketerms[index][1] = liketerms[index][1].simplify(equivalencies)
 							if liketerms[index][1].children?.length == 1
 								liketerms[index][1] = liketerms[index][1].children[0]
 							found = true
@@ -834,15 +853,15 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					found = false
 					for liketerm, index in liketerms
 						if liketerm[0].equals?
-							if liketerm[0].equals(term)
+							if liketerm[0].equals(term, equivalencies)
 								liketerms[index][1] = new Add(liketerm[1], new terminals.Constant("1"))
-								liketerms[index][1] = liketerms[index][1].simplify()
+								liketerms[index][1] = liketerms[index][1].simplify(equivalencies)
 								if liketerms[index][1].children?.length == 1
 									liketerms[index][1] = liketerms[index][1].children[0]
 								found = true
 						else if liketerm[0] == term
 							liketerms[index][1] = new Add(liketerm[1], new terminals.Constant("1"))
-							liketerms[index][1] = liketerms[index][1].simplify()
+							liketerms[index][1] = liketerms[index][1].simplify(equivalencies)
 							if liketerms[index][1].children?.length == 1
 								liketerms[index][1] = liketerms[index][1].children[0]
 							found = true
@@ -858,7 +877,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			for liketerm in liketerms
 				if liketerm[1].evaluate?() != 1
 					newPow = new Pow(liketerm[0], liketerm[1])
-					newPow = newPow.simplify()
+					newPow = newPow.simplify(equivalencies)
 				else
 					newPow = liketerm[0]
 				if newMul?
@@ -893,14 +912,17 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 				child.sort?()
 			@children.sort(compare)
 
-		expandAndSimplify: ->
+		expandAndSimplify: (equivalencies) ->
 			expr = @expand()
 			if expr.simplify?
-				return expr.simplify()
+				return expr.simplify(equivalencies)
 			return expr
 
-		solve: (variable) ->
-			expr = @expandAndSimplify()
+		solve: (variable, equivalencies=null) ->
+			expr = @expandAndSimplify(equivalencies)
+
+			unless equivalencies?
+				equivalencies = {get: (variable) -> [variable]}
 
 			# If one of the children is either
 			# - v
@@ -909,20 +931,20 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			# Else unsolvable.
 
 			if expr instanceof terminals.Terminal
-				if expr instanceof terminals.Variable and expr.label == variable
+				if expr instanceof terminals.Variable and (expr.label == variable or expr.label in equivalencies.get(variable))
 					return [new terminals.Constant("0")]
 				else
 					throw new AlgebraError(expr.toString(), variable)
 
 			unless expr instanceof Mul
-				return expr.solve(variable)
+				return expr.solve(variable, equivalencies)
 
 			for child in expr.children
-				if child instanceof terminals.Variable and child.label == variable
+				if child instanceof terminals.Variable and (child.label == variable or child.label in equivalencies.get(variable))
 					return [new terminals.Constant("0")]
 				else if child instanceof Pow
 					try
-						return child.solve(variable)
+						return child.solve(variable, equivalencies)
 					catch error
 						if error instanceof AlgebraError
 							continue
@@ -953,7 +975,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 				else if child.replaceVariables?
 					child.replaceVariables(replacements)
 
-		sub: (substitutions) ->
+		sub: (substitutions, equivalencies=null) ->
 			# subtitutions: {variable: value}
 			# variable is a label, value is any object - if it is a node,
 			# it will be substituted in; otherwise it is interpreted as a
@@ -974,24 +996,31 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					children.push(child.copy())
 
 			newMul = new Mul(children...)
-			newMul = newMul.expandAndSimplify()
+			newMul = newMul.expandAndSimplify(equivalencies)
 			return newMul
 
 		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
 			# Replace all instances of a variable with an expression.
 			# Eliminate the target variable if set to do so.
 			if eliminate
-				sourceExpression = sourceExpression.solve(variable)[0]
+				sourceExpression = sourceExpression.solve(variable, equivalencies)[0]
+
+			# Generate an equivalencies index if necessary.
+			if not equivalencies?
+				equivalencies = {get: (variable) -> [variable]}
+
+			variableEquivalencies = equivalencies.get(variable)
+
 			children = []
 			for child in @children
-				if child instanceof terminals.Variable and child.label == variable
+				if child instanceof terminals.Variable and (child.label == variable or child.label in variableEquivalencies)
 					children.push(sourceExpression.copy())
 				else if child.substituteExpression?
 					children.push(child.substituteExpression(sourceExpression, variable, equivalencies))
 				else
 					children.push(child.copy())
 			newMul = new Mul(children...)
-			return newMul.expandAndSimplify()
+			return newMul.expandAndSimplify(equivalencies)
 
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return a MathML string representing this node.
@@ -1063,20 +1092,20 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			@children.left.sort?()
 			@children.right.sort?()
 
-		equals: (b) ->
+		equals: (b, equivalencies) ->
 			# Check equality between this and another object.
 			unless b instanceof Pow
 				return false
 
 			if @children.left.equals?
-				unless @children.left.equals(b.children.left)
+				unless @children.left.equals(b.children.left, equivalencies)
 					return false
 			else
 				unless @children.left == b.children.left
 					return false
 
 			if @children.right.equals?
-				unless @children.right.equals(b.children.right)
+				unless @children.right.equals(b.children.right, equivalencies)
 					return false
 			else
 				unless @children.right == b.children.right
@@ -1139,17 +1168,21 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 				# Can't expand any more!
 				return new Pow(left, right)
 
-		simplify: ->
+		simplify: (equivalencies) ->
+
+			unless equivalencies?
+				equivalencies = {get: (variable) -> [variable]}
+
 			# Simplify all the children.
 			if @children.left.simplify?
-				left = @children.left.simplify()
+				left = @children.left.simplify(equivalencies)
 			else if @children.left.copy?
 				left = @children.left.copy()
 			else
 				left = @children.left
 
 			if @children.right.simplify?
-				right = @children.right.simplify()
+				right = @children.right.simplify(equivalencies)
 			else if @children.right.copy?
 				right = @children.right.copy()
 			else
@@ -1167,37 +1200,40 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 				else if left instanceof Pow
 					power = new Mul(left.children.right, right)
 					newPow = new Pow(left.children.left, power)
-					newPow = newPow.simplify()
+					newPow = newPow.simplify(equivalencies)
 					return newPow
 				else
 					return new Pow(left, right)
 
-		expandAndSimplify: ->
+		expandAndSimplify: (equivalencies) ->
 			expr = @expand()
 			if expr.simplify?
-				return expr.simplify()
+				return expr.simplify(equivalencies)
 			return expr
 
-		solve: (variable) ->
+		solve: (variable, equivalencies) ->
 			# variable: The label of the variable to solve for. Return an array of solutions.
 
-			expr = @expandAndSimplify()
+			unless equivalencies?
+				equivalencies = {get: (variable) -> [variable]}
+
+			expr = @expandAndSimplify(equivalencies)
 
 			if expr instanceof terminals.Terminal
-				if expr instanceof terminals.Variable and expr.label == variable
+				if expr instanceof terminals.Variable and (expr.label == variable or expr.label in equivalencies.get(variable))
 					return [new terminals.Constant("0")]
 				else
 					throw new AlgebraError(expr.toString(), variable)
 
 			if expr instanceof Pow
 				if expr.children.left instanceof terminals.Variable
-					return [new terminals.Constant("0")] if expr.children.left.label == variable # 0 = v; v = 0
+					return [new terminals.Constant("0")] if (expr.children.left.label == variable or expr.children.left.label in equivalencies.get(variable)) # 0 = v; v = 0
 					throw new AlgebraError(expr.toString(), variable)
 				else if expr.children.left instanceof terminals.Terminal
 					throw new AlgebraError(expr.toString(), variable)
 				else
 					try
-						solutions = expr.children.left.solve(variable) # Root the 0 on the other side of the equation.
+						solutions = expr.children.left.solve(variable, equivalencies) # Root the 0 on the other side of the equation.
 					catch error
 						throw error # Acknowledging that this solving could fail and we do want it to.
 
@@ -1206,7 +1242,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					if expr.children.right.evaluate? and expr.children.right.evaluate() % 2 == 0
 						returnables = []
 						for solution in solutions
-							negative = (new Mul(-1, solution)).simplify()
+							negative = (new Mul(-1, solution)).simplify(equivalencies)
 							if negative.equals?
 								unless negative.equals(solution)
 									returnables.push(negative)
@@ -1219,9 +1255,9 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					else
 						return solutions
 			else
-				return expr.solve(variable)
+				return expr.solve(variable, equivalencies)
 
-		sub: (substitutions) ->
+		sub: (substitutions, equivalencies=null) ->
 			# subtitutions: {variable: value}
 			# variable is a label, value is any object - if it is a node,
 			# it will be substituted in; otherwise it is interpreted as a
@@ -1248,7 +1284,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 				right = @children.right.copy()
 
 			newPow = new Pow(left, right)
-			newPow = newPow.expandAndSimplify()
+			newPow = newPow.expandAndSimplify(equivalencies)
 			return newPow
 
 		getAllVariables: ->
@@ -1288,23 +1324,30 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			# Replace all instances of a variable with an expression.
 			# Eliminate the target variable if set to do so.
 			if eliminate
-				sourceExpression = sourceExpression.solve(variable)[0]
+				sourceExpression = sourceExpression.solve(variable, equivalencies)[0]
+
+			# Generate an equivalencies index if necessary.
+			if not equivalencies?
+				equivalencies = {get: (variable) -> [variable]}
+
+			variableEquivalencies = equivalencies.get(variable)
+
 			# variable = sourceExpression
 			left = @children.left.copy()
 			right = @children.right.copy()
 			
-			if @children.left instanceof terminals.Variable and @children.left.label == variable
+			if @children.left instanceof terminals.Variable and (@children.left.label == variable or @children.left.label in variableEquivalencies)
 				left = sourceExpression.copy()
 			else if not (@children.left instanceof terminals.Terminal)
 				left = @children.left.substituteExpression(sourceExpression, variable, equivalencies)
 
-			if @children.right instanceof terminals.Variable and @children.right.label == variable
+			if @children.right instanceof terminals.Variable and (@children.right.label == variable or @children.right.label in variableEquivalencies)
 				right = sourceExpression.copy()
 			else if not (@children.right instanceof terminals.Terminal)
 				right = @children.right.substituteExpression(sourceExpression, variable, equivalencies)
 
 			newPow = new Pow(left, right)
-			newPow = newPow.expandAndSimplify()
+			newPow = newPow.expandAndSimplify(equivalencies)
 			return newPow
 
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->

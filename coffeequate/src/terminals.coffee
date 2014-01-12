@@ -198,11 +198,15 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 			else
 				return 1
 
-		equals: (b) ->
+		equals: (b, equivalencies=null) ->
 			# Check equality between this and some other object.
 			unless b instanceof Variable
 				return false
-			return b.label == @label
+
+			if equivalencies?
+				return @label in equivalencies.get(b.label)
+			else
+				return b.label == @label
 
 		replaceVariables: (replacements) ->
 			if @label of replacements
@@ -223,10 +227,17 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 
 		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
 			# Replace all instances of a variable with an expression.
+
+			# Generate an equivalencies index if necessary.
+			if not equivalencies?
+				equivalencies = {get: (variable) -> [variable]}
+
+			variableEquivalencies = equivalencies.get(variable)
+
 			# Eliminate the target variable if set to do so.
 			if eliminate
 				sourceExpression = sourceExpression.solve(variable)[0]
-			if @label == variable
+			if @label == variable or @label in variableEquivalencies
 				return sourceExpression.copy()
 			else
 				return @copy()
