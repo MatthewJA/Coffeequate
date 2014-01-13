@@ -590,23 +590,25 @@ define("lib/almond", function(){});
   define('generateInfo',[],function() {
     return {
       getMathMLInfo: function(equationID, expression, equality) {
-        var html, mathClass, mathID;
+        var html, mathClass, mathID, mathIDstring;
         if (equality == null) {
           equality = "0";
         }
         mathClass = expression ? "expression" : "equation";
         mathID = "" + mathClass + "-" + (equationID != null ? equationID : Math.floor(Math.random() * 10000000).toString(16));
-        html = '<div id="' + mathID + '" class="' + mathClass + '"><math xmlns="http://www.w3.org/1998/Math/MathML">' + (equality != null ? (isFinite(equality) ? "<mn>" + equality + "</mn>" : (equality.toMathML != null ? "" + (equality.toMathML(equationID, expression)) : "<mi>" + equality + "</mi>")) + "<mo>=</mo>" : "");
+        mathIDstring = equationID != null ? 'id="' + mathID + '"' : "";
+        html = '<div ' + mathIDstring + ' class="' + mathClass + '"><math xmlns="http://www.w3.org/1998/Math/MathML">' + (equality != null ? (isFinite(equality) ? "<mn>" + equality + "</mn>" : (equality.toMathML != null ? "" + (equality.toMathML(equationID, expression)) : "<mi>" + equality + "</mi>")) + "<mo>=</mo>" : "");
         return [mathClass, mathID, html];
       },
       getHTMLInfo: function(equationID, expression, equality) {
-        var html, mathClass, mathID;
+        var html, mathClass, mathID, mathIDstring;
         if (equality == null) {
           equality = "0";
         }
         mathClass = expression ? "expression" : "equation";
         mathID = "" + mathClass + "-" + (equationID != null ? equationID : Math.floor(Math.random() * 10000000).toString(16));
-        html = '<div id="' + mathID + '" class="' + mathClass + '">' + (equality != null ? (equality.toHTML != null ? "" + (equality.toHTML(equationID, expression)) : "" + equality) + "=" : "");
+        mathIDstring = equationID != null ? 'id="' + mathID + '"' : "";
+        html = '<div ' + mathIDstring + ' class="' + mathClass + '">' + (equality != null ? (equality.toHTML != null ? "" + (equality.toHTML(equationID, expression)) : "" + equality) + "=" : "");
         return [mathClass, mathID, html];
       }
     };
