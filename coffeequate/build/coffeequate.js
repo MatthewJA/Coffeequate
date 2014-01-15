@@ -1849,7 +1849,6 @@ define("lib/almond", function(){});
           var child = new ctor, result = func.apply(child, args);
           return Object(result) === result ? result : child;
         })(Add, children, function(){});
-        console.log(newAdd.toString());
         return newAdd.expandAndSimplify(equivalencies);
       };
 
@@ -2469,8 +2468,8 @@ define("lib/almond", function(){});
         denominatorWithoutNegatives = denominator.filter(function(child) {
           return !(child instanceof terminals.Constant && (typeof child.evaluate === "function" ? child.evaluate() : void 0) === -1);
         });
+        negativeCount = denominator.length - denominatorWithoutNegatives.length + numerator.length - numeratorWithoutNegatives.length;
         if (denominator.length > 0 && numerator.length > 0) {
-          negativeCount = denominator.length - denominatorWithoutNegatives.length + numerator.length - numeratorWithoutNegatives.length;
           return html + ((function() {
             var _i, _results;
             _results = [];

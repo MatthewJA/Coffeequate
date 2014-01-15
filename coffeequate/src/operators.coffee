@@ -594,7 +594,6 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 				else
 					children.push(child.copy())
 			newAdd = new Add(children...)
-			console.log newAdd.toString()
 			return newAdd.expandAndSimplify(equivalencies)
 
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
@@ -1038,9 +1037,9 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 
 			numeratorWithoutNegatives = numerator.filter((child) -> not (child instanceof terminals.Constant and child.evaluate?() == -1))
 			denominatorWithoutNegatives = denominator.filter((child) -> not (child instanceof terminals.Constant and child.evaluate?() == -1))
+			negativeCount = denominator.length - denominatorWithoutNegatives.length + numerator.length - numeratorWithoutNegatives.length
 
 			if denominator.length > 0 and numerator.length > 0
-				negativeCount = denominator.length - denominatorWithoutNegatives.length + numerator.length - numeratorWithoutNegatives.length
 
 				return html + ("<mo>-</mo>" for i in [0...negativeCount]).join("") + "<mfrac><mrow>" + numeratorWithoutNegatives.map(
 					(child) -> 
