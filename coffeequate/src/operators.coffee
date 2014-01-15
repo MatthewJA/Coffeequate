@@ -1032,14 +1032,54 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			else
 				closingHTML = "</math></div>"
 
-			return html + "<mrow>" + @children.map(
-				(child) -> 
-					# Fence nodes with lower precedence - that is, addition nodes.
-					if child instanceof Add
-						"<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>"
-					else
-						child.toMathML(equationID, expression)
+			# Sort the children into terms with positive exponents and terms with negative exponents.
+			denominator = ((new Pow(child, "-1")).simplify() for child in @children when (child instanceof Pow and child.children.right.evaluate? and child.children.right.evaluate() < 0))
+			numerator = (child for child in @children when not (child instanceof Pow and child.children.right.evaluate? and child.children.right.evaluate() < 0))
+
+			numeratorWithoutNegatives = numerator.filter((child) -> not (child instanceof terminals.Constant and child.evaluate?() == -1))
+			denominatorWithoutNegatives = denominator.filter((child) -> not (child instanceof terminals.Constant and child.evaluate?() == -1))
+
+			if denominator.length > 0 and numerator.length > 0
+				negativeCount = denominator.length - denominatorWithoutNegatives.length + numerator.length - numeratorWithoutNegatives.length
+
+				return html + ("<mo>-</mo>" for i in [0...negativeCount]).join("") + "<mfrac><mrow>" + numeratorWithoutNegatives.map(
+					(child) -> 
+						# Fence nodes with lower precedence - that is, addition nodes.
+						if child instanceof Add
+							"<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>"
+						else
+							child.toMathML(equationID, expression)
+				).join("<mo>&middot;</mo>") + "</mrow><mrow>" + denominatorWithoutNegatives.map(
+					(child) -> 
+						# Fence nodes with lower precedence - that is, addition nodes.
+						if child instanceof Add
+							"<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>"
+						else
+							child.toMathML(equationID, expression)
+				).join("<mo>&middot;</mo>") + "</mrow></mfrac>" + closingHTML
+
+			else if denominator.length > 0
+				return html + ("<mo>-</mo>" for i in [0...negativeCount]).join("") + "<mfrac><mn>1</mn><mrow>" + denominatorWithoutNegatives.map(
+					(child) -> 
+						# Fence nodes with lower precedence - that is, addition nodes.
+						if child instanceof Add
+							"<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>"
+						else
+							child.toMathML(equationID, expression)
+				).join("<mo>&middot;</mo>") + "</mrow></mfrac>" + closingHTML
+
+			else if numerator.length > 0
+				return html + ("<mo>-</mo>" for i in [0...negativeCount]).join("") + "<mrow>" + numeratorWithoutNegatives.map(
+					(child) -> 
+						# Fence nodes with lower precedence - that is, addition nodes.
+						if child instanceof Add
+							"<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>"
+						else
+							child.toMathML(equationID, expression)
 				).join("<mo>&middot;</mo>") + "</mrow>" + closingHTML
+
+			else
+				throw new Error("No terms in Mul node.")
 
 		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return an HTML string representing this node.
