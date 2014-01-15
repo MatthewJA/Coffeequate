@@ -3178,6 +3178,27 @@ define("lib/almond", function(){});
         }
       };
 
+      Equation.prototype.expandAndSimplify = function(equivalencies) {
+        var left, right;
+        left = this.left.expandAndSimplify(equivalencies);
+        right = this.right.expandAndSimplify(equivalencies);
+        return new Equation(left, right);
+      };
+
+      Equation.prototype.simplify = function(equivalencies) {
+        var left, right;
+        left = this.left.simplify(equivalencies);
+        right = this.right.simplify(equivalencies);
+        return new Equation(left, right);
+      };
+
+      Equation.prototype.expand = function(equivalencies) {
+        var left, right;
+        left = this.left.expand(equivalencies);
+        right = this.right.expand(equivalencies);
+        return new Equation(left, right);
+      };
+
       Equation.prototype.toMathML = function(equationID, expression, equality, topLevel) {
         if (expression == null) {
           expression = false;

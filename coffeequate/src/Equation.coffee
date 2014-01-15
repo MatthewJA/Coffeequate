@@ -93,6 +93,21 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 			else
 				return new Equation(@left, @right.substituteExpression(source, variable, equivalencies).expandAndSimplify(equivalencies))
 
+		expandAndSimplify: (equivalencies) ->
+			left = @left.expandAndSimplify(equivalencies)
+			right = @right.expandAndSimplify(equivalencies)
+			return new Equation(left, right)
+
+		simplify: (equivalencies) ->
+			left = @left.simplify(equivalencies)
+			right = @right.simplify(equivalencies)
+			return new Equation(left, right)
+
+		expand: (equivalencies) ->
+			left = @left.expand(equivalencies)
+			right = @right.expand(equivalencies)
+			return new Equation(left, right)
+
 		toMathML: (equationID, expression=false, equality=null, topLevel=false) ->
 			# equality is here for consistency and nothing else, so we ignore it.
 			return @right.toMathML(equationID, expression, @left, topLevel)
