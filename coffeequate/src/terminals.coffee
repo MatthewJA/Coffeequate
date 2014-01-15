@@ -267,10 +267,19 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 			labelArray = @label.split("-")
 			label = labelArray[0]
 			labelID = if labelArray[1]? then 'id="variable-' + (if expression then "expression" else "equation") + "-#{equationID}-" + @label + '"' else ""
+
+			atCount = 0
+			while label[0] == "@"
+				atCount += 1
+				label = label[1..]
+
+			atStart = "<mover accent=\"true\">"
+			atEnd = "<mrow><mo>" + ("." for i in [0...atCount]).join("") + "</mo></mrow></mover>"
+
 			if label.length > 1
-				return html + '<msub class="variable"' + labelID + '><mi>' + label[0] + '</mi><mi>' + label[1..] + "</mi></msub>" + closingHTML
+				return html + atStart + '<msub class="variable"' + labelID + '><mi>' + label[0] + '</mi><mi>' + label[1..] + "</mi></msub>" + atEnd + closingHTML
 			else
-				return html + '<mi class="variable"' + labelID + '>' + label + '</mi>' + closingHTML
+				return html + atStart + '<mi class="variable"' + labelID + '>' + label + '</mi>' + atEnd + closingHTML
 
 		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return an HTML string representing the variable.

@@ -15,9 +15,9 @@ define ["require"], (require) ->
 		terminals = require("terminals")
 		if /^-?\d+(\.\d+)?$/.test(string) or /^-?\d+(\.\d+)?\/\d+(\.\d+)?$/.test(string)
 			return new terminals.Constant(string)
-		else if /^[a-zA-Z][a-zA-Z_\-\d]*$/.test(string)
+		else if /^@*[a-zA-Z][a-zA-Z_\-\d]*$/.test(string)
 			return new terminals.Variable(string)
-		else if /^\\[a-zA-Z][a-zA-Z_\-\d]*$/.test(string)
+		else if /^\\@*[a-zA-Z][a-zA-Z_\-\d]*$/.test(string)
 			return new terminals.SymbolicConstant(string[1..])
 		else
 			throw new ParseError(string, "terminal")
