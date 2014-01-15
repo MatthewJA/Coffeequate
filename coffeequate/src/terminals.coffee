@@ -166,7 +166,7 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 			else
 				html = ""
 				closingHTML = ""
-			return html + @toString() + closingHTML
+			return html + "<span class=\"symbolic-constant\">" + @toString() + "</span>" + closingHTML
 
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			if topLevel
@@ -176,7 +176,7 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 				html = ""
 				closingHTML = ""
 
-			"#{html}<mn>#{@label}</mn>#{closingHTML}"
+			"#{html}<mn class=\"symbolic-constant\">#{@label}</mn>#{closingHTML}"
 
 		toLaTeX: ->
 			@toString()
