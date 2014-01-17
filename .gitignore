@@ -7,7 +7,7 @@
 *.sublime-workspace
 
 ### Libraries ###
-!**/lib/**/*.js
+!**/src/lib/**/*.js
 
 ### Workspace ###
 progress/*

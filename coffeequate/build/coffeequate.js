@@ -863,7 +863,7 @@ define("lib/almond", function(){});
           html = "";
           closingHTML = "";
         }
-        return html + this.toString() + closingHTML;
+        return html + "<span class=\"symbolic-constant\">" + this.toString() + "</span>" + closingHTML;
       };
 
       SymbolicConstant.prototype.toMathML = function(equationID, expression, equality, topLevel) {
@@ -884,7 +884,7 @@ define("lib/almond", function(){});
           html = "";
           closingHTML = "";
         }
-        return "" + html + "<mn>" + this.label + "</mn>" + closingHTML;
+        return "" + html + "<mn class=\"symbolic-constant\">" + this.label + "</mn>" + closingHTML;
       };
 
       SymbolicConstant.prototype.toLaTeX = function() {
