@@ -85,8 +85,8 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 				closingHTML = ""
 
 			if @denominator == 1
-				return html + "<mn>#{@numerator}</mn>" + closingHTML
-			return html + "<mfrac><mrow><mn>#{@numerator}</mn></mrow><mrow><mn>#{@denominator}</mn></mrow></mfrac>" + closingHTML
+				return html + "<mn class=\"constant\">#{@numerator}</mn>" + closingHTML
+			return html + "<mfrac class=\"constant\"><mrow><mn>#{@numerator}</mn></mrow><mrow><mn>#{@denominator}</mn></mrow></mfrac>" + closingHTML
 
 		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return this constant as an HTML string.
@@ -166,7 +166,7 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 			else
 				html = ""
 				closingHTML = ""
-			return html + "<span class=\"symbolic-constant\">" + @toString() + "</span>" + closingHTML
+			return html + "<span class=\"constant symbolic-constant\">" + @toString() + "</span>" + closingHTML
 
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			if topLevel
@@ -176,7 +176,7 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 				html = ""
 				closingHTML = ""
 
-			"#{html}<mn class=\"symbolic-constant\">#{@label}</mn>#{closingHTML}"
+			"#{html}<mn class=\"constant symbolic-constant\">#{@label}</mn>#{closingHTML}"
 
 		toLaTeX: ->
 			@toString()
