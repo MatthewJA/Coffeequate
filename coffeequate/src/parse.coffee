@@ -12,6 +12,7 @@ define ["require"], (require) ->
 		# Take a string and return a Terminal that that string represents.
 		# E.g. "2" -> Constant(2)
 		# E.g. "v" -> Variable(2)
+		string = string.trim()
 		terminals = require("terminals")
 		if /^-?\d+(\.\d+)?$/.test(string) or /^-?\d+(\.\d+)?\/\d+(\.\d+)?$/.test(string)
 			return new terminals.Constant(string)
