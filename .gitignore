@@ -7,7 +7,7 @@
 *.sublime-workspace
 
 ### Libraries ###
-!**/src/lib/**/*.js
+!coffeequate/src/lib/**/*.js
 
 ### Workspace ###
 progress/*
