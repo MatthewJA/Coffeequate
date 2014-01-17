@@ -8,6 +8,8 @@ define ["require"], (require) ->
 		toString: ->
 			"Could not parse '#{@input}' as #{@type}"
 
+	VARIABLE_REGEX = /^@*[a-zA-Z][a-zA-Z_\-\d]*$/
+
 	stringToTerminal = (string) ->
 		# Take a string and return a Terminal that that string represents.
 		# E.g. "2" -> Constant(2)
@@ -16,7 +18,7 @@ define ["require"], (require) ->
 		terminals = require("terminals")
 		if /^-?\d+(\.\d+)?$/.test(string) or /^-?\d+(\.\d+)?\/\d+(\.\d+)?$/.test(string)
 			return new terminals.Constant(string)
-		else if /^@*[a-zA-Zα-ω][a-zA-Zα-ω_\-\d]*$/.test(string)
+		else if VARIABLE_REGEX.test(string)
 			return new terminals.Variable(string)
 		else if /^\\@*[a-zA-Zα-ω][a-zA-Zα-ω_\-\d]*$/.test(string)
 			return new terminals.SymbolicConstant(string[1..])
@@ -72,6 +74,8 @@ define ["require"], (require) ->
 			powr = @parsePower()
 
 			# Expect a "*".
+			if @getToken() and VARIABLE_REGEX.test(@getToken())
+				throw new ParseError(@getToken(), "multiplication")
 			unless @getToken() == "*"
 				# We must have only had a POWR after all.
 				return powr
