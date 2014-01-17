@@ -2,7 +2,16 @@
 <html>
 <head>
 	<title>Coffeequate Test Page</title>
-	<script type="text/javascript" src="./coffeequate.js"></script>
+	<script src="../src/lib/require.js"></script>
+	<script>
+		require.config({
+			baseUrl: "."
+		});
+
+		require( ["coffeequate"], function(coffeequate) {
+			window.coffeequate = coffeequate;
+		});
+	</script>
 </head>
 <body>
 </body>
