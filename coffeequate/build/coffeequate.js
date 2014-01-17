@@ -889,7 +889,7 @@ define("lib/almond", function(){});
       };
 
       SymbolicConstant.prototype.toLaTeX = function() {
-        return this.toString();
+        return "\\text{" + (this.toString()) + "}";
       };
 
       return SymbolicConstant;
@@ -1061,7 +1061,12 @@ define("lib/almond", function(){});
       };
 
       Variable.prototype.toLaTeX = function() {
-        return this.toString();
+        var str;
+        str = this.label.replace("-", "_");
+        if (str.length > 1) {
+          str = str[0] + "_{" + str.slice(1) + "}";
+        }
+        return str;
       };
 
       return Variable;
@@ -1916,7 +1921,7 @@ define("lib/almond", function(){});
       Add.prototype.toLaTeX = function() {
         return this.children.map(function(child) {
           return child.toLaTeX();
-        }).join("+");
+        }).join(" + ");
       };
 
       return Add;
@@ -2574,7 +2579,7 @@ define("lib/almond", function(){});
           } else {
             return child.toLaTeX();
           }
-        }).join("\\cdot");
+        }).join(" \\cdot ");
       };
 
       return Mul;

@@ -179,7 +179,7 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 			"#{html}<mn class=\"constant symbolic-constant\">#{@label}</mn>#{closingHTML}"
 
 		toLaTeX: ->
-			@toString()
+			"\\text{#{@toString()}}"
 
 	class Variable extends Terminal
 		# Variables in the equation tree, e.g. m
@@ -297,7 +297,11 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 			return html + '<span class="variable"' + labelID + '>' + label + '</span>' + closingHTML
 
 		toLaTeX: ->
-			@toString()
+			# Convert -'s to _'s, and subscript everything.
+			str = @label.replace("-", "_")
+			if str.length > 1
+				str = str[0] + "_{" + str[1..] + "}"
+			return str
 
 	return {
 

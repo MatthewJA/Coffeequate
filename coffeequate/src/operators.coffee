@@ -626,7 +626,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 
 		toLaTeX: ->
 			# Return a LaTeX string representing this node.
-			return @children.map((child) -> child.toLaTeX()).join("+")
+			return @children.map((child) -> child.toLaTeX()).join(" + ")
 
 	class Mul extends nodes.RoseNode
 		# Represent multiplication.
@@ -1106,7 +1106,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 						"\\left(" + child.toLaTeX() + "\\right)"
 					else
 						child.toLaTeX()
-				).join("\\cdot")
+				).join(" \\cdot ")
 
 	class Pow extends nodes.BinaryNode
 		# Represent powers.
