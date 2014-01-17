@@ -64,8 +64,7 @@ define ["operators", "parse"], (operators, parse) ->
 
 				# Quadratics?
 				add = parse.stringToExpression("-4 + x ** 2") # Simple quadratic.
-				expect(add.solve("x")[0].toString()).toEqual("2")
-				expect(add.solve("x")[1].toString()).toEqual("-2")
+				expect(add.solve("x").sort().toString()).toEqual("-2,2")
 				add = parse.stringToExpression("-4 * x + x ** 2") # Slightly more complex quadratic.
 				expect(add.solve("x")[0].toString()).toEqual("0")
 				expect(add.solve("x")[1].toString()).toEqual("4")
