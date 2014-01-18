@@ -9,7 +9,14 @@ Include Coffeequate with an AMD loader. It provides a `coffeequate` object, with
 ## Use
 Either make nodes directly:
 
-    expression = new coffeequate.tree.operators.Add(new Pow(a, 2), new Pow(b, 2), new Mul(-1, new Pow(c, 2)))
+    expression = new coffeequate.tree.operators.Add(
+        new coffeequate.tree.operators.Pow(a, 2),
+        new coffeequate.tree.operators.Pow(b, 2),
+        new coffeequate.tree.operators.Mul(
+            -1, 
+            new coffeequate.tree.operators.Pow(c, 2)
+        )
+    )
     
 Or make nodes with the parse functions:
 
