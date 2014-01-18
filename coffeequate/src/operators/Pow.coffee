@@ -290,6 +290,9 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 			return newPow
 
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
+			Mul = require("operators/Mul")
+			Add = require("operators/Add")
+
 			# Return a MathML string representing this node.
 			# This code was partially lifted from the (delightfully uncommented) predecessor
 			# to Coffeequate, MatthewJA/JS-Algebra.
