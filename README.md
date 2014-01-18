@@ -4,18 +4,23 @@ Coffeequate
 Computer algebra system for JavaScript. Uses require.js.
 
 ## Installation
-Drop all the files in /coffeequate/src into wherever you have your code. Do require.js magic until it works.
-Look at /coffeequate/tests/specRunner.coffee for an example of how magic might work.
-
-I'll compile this into a single JS file once I'm done writing it, and then it won't be so much magic.
+Include Coffeequate with an AMD loader. It provides a `coffeequate` object, with a `parse` object, an `Equation` object, and some exposed `tree` code.
 
 ## Use
 Either make nodes directly:
-    expression = new Add(new Pow(a, 2), new Pow(b, 2), new Mul(-1, new Pow(c, 2)))
-Or make nodes with the parse functions:
-	expression = parse.stringToExpression("a**2 + b**2 + -1*c**2")
 
-All nodes are equated to 0.
+    expression = new coffeequate.tree.operators.Add(new Pow(a, 2), new Pow(b, 2), new Mul(-1, new Pow(c, 2)))
+    
+Or make nodes with the parse functions:
+
+    expression = coffeequate.parse.stringToExpression("a**2 + b**2 + -1*c**2")
+
+Or make Equations, which are composed of nodes:
+
+    equation = new coffeequate.Equation("x", "y + z")
+    equation = new coffeequate.Equation("x = y + z")
+
+All nodes are equated to 0. Equations are equated to 0 unless you provide either an `=` sign or a left-hand-side of the equation.
 
 For parsing, you can use `*` for multiplication, `**` for exponentiation, `+` for addition, `-` for *negation* (not subtraction), `1/2` for a fractional constant, and `()` parentheses to change the order of operations. Negation and parenthesising are higher precedence than exponentiation, which is higher precedence than multiplication, which is higher precedence than addition.
 
