@@ -1,6 +1,6 @@
 define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals, generateInfo) ->
 
-	# Defines operator nodes of the expression tree.	
+	# Defines operator nodes of the expression tree.
 
 	class AlgebraError extends Error
 		constructor: (expr, variable, postscript=null) ->
@@ -121,7 +121,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					child = child.copy()
 
 				terms.push(child)
-			
+
 			# Collect like terms into multiplication.
 			liketerms = []
 			constantterm = null
@@ -479,11 +479,11 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					# We have squares and we have inversed variables, so this is usually unsolvable, except if
 					# inversed squares and negated terms are both of 0 length.
 					## FIXME: Deal with that situation.
-					throw new AlgebraError(expr.toString(), variable, " (not supported)")	
+					throw new AlgebraError(expr.toString(), variable, " (not supported)")
 			else
 				# There are squares and standalone variables. Unsolvable if we have any inverses whatsoever.
 				if inversed.length > 0 or inversedSquares.length > 0
-					throw new AlgebraError(expr.toString(), variable, " (not supported)")	
+					throw new AlgebraError(expr.toString(), variable, " (not supported)")
 
 				# We have a quadratic equation.
 				# ((factorisedSquaresEquatable) * (v ** 2)) + (factorisedEquatable * v) + (nonNegatedTerms) = 0
@@ -638,7 +638,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 
 			args = parseArgs(args...)
 			super("*", args)
-		
+
 		copy: ->
 			args = ((if i.copy? then i.copy() else i) for i in @children)
 			return new Mul(args...)
@@ -805,7 +805,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 					child = child.copy()
 
 				terms.push(child)
-			
+
 			# Collect like terms into powers.
 			liketerms = []
 			constantterm = null
@@ -1042,14 +1042,14 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			if denominator.length > 0 and numerator.length > 0
 
 				return html + ("<mo>-</mo>" for i in [0...negativeCount]).join("") + "<mfrac><mrow>" + numeratorWithoutNegatives.map(
-					(child) -> 
+					(child) ->
 						# Fence nodes with lower precedence - that is, addition nodes.
 						if child instanceof Add
 							"<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>"
 						else
 							child.toMathML(equationID, expression)
 				).join("<mo>&middot;</mo>") + "</mrow><mrow>" + denominatorWithoutNegatives.map(
-					(child) -> 
+					(child) ->
 						# Fence nodes with lower precedence - that is, addition nodes.
 						if child instanceof Add
 							"<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>"
@@ -1059,7 +1059,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 
 			else if denominator.length > 0
 				return html + ("<mo>-</mo>" for i in [0...negativeCount]).join("") + "<mfrac><mn>1</mn><mrow>" + denominatorWithoutNegatives.map(
-					(child) -> 
+					(child) ->
 						# Fence nodes with lower precedence - that is, addition nodes.
 						if child instanceof Add
 							"<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>"
@@ -1069,7 +1069,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 
 			else if numerator.length > 0
 				return html + ("<mo>-</mo>" for i in [0...negativeCount]).join("") + "<mrow>" + numeratorWithoutNegatives.map(
-					(child) -> 
+					(child) ->
 						# Fence nodes with lower precedence - that is, addition nodes.
 						if child instanceof Add
 							"<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>"
@@ -1374,7 +1374,7 @@ define ["nodes", "parse", "terminals", "generateInfo"], (nodes, parse, terminals
 			# variable = sourceExpression
 			left = @children.left.copy()
 			right = @children.right.copy()
-			
+
 			if @children.left instanceof terminals.Variable and (@children.left.label == variable or @children.left.label in variableEquivalencies)
 				left = sourceExpression.copy()
 			else if not (@children.left instanceof terminals.Terminal)

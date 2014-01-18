@@ -28,7 +28,9 @@ define ->
 				@children
 
 			toLisp: ->
-				"(#{@label}#{if @children then " " else ""}#{@children.join(" ")})"
+				console.log(@children)
+				childrenStrings = @children.map((x) -> if x.toLisp then x.toLisp() else x)
+				"(#{@label}#{if @children then " " else ""}#{childrenStrings.join(" ")})"
 
 			toString: ->
 				"(#{@children.join(" #{@label} ")})"
@@ -46,7 +48,8 @@ define ->
 				[@children.left, @children.right]
 
 			toLisp: ->
-				"(#{@label} #{@children.left} #{@children.right})"
+				lispify = (x) -> if x.toLisp then x.toLisp() else x
+				"(#{@label} #{lispify(@children.left)} #{lispify(@children.right)})"
 
 			toString: ->
 				"(#{@children.left} #{@label} #{@children.right})"
