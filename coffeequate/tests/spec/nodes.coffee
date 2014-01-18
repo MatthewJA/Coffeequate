@@ -1,4 +1,4 @@
-define ["operators", "parse"], (operators, parse) ->
+define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) ->
 
 	describe "Nodes", ->
 
@@ -171,7 +171,7 @@ define ["operators", "parse"], (operators, parse) ->
 
 				it "trying to solve for a non-existant variable", ->
 					pow = parse.stringToExpression("x * z")
-					expect(-> pow.solve("y")).toThrow(new operators.AlgebraError("Unsolvable: (x * z) for y"))
+					expect(-> pow.solve("y")).toThrow(new AlgebraError("Unsolvable: (x * z) for y"))
 
 			it "substitute values", ->
 				mul = parse.stringToExpression("a * b * c")
@@ -264,11 +264,11 @@ define ["operators", "parse"], (operators, parse) ->
 
 				it "trying to solve for a non-existant variable", ->
 					pow = parse.stringToExpression("x ** 2")
-					expect(-> pow.solve("y")).toThrow(new operators.AlgebraError("Unsolvable: (x ** 2) for y"))
+					expect(-> pow.solve("y")).toThrow(new AlgebraError("Unsolvable: (x ** 2) for y"))
 
 				it "trying to solve for a variable in the exponent", ->
 					pow = parse.stringToExpression("x ** y")
-					expect(-> pow.solve("y")).toThrow(new operators.AlgebraError("Unsolvable: (x ** y) for y"))
+					expect(-> pow.solve("y")).toThrow(new AlgebraError("Unsolvable: (x ** y) for y"))
 
 			it "substitute values", ->
 				pow = parse.stringToExpression("a ** b ** c")
