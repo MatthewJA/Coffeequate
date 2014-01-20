@@ -86,12 +86,20 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 
 			# Eliminate the target variable if necessary.
 			if eliminate
-				source = source.solve(variable, equivalencies)[0]
-			if @left instanceof terminals.Variable and (@left.label == variable or @left.label in variableEquivalencies)
-				expr = new operators.Add(@right, new operators.Mul("-1", @left))
-				return new Equation(expr.substituteExpression(source, variable, equivalencies))
+				sources = source.solve(variable, equivalencies)
 			else
-				return new Equation(@left, @right.substituteExpression(source, variable, equivalencies).expandAndSimplify(equivalencies))
+				sources = [source]
+
+			results = []
+			for s in sources
+				if @left instanceof terminals.Variable and (@left.label == variable or @left.label in variableEquivalencies)
+					expr = new operators.Add(@right, new operators.Mul("-1", @left))
+					for i in (expr.substituteExpression(s, variable, equivalencies))
+						results.push(new Equation(i))
+				else
+					for i in @right.substituteExpression(s, variable, equivalencies).expandAndSimplify(equivalencies)
+						results.push(new Equation(@left, i))
+			return results
 
 		expandAndSimplify: (equivalencies) ->
 			left = @left.expandAndSimplify(equivalencies)

@@ -263,7 +263,9 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 			# Replace all instances of a variable with an expression.
 			# Eliminate the target variable if set to do so.
 			if eliminate
-				sourceExpression = sourceExpression.solve(variable, equivalencies)[0]
+				sourceExpressions = sourceExpression.solve(variable, equivalencies)
+			else
+				sourceExpressions = [sourceExpression]
 
 			# Generate an equivalencies index if necessary.
 			if not equivalencies?
@@ -271,23 +273,29 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 
 			variableEquivalencies = equivalencies.get(variable)
 
-			# variable = sourceExpression
-			left = @children.left.copy()
-			right = @children.right.copy()
+			results = []
 
-			if @children.left instanceof terminals.Variable and (@children.left.label == variable or @children.left.label in variableEquivalencies)
-				left = sourceExpression.copy()
-			else if not (@children.left instanceof terminals.Terminal)
-				left = @children.left.substituteExpression(sourceExpression, variable, equivalencies)
+			for expression in sourceExpressions
+				# variable = sourceExpression
+				left = [@children.left.copy()]
+				right = [@children.right.copy()]
 
-			if @children.right instanceof terminals.Variable and (@children.right.label == variable or @children.right.label in variableEquivalencies)
-				right = sourceExpression.copy()
-			else if not (@children.right instanceof terminals.Terminal)
-				right = @children.right.substituteExpression(sourceExpression, variable, equivalencies)
+				if @children.left instanceof terminals.Variable and (@children.left.label == variable or @children.left.label in variableEquivalencies)
+					left = [expression.copy()]
+				else if not (@children.left instanceof terminals.Terminal)
+					left = @children.left.substituteExpression(expression, variable, equivalencies)
 
-			newPow = new Pow(left, right)
-			newPow = newPow.expandAndSimplify(equivalencies)
-			return newPow
+				if @children.right instanceof terminals.Variable and (@children.right.label == variable or @children.right.label in variableEquivalencies)
+					right = [expression.copy()]
+				else if not (@children.right instanceof terminals.Terminal)
+					right = @children.right.substituteExpression(expression, variable, equivalencies)
+
+
+				for i in left
+					for j in right
+						newPow = new Pow(i, j)
+						newPow = newPow.expandAndSimplify(equivalencies)
+						results.push(newPow)
 
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			Mul = require("operators/Mul")

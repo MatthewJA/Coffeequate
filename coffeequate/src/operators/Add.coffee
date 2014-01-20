@@ -549,7 +549,9 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 			# Replace all instances of a variable with an expression.
 			# Eliminate the target variable if set to do so.
 			if eliminate
-				sourceExpression = sourceExpression.solve(variable, equivalencies)[0]
+				sourceExpressions = sourceExpression.solve(variable, equivalencies)
+			else
+				sourceExpressions = [sourceExpression]
 
 			# Generate an equivalencies index if necessary.
 			if not equivalencies?
@@ -557,16 +559,22 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 
 			variableEquivalencies = equivalencies.get(variable)
 
-			children = []
-			for child in @children
-				if child instanceof terminals.Variable and (child.label == variable or child.label in variableEquivalencies)
-					children.push(sourceExpression.copy())
-				else if child.substituteExpression?
-					children.push(child.substituteExpression(sourceExpression, variable, equivalencies))
-				else
-					children.push(child.copy())
-			newAdd = new Add(children...)
-			return newAdd.expandAndSimplify(equivalencies)
+			results = []
+
+			for expression in sourceExpressions
+				children = []
+				for child in @children
+					if child instanceof terminals.Variable and (child.label == variable or child.label in variableEquivalencies)
+						children.push(expression.copy())
+					else if child.substituteExpression?
+						for i in child.substituteExpression(expression, variable, equivalencies)
+							children.push(i)
+					else
+						children.push(child.copy())
+				newAdd = new Add(children...)
+				results.push(newAdd.expandAndSimplify(equivalencies))
+
+			return results
 
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return a MathML string representing this node.
