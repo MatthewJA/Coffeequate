@@ -3077,7 +3077,7 @@ define("lib/almond", function(){});
       };
 
       Pow.prototype.substituteExpression = function(sourceExpression, variable, equivalencies, eliminate) {
-        var expression, i, j, left, newPow, results, right, sourceExpressions, variableEquivalencies, _i, _len, _ref, _ref1, _results;
+        var expression, i, j, left, newPow, results, right, sourceExpressions, variableEquivalencies, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
         if (equivalencies == null) {
           equivalencies = null;
         }
@@ -3098,7 +3098,6 @@ define("lib/almond", function(){});
         }
         variableEquivalencies = equivalencies.get(variable);
         results = [];
-        _results = [];
         for (_i = 0, _len = sourceExpressions.length; _i < _len; _i++) {
           expression = sourceExpressions[_i];
           left = [this.children.left.copy()];
@@ -3113,27 +3112,17 @@ define("lib/almond", function(){});
           } else if (!(this.children.right instanceof terminals.Terminal)) {
             right = this.children.right.substituteExpression(expression, variable, equivalencies);
           }
-          _results.push((function() {
-            var _j, _len1, _results1;
-            _results1 = [];
-            for (_j = 0, _len1 = left.length; _j < _len1; _j++) {
-              i = left[_j];
-              _results1.push((function() {
-                var _k, _len2, _results2;
-                _results2 = [];
-                for (_k = 0, _len2 = right.length; _k < _len2; _k++) {
-                  j = right[_k];
-                  newPow = new Pow(i, j);
-                  newPow = newPow.expandAndSimplify(equivalencies);
-                  _results2.push(results.push(newPow));
-                }
-                return _results2;
-              })());
+          for (_j = 0, _len1 = left.length; _j < _len1; _j++) {
+            i = left[_j];
+            for (_k = 0, _len2 = right.length; _k < _len2; _k++) {
+              j = right[_k];
+              newPow = new Pow(i, j);
+              newPow = newPow.expandAndSimplify(equivalencies);
+              results.push(newPow);
             }
-            return _results1;
-          })());
+          }
         }
-        return _results;
+        return results;
       };
 
       Pow.prototype.toMathML = function(equationID, expression, equality, topLevel) {

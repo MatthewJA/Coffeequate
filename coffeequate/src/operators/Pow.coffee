@@ -297,6 +297,8 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 						newPow = newPow.expandAndSimplify(equivalencies)
 						results.push(newPow)
 
+			return results
+
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			Mul = require("operators/Mul")
 			Add = require("operators/Add")
