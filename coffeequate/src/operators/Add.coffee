@@ -2,6 +2,16 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 
 	# Represent addition as a node.
 
+	combinations = (list) ->
+		if list.length == 1
+			return (i for i in list[0])
+		else
+			results = []
+			for i in list[0]
+				for ii in combinations(list[1..])
+					results.push([i].concat(ii))
+			return results
+
 	return class Add extends nodes.RoseNode
 		constructor: (args...) ->
 			# Check validity of arguments.
@@ -562,15 +572,19 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 			results = []
 
 			for expression in sourceExpressions
-				children = []
+				childrenExpressions = []
 				for child in @children
 					if child instanceof terminals.Variable and (child.label == variable or child.label in variableEquivalencies)
-						children.push(expression.copy())
+						childrenExpressions.push([expression.copy()])
 					else if child.substituteExpression?
-						for i in child.substituteExpression(expression, variable, equivalencies)
-							children.push(i)
+						childrenExpressions.push(child.substituteExpression(expression, variable, equivalencies))
 					else
-						children.push(child.copy())
+						childrenExpressions.push([child.copy()])
+
+				# childrenExpressions is now an array of arrays. We want every combination of them.
+				childrenArray = combinations(childrenExpressions)
+
+			for children in childrenArray
 				newAdd = new Add(children...)
 				results.push(newAdd.expandAndSimplify(equivalencies))
 

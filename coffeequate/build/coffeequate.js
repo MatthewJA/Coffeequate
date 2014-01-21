@@ -723,7 +723,7 @@ define("lib/almond", function(){});
       };
 
       Constant.prototype.substituteExpression = function(sourceExpression, variable, equivalencies) {
-        return this.copy();
+        return [this.copy()];
       };
 
       Constant.prototype.toMathML = function(equationID, expression, equality, topLevel) {
@@ -850,7 +850,7 @@ define("lib/almond", function(){});
       };
 
       SymbolicConstant.prototype.substituteExpression = function(sourceExpression, variable, equivalencies) {
-        return this.copy();
+        return [this.copy()];
       };
 
       SymbolicConstant.prototype.toHTML = function(equationID, expression, equality, topLevel) {
@@ -964,7 +964,7 @@ define("lib/almond", function(){});
       };
 
       Variable.prototype.substituteExpression = function(sourceExpression, variable, equivalencies, eliminate) {
-        var variableEquivalencies, _ref;
+        var e, sourceExpressions, variableEquivalencies, _ref;
         if (equivalencies == null) {
           equivalencies = null;
         }
@@ -980,12 +980,22 @@ define("lib/almond", function(){});
         }
         variableEquivalencies = equivalencies.get(variable);
         if (eliminate) {
-          sourceExpression = sourceExpression.solve(variable)[0];
+          sourceExpressions = sourceExpression.solve(variable);
+        } else {
+          sourceExpressions = [sourceExpression];
         }
         if (this.label === variable || (_ref = this.label, __indexOf.call(variableEquivalencies, _ref) >= 0)) {
-          return sourceExpression.copy();
+          return (function() {
+            var _i, _len, _results;
+            _results = [];
+            for (_i = 0, _len = sourceExpressions.length; _i < _len; _i++) {
+              e = sourceExpressions[_i];
+              _results.push(e.copy());
+            }
+            return _results;
+          })();
         } else {
-          return this.copy();
+          return [this.copy()];
         }
       };
 
@@ -1273,7 +1283,34 @@ define("lib/almond", function(){});
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   define('operators/Add',["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "require", "compare"], function(nodes, terminals, generateInfo, AlgebraError, parseArgs, require, compare) {
-    var Add;
+    var Add, combinations;
+    combinations = function(list) {
+      var i, ii, results, _i, _j, _len, _len1, _ref, _ref1;
+      if (list.length === 1) {
+        return (function() {
+          var _i, _len, _ref, _results;
+          _ref = list[0];
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            i = _ref[_i];
+            _results.push(i);
+          }
+          return _results;
+        })();
+      } else {
+        results = [];
+        _ref = list[0];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          i = _ref[_i];
+          _ref1 = combinations(list.slice(1));
+          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+            ii = _ref1[_j];
+            results.push([i].concat(ii));
+          }
+        }
+        return results;
+      }
+    };
     return Add = (function(_super) {
       __extends(Add, _super);
 
@@ -1898,7 +1935,7 @@ define("lib/almond", function(){});
       };
 
       Add.prototype.substituteExpression = function(sourceExpression, variable, equivalencies, eliminate) {
-        var child, children, expression, i, newAdd, results, sourceExpressions, variableEquivalencies, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
+        var child, children, childrenArray, childrenExpressions, expression, newAdd, results, sourceExpressions, variableEquivalencies, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
         if (equivalencies == null) {
           equivalencies = null;
         }
@@ -1921,22 +1958,22 @@ define("lib/almond", function(){});
         results = [];
         for (_i = 0, _len = sourceExpressions.length; _i < _len; _i++) {
           expression = sourceExpressions[_i];
-          children = [];
+          childrenExpressions = [];
           _ref = this.children;
           for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
             child = _ref[_j];
             if (child instanceof terminals.Variable && (child.label === variable || (_ref1 = child.label, __indexOf.call(variableEquivalencies, _ref1) >= 0))) {
-              children.push(expression.copy());
+              childrenExpressions.push([expression.copy()]);
             } else if (child.substituteExpression != null) {
-              _ref2 = child.substituteExpression(expression, variable, equivalencies);
-              for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
-                i = _ref2[_k];
-                children.push(i);
-              }
+              childrenExpressions.push(child.substituteExpression(expression, variable, equivalencies));
             } else {
-              children.push(child.copy());
+              childrenExpressions.push([child.copy()]);
             }
           }
+          childrenArray = combinations(childrenExpressions);
+        }
+        for (_k = 0, _len2 = childrenArray.length; _k < _len2; _k++) {
+          children = childrenArray[_k];
           newAdd = (function(func, args, ctor) {
             ctor.prototype = func.prototype;
             var child = new ctor, result = func.apply(child, args);
@@ -2014,7 +2051,34 @@ define("lib/almond", function(){});
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   define('operators/Mul',["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "require", "compare"], function(nodes, terminals, generateInfo, AlgebraError, parseArgs, require, compare) {
-    var Mul;
+    var Mul, combinations;
+    combinations = function(list) {
+      var i, ii, results, _i, _j, _len, _len1, _ref, _ref1;
+      if (list.length === 1) {
+        return (function() {
+          var _i, _len, _ref, _results;
+          _ref = list[0];
+          _results = [];
+          for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+            i = _ref[_i];
+            _results.push(i);
+          }
+          return _results;
+        })();
+      } else {
+        results = [];
+        _ref = list[0];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          i = _ref[_i];
+          _ref1 = combinations(list.slice(1));
+          for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+            ii = _ref1[_j];
+            results.push([i].concat(ii));
+          }
+        }
+        return results;
+      }
+    };
     return Mul = (function(_super) {
       __extends(Mul, _super);
 
@@ -2495,7 +2559,7 @@ define("lib/almond", function(){});
       };
 
       Mul.prototype.substituteExpression = function(sourceExpression, variable, equivalencies, eliminate) {
-        var child, children, expression, i, newMul, results, sourceExpressions, variableEquivalencies, _i, _j, _k, _len, _len1, _len2, _ref, _ref1, _ref2;
+        var child, children, childrenArray, childrenExpressions, expression, newMul, results, sourceExpressions, variableEquivalencies, _i, _j, _k, _len, _len1, _len2, _ref, _ref1;
         if (equivalencies == null) {
           equivalencies = null;
         }
@@ -2518,29 +2582,32 @@ define("lib/almond", function(){});
         results = [];
         for (_i = 0, _len = sourceExpressions.length; _i < _len; _i++) {
           expression = sourceExpressions[_i];
-          children = [];
+          childrenExpressions = [];
           _ref = this.children;
           for (_j = 0, _len1 = _ref.length; _j < _len1; _j++) {
             child = _ref[_j];
             if (child instanceof terminals.Variable && (child.label === variable || (_ref1 = child.label, __indexOf.call(variableEquivalencies, _ref1) >= 0))) {
-              children.push(expression.copy());
+              childrenExpressions.push([expression.copy()]);
             } else if (child.substituteExpression != null) {
-              _ref2 = child.substituteExpression(expression, variable, equivalencies);
-              for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
-                i = _ref2[_k];
-                children.push(i);
-              }
+              childrenExpressions.push(child.substituteExpression(expression, variable, equivalencies));
             } else {
-              children.push(child.copy());
+              childrenExpressions.push([child.copy()]);
             }
           }
-          newMul = (function(func, args, ctor) {
-            ctor.prototype = func.prototype;
-            var child = new ctor, result = func.apply(child, args);
-            return Object(result) === result ? result : child;
-          })(Mul, children, function(){});
-          results.push(newMul.expandAndSimplify(equivalencies));
+          console.log("childrenExpressions", childrenExpressions);
+          childrenArray = combinations(childrenExpressions);
+          console.log("childrenArray", childrenArray);
+          for (_k = 0, _len2 = childrenArray.length; _k < _len2; _k++) {
+            children = childrenArray[_k];
+            newMul = (function(func, args, ctor) {
+              ctor.prototype = func.prototype;
+              var child = new ctor, result = func.apply(child, args);
+              return Object(result) === result ? result : child;
+            })(Mul, children, function(){});
+            results.push(newMul.expandAndSimplify(equivalencies));
+          }
         }
+        console.log(results);
         return results;
       };
 
@@ -3327,10 +3394,10 @@ define("lib/almond", function(){});
               results.push(new Equation(i));
             }
           } else {
-            _ref2 = this.right.substituteExpression(s, variable, equivalencies).expandAndSimplify(equivalencies);
+            _ref2 = this.right.substituteExpression(s, variable, equivalencies);
             for (_k = 0, _len2 = _ref2.length; _k < _len2; _k++) {
               i = _ref2[_k];
-              results.push(new Equation(this.left, i));
+              results.push(new Equation(this.left, i.expandAndSimplify(equivalencies)));
             }
           }
         }

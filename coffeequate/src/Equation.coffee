@@ -97,8 +97,8 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 					for i in (expr.substituteExpression(s, variable, equivalencies))
 						results.push(new Equation(i))
 				else
-					for i in @right.substituteExpression(s, variable, equivalencies).expandAndSimplify(equivalencies)
-						results.push(new Equation(@left, i))
+					for i in @right.substituteExpression(s, variable, equivalencies)
+						results.push(new Equation(@left, i.expandAndSimplify(equivalencies)))
 			return results
 
 		expandAndSimplify: (equivalencies) ->
