@@ -522,14 +522,14 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 				).join(" \\cdot ")
 
 		differentiate: (variable) ->
-			derivative = [new Constant(1)]
-			for term in @children
-				do (term) ->
-					derivative = ((new Mul(x.differentiate(variable), term) for x in derivative)
-											.concat(new Mul(x,term.differentiate(variable)) for x in derivative))
-			return new Add(derivative...)
-
-
-			# TODO
-
-
+			Add = require("operators/Add")
+			if @children.length == 0
+				throw new Error("I'm pretty sure you need children in your Mul node")
+			if @children.length == 1
+				return @children[0].differentiate(variable).expandAndSimplify()
+			else
+				f = @children[0]
+				g = new Mul(@children.slice(1)...)
+				console.log(f.toString(),g.toString())
+				return new Add(new Mul(f, g.differentiate(variable)),
+											 new Mul(g, f.differentiate(variable))).expandAndSimplify()

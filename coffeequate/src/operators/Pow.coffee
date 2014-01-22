@@ -386,3 +386,14 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 					right = right.simplify()
 					innerLaTeX = "\\frac{1}{#{innerLaTeX}}"
 				return innerLaTeX
+
+		differentiate: (variable)  ->
+			Add = require("operators/Add")
+			Mul = require("operators/Mul")
+			Constant = require("terminals").Constant
+			if variable in @children.right.getAllVariables
+				throw new Error("I can't differentiate with a variable on the top of a power")
+			if @children.right.evaluate?() == 0
+				return new Constant(0)
+			return new Mul(new Pow(@children.left, new Add(@children.right, new Constant(-1))),
+										 @children.differentiate(variable))
