@@ -113,6 +113,9 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 				return "#{@numerator}/#{@denominator}"
 			return "#{@numerator}"
 
+		differentiate: (variable) ->
+			return new Constant(0)
+
 	class SymbolicConstant extends Terminal
 		# Symbolic constants in the equation tree, e.g. π
 		constructor: (@label, @value=null) ->
@@ -180,6 +183,9 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 
 		toLaTeX: ->
 			"\\text{#{@toString()}}"
+
+		differentiate: (variable) ->
+			return new Constant(0)
 
 	class Variable extends Terminal
 		# Variables in the equation tree, e.g. m
@@ -304,6 +310,11 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 			if str.length > 1
 				str = str[0] + "_{" + str[1..] + "}"
 			return str
+
+		differentiate: (variable) ->
+			if variable == @label
+				return new Constant(1)
+			return new Constant(0)
 
 	return {
 

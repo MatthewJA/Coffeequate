@@ -520,3 +520,16 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 					else
 						child.toLaTeX()
 				).join(" \\cdot ")
+
+		differentiate: (variable) ->
+			derivative = [new Constant(1)]
+			for term in @children
+				do (term) ->
+					derivative = ((new Mul(x.differentiate(variable), term) for x in derivative)
+											.concat(new Mul(x,term.differentiate(variable)) for x in derivative))
+			return new Add(derivative...)
+
+
+			# TODO
+
+

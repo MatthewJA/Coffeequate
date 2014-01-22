@@ -1,4 +1,4 @@
-define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "require", "compare"], (nodes, terminals, generateInfo, AlgebraError, parseArgs, require, compare) ->
+define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "require", "compare", "differentiate"], (nodes, terminals, generateInfo, AlgebraError, parseArgs, require, compare, differentiate) ->
 
 	# Represent addition as a node.
 
@@ -621,3 +621,14 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 		toLaTeX: ->
 			# Return a LaTeX string representing this node.
 			return @children.map((child) -> child.toLaTeX()).join(" + ")
+
+		differentiate: (variable) ->
+			console.log(@children)
+
+			newChildren = @children.map (x) -> x.differentiate(variable)
+
+			console.log(newChildren)
+
+			derivative = new Add(newChildren...)
+
+			return derivative.expandAndSimplify()
