@@ -396,4 +396,5 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 			if @children.right.evaluate?() == 0
 				return new Constant(0)
 			return new Mul(new Pow(@children.left, new Add(@children.right, new Constant(-1))),
-										 @children.differentiate(variable))
+										 @children.left.differentiate(variable),
+										 @children.right).expandAndSimplify()
