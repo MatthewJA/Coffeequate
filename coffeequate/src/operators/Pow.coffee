@@ -207,16 +207,36 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 				unless substitutions[variable] instanceof terminals.Terminal or substitutions[variable] instanceof nodes.BasicNode
 					substitutions[variable] = new terminals.Constant(substitutions[variable])
 
+			unless equivalencies?
+				equivalencies = {get: (z) -> [z]}
+
 			left = null
 			right = null
-			if @children.left instanceof terminals.Variable and @children.left.label of substitutions
-				left = substitutions[@children.left.label].copy()
+			if @children.left instanceof terminals.Variable
+				variableEquivalencies = equivalencies.get(@children.left.label)
+				subbed = false
+				for equiv in variableEquivalencies
+					if equiv of substitutions
+						left = substitutions[equiv].copy()
+						subbed = true
+						break
+				unless subbed
+					left = @children.left.copy()
 			else if @children.left.sub?
 				left = @children.left.sub(substitutions)
 			else
 				left = @children.left.copy()
-			if @children.right instanceof terminals.Variable and @children.right.label of substitutions
-				right = substitutions[@children.right.label].copy()
+
+			if @children.right instanceof terminals.Variable
+				variableEquivalencies = equivalencies.get(@children.right.label)
+				subbed = false
+				for equiv in variableEquivalencies
+					if equiv of substitutions
+						right = substitutions[equiv].copy()
+						subbed = true
+						break
+				unless subbed
+					right = @children.right.copy()
 			else if @children.right.sub?
 				right = @children.right.sub(substitutions)
 			else

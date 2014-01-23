@@ -532,7 +532,7 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 					child.replaceVariables(replacements)
 
 		sub: (substitutions, equivalencies=null) ->
-			# subtitutions: {variable: value}
+			# substitutions: {variable: value}
 			# variable is a label, value is any object - if it is a node,
 			# it will be substituted in; otherwise it is interpreted as a
 			# constant (and any exceptions that might cause will be thrown).
@@ -542,12 +542,23 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 				unless substitutions[variable] instanceof terminals.Terminal or substitutions[variable] instanceof nodes.BasicNode
 					substitutions[variable] = new terminals.Constant(substitutions[variable])
 
+			unless equivalencies?
+				equivalencies = {get: (z) -> [z]}
+
 			children = []
 			for child in @children
-				if child instanceof terminals.Variable and child.label of substitutions
-					children.push(substitutions[child.label].copy())
+				if child instanceof terminals.Variable
+					variableEquivalencies = equivalencies.get(child.label)
+					subbed = false
+					for equiv in variableEquivalencies
+						if equiv of substitutions
+							children.push(substitutions[equiv].copy())
+							subbed = true
+							break
+					unless subbed
+						children.push(child.copy())
 				else if child.sub?
-					children.push(child.sub(substitutions))
+					children.push(child.sub(substitutions, equivalencies))
 				else
 					children.push(child.copy())
 
