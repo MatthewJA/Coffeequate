@@ -541,6 +541,5 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 			else
 				f = @children[0]
 				g = new Mul(@children.slice(1)...)
-				console.log(f.toString(),g.toString())
 				return new Add(new Mul(f, g.differentiate(variable)),
 											 new Mul(g, f.differentiate(variable))).expandAndSimplify()
