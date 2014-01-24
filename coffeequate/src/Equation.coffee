@@ -75,8 +75,7 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 					if @left.label of substitutions
 						expr = new operators.Add(@right, new operators.Mul("-1", @left))
 						return new Equation(expr.sub(substitutions, equivalencies))
-			else
-				return new Equation(@left, @right.sub(substitutions, equivalencies))
+			return new Equation(@left, @right.sub(substitutions, equivalencies))
 
 		substituteExpression: (source, variable, equivalencies, eliminate=false) ->
 			# Substitute an equation or expression into a variable in this equation.
