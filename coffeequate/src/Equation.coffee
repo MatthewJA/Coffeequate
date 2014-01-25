@@ -65,16 +65,16 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 			return rightVars
 
 		sub: (substitutions, equivalencies) ->
-			if @left instanceof terminals.Variable
-				if equivalencies?
-					for equiv in equivalencies.get(@left.label)
-						if equiv of substitutions
-							expr = new operators.Add(@right, new operators.Mul("-1", @left))
-							return new Equation(expr.sub(substitutions, equivalencies))
-				else
-					if @left.label of substitutions
-						expr = new operators.Add(@right, new operators.Mul("-1", @left))
-						return new Equation(expr.sub(substitutions, equivalencies))
+			# if @left instanceof terminals.Variable
+			# 	if equivalencies?
+			# 		for equiv in equivalencies.get(@left.label)
+			# 			if equiv of substitutions
+			# 				expr = new operators.Add(@right, new operators.Mul("-1", @left))
+			# 				return new Equation(expr.sub(substitutions, equivalencies))
+			# 	else
+			# 		if @left.label of substitutions
+			# 			expr = new operators.Add(@right, new operators.Mul("-1", @left))
+			# 			return new Equation(expr.sub(substitutions, equivalencies))
 			return new Equation(@left, @right.sub(substitutions, equivalencies))
 
 		substituteExpression: (source, variable, equivalencies, eliminate=false) ->
@@ -98,13 +98,13 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 
 			results = []
 			for s in sources
-				if @left instanceof terminals.Variable and (@left.label == variable or @left.label in variableEquivalencies)
-					expr = new operators.Add(@right, new operators.Mul("-1", @left))
-					for i in (expr.substituteExpression(s, variable, equivalencies))
-						results.push(new Equation(i))
-				else
-					for i in @right.substituteExpression(s, variable, equivalencies)
-						results.push(new Equation(@left, i.expandAndSimplify(equivalencies)))
+				# if @left instanceof terminals.Variable and (@left.label == variable or @left.label in variableEquivalencies)
+				# 	expr = new operators.Add(@right, new operators.Mul("-1", @left))
+				# 	for i in (expr.substituteExpression(s, variable, equivalencies))
+				# 		results.push(new Equation(i))
+				# else
+				for i in @right.substituteExpression(s, variable, equivalencies)
+					results.push(new Equation(@left, i.expandAndSimplify(equivalencies)))
 			return results
 
 		expandAndSimplify: (equivalencies) ->
