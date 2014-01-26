@@ -54,6 +54,22 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 			else
 				return compare(@children.right, b.children.right)
 
+		getVariableUnits: (variable, equivalencies) ->
+			variableEquivalencies = if equivalencies? then equivalencies.get(variable) else {get: (z) -> [z]}
+			if @children.left instanceof terminals.Variable and @children.left.label in variableEquivalencies
+				return @children.left.units
+			else
+				leftVariableUnits = @children.left.getVariableUnits(variable, equivalencies)
+				if leftVariableUnits?
+					return leftVariableUnits
+			if @children.right instanceof terminals.Variable and @children.right.label in variableEquivalencies
+				return @children.right.units
+			else
+				rightVariableUnits = @children.right.getVariableUnits(variable, equivalencies)
+				if rightVariableUnits?
+					return rightVariableUnits
+			return null
+
 		expand: ->
 			Mul = require("operators/Mul")
 			Add = require("operators/Add")

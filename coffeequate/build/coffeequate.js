@@ -431,7 +431,7 @@ define("lib/almond", function(){});
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
   define('parse',["require"], function(require) {
-    var ParseError, StringToExpression, VARIABLE_REGEX, stringToTerminal;
+    var CONSTANT_REGEX, DIMENSIONS_REGEX, ParseError, RATIO_REGEX, SYMBOLIC_CONSTANT_REGEX, StringToExpression, VARIABLE_REGEX, stringToTerminal;
     ParseError = (function(_super) {
       __extends(ParseError, _super);
 
@@ -448,12 +448,16 @@ define("lib/almond", function(){});
 
     })(Error);
     VARIABLE_REGEX = /^@*[a-zA-Zα-ω][a-zA-Zα-ω_\-\d]*$/;
+    CONSTANT_REGEX = /^-?\d+(\.\d+)?$/;
+    RATIO_REGEX = /^-?\d+(\.\d+)?\/\d+(\.\d+)?$/;
+    SYMBOLIC_CONSTANT_REGEX = /^\\@*[a-zA-Zα-ω][a-zA-Zα-ω_\-\d]*$/;
+    DIMENSIONS_REGEX = /^[^:]*::\([^:+]*\)$/;
     stringToTerminal = function(string) {
       var segments, terminal, terminals;
       if (/\^/.test(string)) {
         throw new Error("Unexpected carat (^). Coffeequate uses ** for exponentiation");
       }
-      if (/^[^:]*::\([^:]*\)$/.test(string)) {
+      if (DIMENSIONS_REGEX.test(string)) {
         segments = string.split("::");
         terminal = stringToTerminal(segments[0]);
         terminal.units = new StringToExpression(segments[1]);
@@ -461,11 +465,11 @@ define("lib/almond", function(){});
       }
       string = string.trim();
       terminals = require("terminals");
-      if (/^-?\d+(\.\d+)?$/.test(string) || /^-?\d+(\.\d+)?\/\d+(\.\d+)?$/.test(string)) {
+      if (CONSTANT_REGEX.test(string) || RATIO_REGEX.test(string)) {
         return new terminals.Constant(string);
       } else if (VARIABLE_REGEX.test(string)) {
         return new terminals.Variable(string);
-      } else if (/^\\@*[a-zA-Zα-ω][a-zA-Zα-ω_\-\d]*$/.test(string)) {
+      } else if (SYMBOLIC_CONSTANT_REGEX.test(string)) {
         return new terminals.SymbolicConstant(string.slice(1));
       } else {
         throw new ParseError(string, "terminal");

@@ -64,6 +64,17 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 
 			return lengthComparison
 
+		getVariableUnits: (variable, equivalencies) ->
+			variableEquivalencies = if equivalencies? then equivalencies.get(variable) else {get: (z) -> [z]}
+			for child in @children
+				if child instanceof terminals.Variable and child.label in variableEquivalencies
+					return child.units
+				else
+					childVariableUnits = child.getVariableUnits(variable, equivalencies)
+					if childVariableUnits?
+						return childVariableUnits
+			return null
+
 		@expandMulAdd: (mul, add) ->
 			Add = require("operators/Add")
 			# Multiply out.

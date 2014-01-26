@@ -122,6 +122,11 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 			right = @right.expand(equivalencies)
 			return new Equation(left, right)
 
+		getVariableUnits: (variable) ->
+			if @left.label == variable
+				return @left.units
+			return @right.getVariableUnits(variable)
+
 		toMathML: (equationID, expression=false, equality=null, topLevel=false) ->
 			# equality is here for consistency and nothing else, so we ignore it.
 			return @right.toMathML(equationID, expression, @left, topLevel)

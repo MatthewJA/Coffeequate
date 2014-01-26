@@ -75,6 +75,9 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 		substituteExpression: (sourceExpression, variable, equivalencies) ->
 			[@copy()]
 
+		getVariableUnits: ->
+			null
+
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return this constant as a MathML string.
 			if topLevel
@@ -163,6 +166,9 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 
 		substituteExpression: (sourceExpression, variable, equivalencies) ->
 			[@copy()]
+
+		getVariableUnits: ->
+			null
 
 		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
 			if topLevel
@@ -253,6 +259,14 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 				return (e.copy() for e in sourceExpressions)
 			else
 				return [@copy()]
+
+		getVariableUnits: (variable, equivalencies) ->
+			if equivalencies?
+				if @label in equivalencies.get(variable)
+					return @units
+			else if @label == variable
+				return @units
+			return null
 
 		simplify: ->
 			@copy()
