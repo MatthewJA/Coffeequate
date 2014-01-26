@@ -121,6 +121,8 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 		constructor: (@label, @value=null) ->
 			@cmp = -5
 
+			@units = null
+
 		copy: ->
 			return new SymbolicConstant(@label, @value)
 
@@ -191,6 +193,8 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 		# Variables in the equation tree, e.g. m
 		constructor: (@label) ->
 			@cmp = -4
+
+			@units = null
 
 		copy: ->
 			return new Variable(@label)

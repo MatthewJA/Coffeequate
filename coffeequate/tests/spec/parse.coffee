@@ -27,3 +27,6 @@ define ["parse", "terminals"], (parse, terminals) ->
 		it "terms", ->
 			expect(parse.stringToTerminal("1/2").toString()).toEqual("1/2")
 			expect(parse.stringToTerminal("2/4")).toEqual(new terminals.Constant("2", "4"))
+
+		it "terminals with units", ->
+			expect(parse.stringToTerminal("v::(m * s**-1)").units).toEqual(parse.stringToExpression("m * s ** -1"))

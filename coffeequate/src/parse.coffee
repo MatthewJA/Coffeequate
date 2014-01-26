@@ -8,7 +8,7 @@ define ["require"], (require) ->
 		toString: ->
 			"Could not parse '#{@input}' as #{@type}"
 
-	VARIABLE_REGEX = /^@*[a-zA-Z][a-zA-Z_\-\d]*$/
+	VARIABLE_REGEX = /^@*[a-zA-Zα-ω][a-zA-Zα-ω_\-\d]*$/
 
 	stringToTerminal = (string) ->
 		# Take a string and return a Terminal that that string represents.
@@ -16,6 +16,11 @@ define ["require"], (require) ->
 		# E.g. "v" -> Variable(2)
 		if /\^/.test(string)
 			throw new Error("Unexpected carat (^). Coffeequate uses ** for exponentiation")
+		if /^[^:]*::\([^:]*\)$/.test(string)
+			segments = string.split("::")
+			terminal = stringToTerminal(segments[0])
+			terminal.units = new StringToExpression(segments[1])
+			return terminal
 		string = string.trim()
 		terminals = require("terminals")
 		if /^-?\d+(\.\d+)?$/.test(string) or /^-?\d+(\.\d+)?\/\d+(\.\d+)?$/.test(string)
