@@ -65,7 +65,7 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 			return lengthComparison
 
 		getVariableUnits: (variable, equivalencies) ->
-			variableEquivalencies = if equivalencies? then equivalencies.get(variable) else {get: (z) -> [z]}
+			variableEquivalencies = if equivalencies? then equivalencies.get(variable) else [variable]
 			for child in @children
 				if child instanceof terminals.Variable and child.label in variableEquivalencies
 					return child.units

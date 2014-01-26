@@ -45,7 +45,7 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 			return lengthComparison
 
 		getVariableUnits: (variable, equivalencies) ->
-			variableEquivalencies = if equivalencies? then equivalencies.get(variable) else {get: (z) -> [z]}
+			variableEquivalencies = if equivalencies? then equivalencies.get(variable) else [variable]
 			for child in @children
 				if child instanceof terminals.Variable and child.label in variableEquivalencies
 					return child.units
@@ -238,6 +238,13 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 			termsContainingVariable = []
 			termsNotContainingVariable = []
 
+			variableUnits = null
+			for equiv in equivalencies
+				units = @getVariableUnits(equiv)
+				if units?
+					variableUnits = units
+					break
+
 			if expr instanceof terminals.Terminal
 				if expr instanceof terminals.Variable and (expr.label == variable or expr.label in equivalencies.get(variable))
 					return [new terminals.Constant("0")]
@@ -419,8 +426,8 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 							# Ewwwwwwwwwwwwwwwwwww
 							# 0 = a + b/v + c/v**2
 							# 0 = a v**2 + b v + c
-							newAdd = new Add(new Mul(nonNegatedTermsEquatable, new Pow(new terminals.Variable(variable), 2)),
-								new Mul(inversedEquatable, new terminals.Variable(variable)),
+							newAdd = new Add(new Mul(nonNegatedTermsEquatable, new Pow(new terminals.Variable(variable, variableUnits), 2)),
+								new Mul(inversedEquatable, new terminals.Variable(variable, variableUnits)),
 								inversedSquaresEquatable)
 							return newAdd.solve(variable, equivalencies)
 				else if inversed.length == 0

@@ -12,7 +12,7 @@ define ["require"], (require) ->
 	CONSTANT_REGEX = /^-?\d+(\.\d+)?$/
 	RATIO_REGEX = /^-?\d+(\.\d+)?\/\d+(\.\d+)?$/
 	SYMBOLIC_CONSTANT_REGEX = /^\\@*[a-zA-Zα-ω][a-zA-Zα-ω_\-\d]*$/
-	DIMENSIONS_REGEX = /^[^:]*::\([^:+]*\)$/
+	DIMENSIONS_REGEX = /^[^:]*::\{[^:+]*\}$/
 
 	stringToTerminal = (string) ->
 		# Take a string and return a Terminal that that string represents.
@@ -23,7 +23,7 @@ define ["require"], (require) ->
 		if DIMENSIONS_REGEX.test(string)
 			segments = string.split("::")
 			terminal = stringToTerminal(segments[0])
-			terminal.units = new StringToExpression(segments[1])
+			terminal.units = new StringToExpression(segments[1][1...segments[1].length-1])
 			return terminal
 		string = string.trim()
 		terminals = require("terminals")
@@ -58,7 +58,7 @@ define ["require"], (require) ->
 
 		@tokenise: (string) ->
 			# Convert a string into an array of token strings.
-			string.split(/(\*\*|[+*()\-]|\s)/).filter((z) -> !/^\s*$/.test(z))
+			string.split(/(\*\*|[+*()\-:]|\s)/).filter((z) -> !/^\s*$/.test(z))
 
 		getToken: ->
 			@tokens[@upto]
@@ -154,7 +154,21 @@ define ["require"], (require) ->
 					return term
 
 		parseTerm: ->
-			term = stringToTerminal(@getToken())
+			# Do we have term::{} or just term?
+			terminal = []
+			if @getToken()[@getToken().length - 1] == "}"
+				while @getToken()[0] != ":"
+					terminal.push(@getToken())
+					@upto += 1
+				terminal.push(@getToken())
+				@upto += 1
+				terminal.push(@getToken())
+				@upto += 1
+				terminal.push(@getToken())
+				term = stringToTerminal(terminal.reverse().join(""))
+			else
+				term = stringToTerminal(@getToken())
+
 			@upto += 1
 			return term
 

@@ -121,13 +121,11 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 
 	class SymbolicConstant extends Terminal
 		# Symbolic constants in the equation tree, e.g. π
-		constructor: (@label, @value=null) ->
+		constructor: (@label, @value=null, @units=null) ->
 			@cmp = -5
 
-			@units = null
-
 		copy: ->
-			return new SymbolicConstant(@label, @value)
+			return new SymbolicConstant(@label, @value, @units)
 
 		compareSameType: (b) ->
 			# Compare this object with another of the same type.
@@ -197,13 +195,11 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 
 	class Variable extends Terminal
 		# Variables in the equation tree, e.g. m
-		constructor: (@label) ->
+		constructor: (@label, @units=null) ->
 			@cmp = -4
 
-			@units = null
-
 		copy: ->
-			return new Variable(@label)
+			return new Variable(@label, @units)
 
 		compareSameType: (b) ->
 			# Compare this object with another of the same type.
