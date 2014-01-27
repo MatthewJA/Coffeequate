@@ -1,28 +1,18 @@
 Coffeequate
 ===========
 
-Computer algebra system for JavaScript. Uses require.js.
+A computer algebra system for JavaScript.
 
 ## Installation
 Include Coffeequate with an AMD loader. It provides a `coffeequate` object, with a `parse` object, an `Equation` object, and some exposed `tree` code.
+Later versions of Coffeequate may be released as standalone JavaScript files that do not require an AMD loader.
 
 ## Use
-Either make nodes directly:
-
-    expression = new coffeequate.tree.operators.Add(
-        new coffeequate.tree.operators.Pow(a, 2),
-        new coffeequate.tree.operators.Pow(b, 2),
-        new coffeequate.tree.operators.Mul(
-            -1, 
-            new coffeequate.tree.operators.Pow(c, 2)
-        )
-    )
-    
-Or make nodes with the parse functions:
+Make expressions with the parse method `stringToExpression`:
 
     expression = coffeequate.parse.stringToExpression("a**2 + b**2 + -1*c**2")
 
-Or make Equations, which are composed of nodes:
+Or make *Equations* directly:
 
     equation = new coffeequate.Equation("x", "y + z")
     equation = new coffeequate.Equation("x = y + z")
@@ -38,6 +28,7 @@ You also have at your disposal:
 - `.expand()` to naively expand a node.
 - `.simplify()` to naively simplify a node.
 - `.copy()` to return a copy of the node.
+- `.sub(substitutions)`, to substitute items in a dictionary into variables in the expressions.
 - `.equals(b)` to compare the node with some object b.
 - `.toMathML(equationID, expression=false, equality="0", topLevel=false)` to return a MathML string representing the expression. It takes some options:
 	- `equationID`: used to uniquely identify the expression if you so wish.
@@ -48,4 +39,4 @@ You also have at your disposal:
 - `.toHTML(equationID, expression=false, equality="0", topLevel=false)` to output similarly to the `.toMathML()` method, but without actually using MathML.
 
 ## License
-See /LICENSE.
+Licensed under the MIT License. See /LICENSE for a copy of the license.
