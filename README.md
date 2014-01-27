@@ -39,4 +39,4 @@ You also have at your disposal:
 - `.toHTML(equationID, expression=false, equality="0", topLevel=false)` to output similarly to the `.toMathML()` method, but without actually using MathML.
 
 ## License
-Licensed under the MIT License. See /LICENSE for a copy of the license.
+All current and previous versions licensed under the MIT License. See /LICENSE for a copy of this license.
