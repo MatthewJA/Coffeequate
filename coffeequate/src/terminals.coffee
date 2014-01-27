@@ -75,6 +75,9 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 		substituteExpression: (sourceExpression, variable, equivalencies) ->
 			[@copy()]
 
+		getUncertainty: ->
+			new Constant(0)
+
 		getVariableUnits: ->
 			null
 
@@ -118,6 +121,8 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 
 		differentiate: (variable) ->
 			return new Constant(0)
+
+
 
 	class SymbolicConstant extends Terminal
 		# Symbolic constants in the equation tree, e.g. π
@@ -164,6 +169,9 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 
 		substituteExpression: (sourceExpression, variable, equivalencies) ->
 			[@copy()]
+
+		getUncertainty: ->
+			new Constant(0)
 
 		getVariableUnits: ->
 			null
@@ -256,6 +264,10 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 			else
 				return [@copy()]
 
+
+		getUncertainty: ->
+			new Uncertainty(@label)
+
 		getVariableUnits: (variable, equivalencies) ->
 			if equivalencies?
 				if @label in equivalencies.get(variable)
@@ -330,6 +342,80 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 				return new Constant(1)
 			return new Constant(0)
 
+	class Uncertainty extends Terminal
+		# Uncertainty in the equation tree, e.g. sigma_m
+		constructor: (@label) ->
+			# Matt: what do I do here?
+			@cmp = -4
+
+		copy: ->
+			return new Uncertainty(@label)
+
+		compareSameType: (b) ->
+			# Compare this object with another of the same type.
+			if @label < b.label
+				return -1
+			else if @label == b.label
+				return 0
+			else
+				return 1
+
+		# Before commit: think about this more before asking Matt
+		# Matt: should we do this?
+		equals: (b, equivalencies=null) ->
+			# Check equality between this and some other object.
+			unless b instanceof Uncertainty
+				return false
+
+			if equivalencies?
+				return @label in equivalencies.get(b.label)
+			else
+				return b.label == @label
+
+		replaceVariables: (replacements) ->
+			if @label of replacements
+				@label = replacements[@label]
+
+		getAllVariables: ->
+			[@label]
+
+		sub: (substitutions) ->
+			throw new Error("Can't sub uncertainties")
+
+		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
+			throw new Error("Can't sub uncertainties")
+
+		getUncertainty: ->
+			throw new Error("Can't take uncertainty of an uncertainty")
+
+		getVariableUnits: (variable, equivalencies) ->
+			throw new Error("Can't do that with uncertainties")
+
+		simplify: ->
+			@copy()
+
+		expand: ->
+			@copy()
+
+		expandAndSimplify: ->
+			@copy()
+
+		toString: ->
+			"sigma(#{@label})"
+
+		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
+			# TODO: make this work
+
+		toLaTeX: ->
+			# Convert -'s to _'s, and subscript everything.
+			str = @label.replace("-", "_")
+			if str.length > 1
+				str = str[0] + "_{" + str[1..] + "}"
+			return "\\sigma(#{str})"
+
+		differentiate: (variable) ->
+			throw new Error("Can't do that with uncertainties")
+
 	return {
 
 		Terminal: Terminal
@@ -339,5 +425,7 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 		Constant: Constant
 
 		SymbolicConstant: SymbolicConstant
+
+		Uncertainty: Uncertainty
 
 	}
