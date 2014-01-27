@@ -655,7 +655,7 @@ define("lib/almond", function(){});
     __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   define('terminals',["parse", "generateInfo"], function(parse, generateInfo) {
-    var Constant, SymbolicConstant, Terminal, Variable;
+    var Constant, SymbolicConstant, Terminal, Uncertainty, Variable;
     Terminal = (function() {
       function Terminal(label) {
         this.label = label;
@@ -748,6 +748,10 @@ define("lib/almond", function(){});
 
       Constant.prototype.substituteExpression = function(sourceExpression, variable, equivalencies) {
         return [this.copy()];
+      };
+
+      Constant.prototype.getUncertainty = function() {
+        return new Constant(0);
       };
 
       Constant.prototype.getVariableUnits = function() {
@@ -884,6 +888,10 @@ define("lib/almond", function(){});
 
       SymbolicConstant.prototype.substituteExpression = function(sourceExpression, variable, equivalencies) {
         return [this.copy()];
+      };
+
+      SymbolicConstant.prototype.getUncertainty = function() {
+        return new Constant(0);
       };
 
       SymbolicConstant.prototype.getVariableUnits = function() {
@@ -1041,6 +1049,10 @@ define("lib/almond", function(){});
         }
       };
 
+      Variable.prototype.getUncertainty = function() {
+        return new Uncertainty(this.label);
+      };
+
       Variable.prototype.getVariableUnits = function(variable, equivalencies) {
         var _ref;
         if (equivalencies != null) {
@@ -1150,106 +1162,125 @@ define("lib/almond", function(){});
       return Variable;
 
     })(Terminal);
+    Uncertainty = (function(_super) {
+      __extends(Uncertainty, _super);
+
+      function Uncertainty(label) {
+        this.label = label;
+        this.cmp = -4;
+      }
+
+      Uncertainty.prototype.copy = function() {
+        return new Uncertainty(this.label);
+      };
+
+      Uncertainty.prototype.compareSameType = function(b) {
+        if (this.label < b.label) {
+          return -1;
+        } else if (this.label === b.label) {
+          return 0;
+        } else {
+          return 1;
+        }
+      };
+
+      Uncertainty.prototype.equals = function(b, equivalencies) {
+        var _ref;
+        if (equivalencies == null) {
+          equivalencies = null;
+        }
+        if (!(b instanceof Uncertainty)) {
+          return false;
+        }
+        if (equivalencies != null) {
+          return _ref = this.label, __indexOf.call(equivalencies.get(b.label), _ref) >= 0;
+        } else {
+          return b.label === this.label;
+        }
+      };
+
+      Uncertainty.prototype.replaceVariables = function(replacements) {
+        if (this.label in replacements) {
+          return this.label = replacements[this.label];
+        }
+      };
+
+      Uncertainty.prototype.getAllVariables = function() {
+        return [this.label];
+      };
+
+      Uncertainty.prototype.sub = function(substitutions) {
+        throw new Error("Can't sub uncertainties");
+      };
+
+      Uncertainty.prototype.substituteExpression = function(sourceExpression, variable, equivalencies, eliminate) {
+        if (equivalencies == null) {
+          equivalencies = null;
+        }
+        if (eliminate == null) {
+          eliminate = false;
+        }
+        throw new Error("Can't sub uncertainties");
+      };
+
+      Uncertainty.prototype.getUncertainty = function() {
+        throw new Error("Can't take uncertainty of an uncertainty");
+      };
+
+      Uncertainty.prototype.getVariableUnits = function(variable, equivalencies) {
+        throw new Error("Can't do that with uncertainties");
+      };
+
+      Uncertainty.prototype.simplify = function() {
+        return this.copy();
+      };
+
+      Uncertainty.prototype.expand = function() {
+        return this.copy();
+      };
+
+      Uncertainty.prototype.expandAndSimplify = function() {
+        return this.copy();
+      };
+
+      Uncertainty.prototype.toString = function() {
+        return "sigma(" + this.label + ")";
+      };
+
+      Uncertainty.prototype.toMathML = function(equationID, expression, equality, topLevel) {
+        if (expression == null) {
+          expression = false;
+        }
+        if (equality == null) {
+          equality = "0";
+        }
+        if (topLevel == null) {
+          topLevel = false;
+        }
+      };
+
+      Uncertainty.prototype.toLaTeX = function() {
+        var str;
+        str = this.label.replace("-", "_");
+        if (str.length > 1) {
+          str = str[0] + "_{" + str.slice(1) + "}";
+        }
+        return "\\sigma(" + str + ")";
+      };
+
+      Uncertainty.prototype.differentiate = function(variable) {
+        throw new Error("Can't do that with uncertainties");
+      };
+
+      return Uncertainty;
+
+    })(Terminal);
     return {
       Terminal: Terminal,
       Variable: Variable,
       Constant: Constant,
-      SymbolicConstant: SymbolicConstant
-    };
-  });
-
-}).call(this);
-
-// Generated by CoffeeScript 1.6.3
-(function() {
-  var __hasProp = {}.hasOwnProperty,
-    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
-
-  define('nodes',[],function() {
-    var BasicNode;
-    BasicNode = (function() {
-      function BasicNode(label) {
-        this.label = label;
-      }
-
-      BasicNode.prototype.getChildren = function() {
-        return [];
-      };
-
-      return BasicNode;
-
-    })();
-    return {
-      BasicNode: BasicNode,
-      RoseNode: (function(_super) {
-        __extends(_Class, _super);
-
-        function _Class(label, children) {
-          this.children = children != null ? children : null;
-          if (this.children == null) {
-            this.children = [];
-          }
-          _Class.__super__.constructor.call(this, label);
-        }
-
-        _Class.prototype.getChildren = function() {
-          return this.children;
-        };
-
-        _Class.prototype.toLisp = function() {
-          var childrenStrings;
-          console.log(this.children);
-          childrenStrings = this.children.map(function(x) {
-            if (x.toLisp) {
-              return x.toLisp();
-            } else {
-              return x;
-            }
-          });
-          return "(" + this.label + (this.children ? " " : "") + (childrenStrings.join(" ")) + ")";
-        };
-
-        _Class.prototype.toString = function() {
-          return "(" + (this.children.join(" " + this.label + " ")) + ")";
-        };
-
-        return _Class;
-
-      })(BasicNode),
-      BinaryNode: (function(_super) {
-        __extends(_Class, _super);
-
-        function _Class(label, left, right) {
-          this.label = label;
-          this.children = {
-            left: left,
-            right: right
-          };
-        }
-
-        _Class.prototype.getChildren = function() {
-          return [this.children.left, this.children.right];
-        };
-
-        _Class.prototype.toLisp = function() {
-          var lispify;
-          lispify = function(x) {
-            if (x.toLisp) {
-              return x.toLisp();
-            } else {
-              return x;
-            }
-          };
-          return "(" + this.label + " " + (lispify(this.children.left)) + " " + (lispify(this.children.right)) + ")";
-        };
-
-        _Class.prototype.toString = function() {
-          return "(" + this.children.left + " " + this.label + " " + this.children.right + ")";
-        };
-
-        return _Class;
-
-      })(BasicNode)
+      SymbolicConstant: SymbolicConstant,
+      Uncertainty: Uncertainty
     };
   });
 
@@ -2145,11 +2176,9 @@ define("lib/almond", function(){});
 
       Add.prototype.differentiate = function(variable) {
         var derivative, newChildren;
-        console.log(this.children);
         newChildren = this.children.map(function(x) {
           return x.differentiate(variable);
         });
-        console.log(newChildren);
         derivative = (function(func, args, ctor) {
           ctor.prototype = func.prototype;
           var child = new ctor, result = func.apply(child, args);
@@ -3486,6 +3515,122 @@ define("lib/almond", function(){});
       return Pow;
 
     })(nodes.BinaryNode);
+  });
+
+}).call(this);
+
+// Generated by CoffeeScript 1.6.3
+(function() {
+  var __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  define('nodes',['operators/Add','operators/Mul','operators/Pow','terminals','terminals'],function() {
+    var BasicNode;
+    BasicNode = (function() {
+      function BasicNode(label) {
+        this.label = label;
+      }
+
+      BasicNode.prototype.getChildren = function() {
+        return [];
+      };
+
+      BasicNode.prototype.getUncertainty = function() {
+        var Add, Constant, Mul, Pow, Uncertainty, out, stuff, variable, variables, _i, _len;
+        Add = require("operators/Add");
+        Mul = require("operators/Mul");
+        Pow = require("operators/Pow");
+        Uncertainty = require("terminals").Uncertainty;
+        Constant = require("terminals").Constant;
+        variables = this.getAllVariables();
+        out = [];
+        for (_i = 0, _len = variables.length; _i < _len; _i++) {
+          variable = variables[_i];
+          stuff = new Mul(new Uncertainty(variable), this.differentiate(variable));
+          out.push(new Pow(stuff, 2));
+        }
+        return new Pow((function(func, args, ctor) {
+          ctor.prototype = func.prototype;
+          var child = new ctor, result = func.apply(child, args);
+          return Object(result) === result ? result : child;
+        })(Add, out, function(){}), new Constant(1, 2)).expandAndSimplify();
+      };
+
+      return BasicNode;
+
+    })();
+    return {
+      BasicNode: BasicNode,
+      RoseNode: (function(_super) {
+        __extends(_Class, _super);
+
+        function _Class(label, children) {
+          this.children = children != null ? children : null;
+          if (this.children == null) {
+            this.children = [];
+          }
+          _Class.__super__.constructor.call(this, label);
+        }
+
+        _Class.prototype.getChildren = function() {
+          return this.children;
+        };
+
+        _Class.prototype.toLisp = function() {
+          var childrenStrings;
+          console.log(this.children);
+          childrenStrings = this.children.map(function(x) {
+            if (x.toLisp) {
+              return x.toLisp();
+            } else {
+              return x;
+            }
+          });
+          return "(" + this.label + (this.children ? " " : "") + (childrenStrings.join(" ")) + ")";
+        };
+
+        _Class.prototype.toString = function() {
+          return "(" + (this.children.join(" " + this.label + " ")) + ")";
+        };
+
+        return _Class;
+
+      })(BasicNode),
+      BinaryNode: (function(_super) {
+        __extends(_Class, _super);
+
+        function _Class(label, left, right) {
+          this.label = label;
+          this.children = {
+            left: left,
+            right: right
+          };
+        }
+
+        _Class.prototype.getChildren = function() {
+          return [this.children.left, this.children.right];
+        };
+
+        _Class.prototype.toLisp = function() {
+          var lispify;
+          lispify = function(x) {
+            if (x.toLisp) {
+              return x.toLisp();
+            } else {
+              return x;
+            }
+          };
+          return "(" + this.label + " " + (lispify(this.children.left)) + " " + (lispify(this.children.right)) + ")";
+        };
+
+        _Class.prototype.toString = function() {
+          return "(" + this.children.left + " " + this.label + " " + this.children.right + ")";
+        };
+
+        return _Class;
+
+      })(BasicNode)
+    };
   });
 
 }).call(this);
