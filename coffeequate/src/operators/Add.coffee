@@ -652,11 +652,7 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 			return @children.map((child) -> child.toLaTeX()).join(" + ")
 
 		differentiate: (variable) ->
-			console.log(@children)
-
 			newChildren = @children.map (x) -> x.differentiate(variable)
-
-			console.log(newChildren)
 
 			derivative = new Add(newChildren...)
 

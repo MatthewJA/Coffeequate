@@ -11,6 +11,23 @@ define ->
 			# Return an array of children.
 			return []
 
+		getUncertainty: ->
+			Add = require("operators/Add")
+			Mul = require("operators/Mul")
+			Pow = require("operators/Pow")
+
+			# Is this the best way to import two things?
+			Uncertainty = require("terminals").Uncertainty
+			Constant = require("terminals").Constant
+
+			variables = @getAllVariables()
+			out = []
+			for variable in variables
+				stuff = new Mul(new Uncertainty(variable), @differentiate(variable))
+				out.push(new Pow(stuff, 2))
+
+			return new Pow(new Add(out...), new Constant(1,2)).expandAndSimplify()
+
 	return {
 
 		BasicNode: BasicNode
