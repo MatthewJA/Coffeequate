@@ -12,21 +12,18 @@ define ->
 			return []
 
 		getUncertainty: ->
-			Add = require("operators/Add")
-			Mul = require("operators/Mul")
-			Pow = require("operators/Pow")
+			require ["operators/Add, operators/Mul, operators/Pow, terminals"], (Add, Mul, Pow, terminals) ->
 
-			# Is this the best way to import two things?
-			Uncertainty = require("terminals").Uncertainty
-			Constant = require("terminals").Constant
+				Uncertainty = terminals.Uncertainty
+				Constant = terminals.Constant
 
-			variables = @getAllVariables()
-			out = []
-			for variable in variables
-				stuff = new Mul(new Uncertainty(variable), @differentiate(variable))
-				out.push(new Pow(stuff, 2))
+				variables = @getAllVariables()
+				out = []
+				for variable in variables
+					stuff = new Mul(new Uncertainty(variable), @differentiate(variable))
+					out.push(new Pow(stuff, 2))
 
-			return new Pow(new Add(out...), new Constant(1,2)).expandAndSimplify()
+				return new Pow(new Add(out...), new Constant(1,2)).expandAndSimplify()
 
 	return {
 
@@ -45,7 +42,6 @@ define ->
 				@children
 
 			toLisp: ->
-				console.log(@children)
 				childrenStrings = @children.map((x) -> if x.toLisp then x.toLisp() else x)
 				"(#{@label}#{if @children then " " else ""}#{childrenStrings.join(" ")})"
 

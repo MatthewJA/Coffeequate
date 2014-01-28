@@ -1,4 +1,12 @@
-define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "require", "compare"], (nodes, terminals, generateInfo, AlgebraError, parseArgs, require, compare) ->
+define [
+	"nodes"
+	"terminals"
+	"generateInfo"
+	"AlgebraError"
+	"parseArgs"
+	"require"
+	"compare"
+], (nodes, terminals, generateInfo, AlgebraError, parseArgs, require, compare) ->
 
 	# Represent addition as a node.
 
