@@ -687,6 +687,7 @@ define("lib/almond", function(){});
         } else {
           _ref1 = parse.constant(value), this.numerator = _ref1[0], this.denominator = _ref1[1];
         }
+        this.simplifyInPlace();
       }
 
       Constant.prototype.evaluate = function() {
@@ -734,8 +735,25 @@ define("lib/almond", function(){});
         return this.copy();
       };
 
+      Constant.prototype.simplifyInPlace = function() {
+        var a, b, gcd, _ref;
+        a = this.numerator;
+        b = this.denominator;
+        while (b !== 0) {
+          _ref = [b, Math.round(a % b * 10) / 10], a = _ref[0], b = _ref[1];
+        }
+        gcd = a;
+        this.numerator /= gcd;
+        this.numerator = Math.round(this.numerator * 10) / 10;
+        this.denominator /= gcd;
+        return this.denominator = Math.round(this.denominator * 10) / 10;
+      };
+
       Constant.prototype.simplify = function() {
-        return this.copy();
+        var constant;
+        constant = this.copy();
+        constant.simplifyInPlace();
+        return constant;
       };
 
       Constant.prototype.expand = function() {

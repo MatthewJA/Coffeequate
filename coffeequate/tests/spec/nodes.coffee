@@ -60,7 +60,7 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 
 				# Works so far. Let's try some multiplication.
 				add = parse.stringToExpression("2 * x + -y") # x = y/2
-				expect(add.solve("x")[0].toString()).toEqual("(0.5 * y)")
+				expect(add.solve("x")[0].toString()).toEqual("(1/2 * y)")
 
 				# Quadratics?
 				add = parse.stringToExpression("-4 + x ** 2") # Simple quadratic.
@@ -253,7 +253,7 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 				pow = parse.stringToExpression("(0 ** 0)")
 				expect(pow.simplify().toString()).toBe("1")
 				pow = new operators.Pow(new operators.Add("2", "0"), "-1")
-				expect(pow.expandAndSimplify().toString()).toBe("0.5")
+				expect(pow.expandAndSimplify().toString()).toBe("1/2")
 
 			it "can be solved", ->
 				pow = parse.stringToExpression("x ** 2")

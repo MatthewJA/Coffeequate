@@ -12,7 +12,7 @@ define ["terminals", "parse"], (terminals, parse) ->
 
 			it "represent constants", ->
 				term = new terminals.Constant("1.2")
-				expect(term.toString()).toBe("1.2")
+				expect(term.toString()).toBe("6/5")
 				term = new terminals.Constant("1/2")
 				expect(term.toString()).toBe("1/2")
 

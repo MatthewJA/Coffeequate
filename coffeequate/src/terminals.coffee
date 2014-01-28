@@ -25,6 +25,8 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 			else
 				[@numerator, @denominator] = parse.constant(value)
 
+			@simplifyInPlace()
+
 		evaluate: ->
 			@numerator/@denominator
 
@@ -63,8 +65,24 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 		sub: (substitutions) ->
 			@copy()
 
+		simplifyInPlace: ->
+			# Get the greatest common divisor.
+			a = @numerator
+			b = @denominator
+			until b == 0
+				[a, b] = [b, Math.round(a % b * 10) / 10] # Floating point errors.
+			gcd = a
+
+			# Divide out.
+			@numerator /= gcd
+			@numerator = Math.round(@numerator*10)/10 # Floating point errors.
+			@denominator /= gcd
+			@denominator = Math.round(@denominator*10)/10
+
 		simplify: ->
-			@copy()
+			constant = @copy()
+			constant.simplifyInPlace()
+			return constant
 
 		expand: ->
 			@copy()
@@ -121,8 +139,6 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 
 		differentiate: (variable) ->
 			return new Constant(0)
-
-
 
 	class SymbolicConstant extends Terminal
 		# Symbolic constants in the equation tree, e.g. π
@@ -263,7 +279,6 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 				return (e.copy() for e in sourceExpressions)
 			else
 				return [@copy()]
-
 
 		getUncertainty: ->
 			new Uncertainty(@label)
