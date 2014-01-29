@@ -1,11 +1,13 @@
-define ["parse", "generateInfo"], (parse, generateInfo) ->
+define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 
 	# Terminals for the equation tree.
 
-	class Terminal
+	class Terminal extends nodes.BasicNode
 		# Base class for terminals.
 		constructor: (@label) ->
 
+		# Question for Matt: why do the next two functions exist?
+		# I would have thought they should raise a NotImplementedError
 		evaluate: ->
 
 		copy: ->
@@ -422,8 +424,9 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 		toString: ->
 			"sigma(#{@label})"
 
-		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
-			# TODO: make this work
+		toMathML: ->
+			dummyVar = new Variable("σ(#{label})")
+			return dummyVar.toMathML(arguments)
 
 		toLaTeX: ->
 			# Convert -'s to _'s, and subscript everything.

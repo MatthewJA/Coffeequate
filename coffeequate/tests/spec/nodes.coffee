@@ -17,18 +17,18 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 				expect(-> new operators.Add()).toThrow(new Error("Add nodes must have at least one child."))
 
 			it "expand", ->
-				add = parse.stringToExpression("1 + (2 + 3)")
-				expect(add.expand().toString()).toBe("(1 + 2 + 3)")
-				add = parse.stringToExpression("1 + (2 + (3 + 4))")
-				expect(add.expand().toString()).toBe("(1 + 2 + 3 + 4)")
-				add = parse.stringToExpression("1 + ((2 + 5) + (3 + 4))")
-				expect(add.expand().toString()).toBe("(1 + 2 + 3 + 4 + 5)")
+				add = parse.stringToExpression("a + (b + c)")
+				expect(add.expand().toString()).toBe("(a + b + c)")
+				add = parse.stringToExpression("a + (b + (c + 4))")
+				expect(add.expand().toString()).toBe("(4 + a + b + c)")
+				add = parse.stringToExpression("a + ((b + e) + (c + d))")
+				expect(add.expand().toString()).toBe("(a + b + c + d + e)")
 				add = parse.stringToExpression("((a * b) + (c * d)) + ((e * f) + (g * h))")
 				expect(add.expand().toString()).toBe("((a * b) + (c * d) + (e * f) + (g * h))")
-				add = parse.stringToExpression("3 + 2 + 1")
-				expect(add.expand().toString()).toBe("(1 + 2 + 3)")
-				add = parse.stringToExpression("3 + x + 1")
-				expect(add.expand().toString()).toBe("(1 + 3 + x)")
+				add = parse.stringToExpression("c + b + a")
+				expect(add.expand().toString()).toBe("(a + b + c)")
+				add = parse.stringToExpression("c + x + a")
+				expect(add.expand().toString()).toBe("(a + c + x)")
 
 			it "simplify", ->
 				add = parse.stringToExpression("1 + 1")
@@ -107,12 +107,12 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 		describe "representing multiplication", ->
 
 			it "represent multiplication", ->
-				mul = new operators.Mul("2", "3")
+				mul = new operators.Mul("b", "3")
 				expect(mul.label).toBe("*")
-				expect(mul.toString()).toBe("(2 * 3)")
+				expect(mul.toString()).toBe("(b * 3)")
 
-				mul = new operators.Mul("2", "3", "4")
-				expect(mul.toString()).toBe("(2 * 3 * 4)")
+				mul = new operators.Mul("b", "3", "d")
+				expect(mul.toString()).toBe("(b * 3 * d)")
 
 			it "require at least one child", ->
 				expect(-> new operators.Mul()).toThrow(new Error("Mul nodes must have at least one child."))
@@ -120,48 +120,48 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 			describe "expand", ->
 
 				it "associative expressions of multiplication", ->
-					mul = parse.stringToExpression("1 * (2 * 3)")
-					expect(mul.expand().toString()).toBe("(1 * 2 * 3)")
-					mul = parse.stringToExpression("(1 * 2) * (2 * 3)")
-					expect(mul.expand().toString()).toBe("(1 * 2 * 2 * 3)")
+					mul = parse.stringToExpression("a * (b * 3)", false)
+					expect(mul.expand().toString()).toBe("(3 * a * b)")
+					mul = parse.stringToExpression("(a * b) * (b * 3)", false)
+					expect(mul.expand().toString()).toBe('(3 * a * b * b)')
 
 				it "distributive expressions over addition", ->
-					mul = parse.stringToExpression("1 * (2 + 3)")
+					mul = parse.stringToExpression("1 * (2 + 3)", false)
 					expect(mul.expand().toString()).toBe("((1 * 2) + (1 * 3))")
-					mul = parse.stringToExpression("1 * (2 + 3 ** 2)")
+					mul = parse.stringToExpression("1 * (2 + 3 ** 2)", false)
 					expect(mul.expand().toString()).toBe("((1 * 2) + (1 * (3 ** 2)))")
-					mul = parse.stringToExpression("(1 + 2) * (2 + 3)")
+					mul = parse.stringToExpression("(1 + 2) * (2 + 3)", false)
 					expect(mul.expand().toString()).toBe("((1 * 2) + (1 * 3) + (2 * 2) + (2 * 3))")
 
 				it "more complex expressions", ->
-					mul = parse.stringToExpression("-(x + (x * 4) ** 2) + 7")
+					mul = parse.stringToExpression("-(x + (x * 4) ** 2) + 7", false)
 					expect(mul.expand().toString()).toBe("(7 + (-1 * x) + (-1 * (4 ** 2) * (x ** 2)))")
-					mul = parse.stringToExpression("(((x + 4) * 2)**(x + - 2) + - 2)**x")
+					mul = parse.stringToExpression("(((x + 4) * 2)**(x + - 2) + - 2)**x", false)
 					expect(mul.expand().toString()).toBe("(((-1 * 2) + ((2 ** (x + (-1 * 2))) * ((4 + x) ** (x + (-1 * 2))))) ** x)")
 
 				it "expressions into a sorted form", ->
-					mul = parse.stringToExpression("3 * 2 * 1")
+					mul = parse.stringToExpression("3 * 2 * 1", false)
 					expect(mul.expand().toString()).toBe("(1 * 2 * 3)")
-					mul = parse.stringToExpression("3 * x * 1")
+					mul = parse.stringToExpression("3 * x * 1", false)
 					expect(mul.expand().toString()).toBe("(1 * 3 * x)")
 
 			it "simplify", ->
-				mul = parse.stringToExpression("1 * x")
+				mul = parse.stringToExpression("1 * x", false)
 				expect(mul.simplify().toString()).toBe("x")
-				mul = parse.stringToExpression("1 * x * 1")
+				mul = parse.stringToExpression("1 * x * 1", false)
 				expect(mul.simplify().toString()).toBe("x")
-				mul = parse.stringToExpression("x * x")
+				mul = parse.stringToExpression("x * x", false)
 				expect(mul.simplify().toString()).toBe("(x ** 2)")
-				mul = parse.stringToExpression("x * y * x")
+				mul = parse.stringToExpression("x * y * x", false)
 				expect(mul.simplify().toString()).toBe("(y * (x ** 2))")
-				mul = parse.stringToExpression("x * 1 * y * 1 ** 1")
+				mul = parse.stringToExpression("x * 1 * y * 1 ** 1", false)
 				expect(mul.simplify().toString()).toBe("(x * y)")
 
 			it "can be solved", ->
-				mul = parse.stringToExpression("x * y * z")
+				mul = parse.stringToExpression("x * y * z", false)
 				expect(mul.solve("y")[0].evaluate()).toEqual(0)
 				expect(mul.solve("y").length).toEqual(1)
-				mul = parse.stringToExpression("x * y * (z ** 2)")
+				mul = parse.stringToExpression("x * y * (z ** 2)", false)
 				expect(mul.solve("z")[0].evaluate()).toEqual(0)
 				expect(mul.solve("z").length).toEqual(1)
 				mul = new operators.Mul("x") # 0 = x
@@ -170,18 +170,18 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 			describe "throw sensible errors when", ->
 
 				it "trying to solve for a non-existant variable", ->
-					pow = parse.stringToExpression("x * z")
+					pow = parse.stringToExpression("x * z", false)
 					expect(-> pow.solve("y")).toThrow(new AlgebraError("Unsolvable: (x * z) for y"))
 
 			it "substitute values", ->
-				mul = parse.stringToExpression("a * b * c")
+				mul = parse.stringToExpression("a * b * c", false)
 				mul = mul.sub(
 					a: 10,
 					b: 20,
 					c: 30
 				)
 				expect(mul.evaluate()).toEqual(6000)
-				mul = parse.stringToExpression("(a + b) * c")
+				mul = parse.stringToExpression("(a + b) * c", false)
 				mul = mul.sub(
 					a: 10,
 					b: 20,
@@ -190,7 +190,7 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 				expect(mul.evaluate()).toEqual(900)
 
 			it "can return an array of all contained variables", ->
-				pow = parse.stringToExpression("(a * b) * c")
+				pow = parse.stringToExpression("(a * b) * c", false)
 				vars = pow.getAllVariables()
 				console.log(vars)
 				expect("a" in vars).toBe(true)
@@ -198,11 +198,11 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 				expect("c" in vars).toBe(true)
 
 		it "expand and simplify into reasonably-canonical forms", ->
-			add = parse.stringToExpression("(a * b)*(2*x + 1)")
+			add = parse.stringToExpression("(a * b)*(2*x + 1)", false)
 			expect(add.expandAndSimplify().toString()).toBe("((2 * a * b * x) + (a * b))")
-			add = parse.stringToExpression("(3*x+2)*(4*y**2+7)")
+			add = parse.stringToExpression("(3*x+2)*(4*y**2+7)", false)
 			expect(add.expand().simplify().toString()).toBe("(14 + (8 * (y ** 2)) + (12 * x * (y ** 2)) + (21 * x))")
-			add = parse.stringToExpression("(3*x+2)*(4*y**2+7)*(x+2*y)**-1")
+			add = parse.stringToExpression("(3*x+2)*(4*y**2+7)*(x+2*y)**-1", false)
 			expect(add.expand().simplify().toString()).toBe("(((x + (2 * y)) ** -1) * (14 + (8 * (y ** 2)) + (12 * x * (y ** 2)) + (21 * x)))")
 
 		describe "representing powers", ->
@@ -220,65 +220,65 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 			it "expand", ->
 				pow = new operators.Pow("x", 2)
 				expect(pow.expand().toString()).toBe("(x ** 2)")
-				pow = parse.stringToExpression("(1 + x)**2")
+				pow = parse.stringToExpression("(1 + x)**2", false)
 				expect(pow.expand().toString()).toBe("((1 * 1) + (1 * x) + (1 * x) + (x * x))")
-				pow = parse.stringToExpression("(a * b * c)**d")
+				pow = parse.stringToExpression("(a * b * c)**d", false)
 				expect(pow.expand().toString()).toBe("((a ** d) * (b ** d) * (c ** d))")
 
 			it "simplify", ->
-				pow = parse.stringToExpression("x ** 2")
+				pow = parse.stringToExpression("x ** 2", false)
 				expect(pow.simplify().toString()).toBe("(x ** 2)")
-				pow = parse.stringToExpression("((2 * x) + (3 * x))**2")
+				pow = parse.stringToExpression("((2 * x) + (3 * x))**2", false)
 				expect(pow.simplify().toString()).toBe("((5 * x) ** 2)")
-				pow = parse.stringToExpression("2**((2 * x) + (3 * x))")
+				pow = parse.stringToExpression("2**((2 * x) + (3 * x))", false)
 				expect(pow.simplify().toString()).toBe("(2 ** (5 * x))")
-				pow = parse.stringToExpression("((2 * x) + (3 * x))**((2 * x) + (3 * x))")
+				pow = parse.stringToExpression("((2 * x) + (3 * x))**((2 * x) + (3 * x))", false)
 				expect(pow.simplify().toString()).toBe("((5 * x) ** (5 * x))")
-				pow = parse.stringToExpression("(x ** 1)")
+				pow = parse.stringToExpression("(x ** 1)", false)
 				expect(pow.simplify().toString()).toBe("x")
-				pow = parse.stringToExpression("(4 ** 0.5)")
+				pow = parse.stringToExpression("(4 ** 0.5)", false)
 				expect(pow.simplify().toString()).toBe("2")
-				pow = parse.stringToExpression("(4 ** -1 * 4 ** 1")
+				pow = parse.stringToExpression("(4 ** -1 * 4 ** 1", false)
 				expect(pow.simplify().toString()).toBe("1")
-				pow = parse.stringToExpression("(x ** -1 * x ** 1")
+				pow = parse.stringToExpression("(x ** -1 * x ** 1", false)
 				expect(pow.simplify().toString()).toBe("1")
-				pow = parse.stringToExpression("(x ** 2) ** 0.5")
+				pow = parse.stringToExpression("(x ** 2) ** 0.5", false)
 				expect(pow.simplify().toString()).toBe("x")
-				pow = parse.stringToExpression("(x ** 2) ** y")
+				pow = parse.stringToExpression("(x ** 2) ** y", false)
 				expect(pow.simplify().toString()).toBe("(x ** (2 * y))")
-				pow = parse.stringToExpression("(1 ** 2)")
+				pow = parse.stringToExpression("(1 ** 2)", false)
 				expect(pow.simplify().toString()).toBe("1")
-				pow = parse.stringToExpression("(1 ** x)")
+				pow = parse.stringToExpression("(1 ** x)", false)
 				expect(pow.simplify().toString()).toBe("1")
-				pow = parse.stringToExpression("(0 ** 0)")
+				pow = parse.stringToExpression("(0 ** 0)", false)
 				expect(pow.simplify().toString()).toBe("1")
 				pow = new operators.Pow(new operators.Add("2", "0"), "-1")
 				expect(pow.expandAndSimplify().toString()).toBe("1/2")
 
 			it "can be solved", ->
-				pow = parse.stringToExpression("x ** 2")
+				pow = parse.stringToExpression("x ** 2", false)
 				expect(pow.solve("x")[0].evaluate()).toEqual(0)
 				expect(pow.solve("x").length).toEqual(1)
 
 			describe "throw sensible errors when", ->
 
 				it "trying to solve for a non-existant variable", ->
-					pow = parse.stringToExpression("x ** 2")
+					pow = parse.stringToExpression("x ** 2", false)
 					expect(-> pow.solve("y")).toThrow(new AlgebraError("Unsolvable: (x ** 2) for y"))
 
 				it "trying to solve for a variable in the exponent", ->
-					pow = parse.stringToExpression("x ** y")
+					pow = parse.stringToExpression("x ** y", false)
 					expect(-> pow.solve("y")).toThrow(new AlgebraError("Unsolvable: (x ** y) for y"))
 
 			it "substitute values", ->
-				pow = parse.stringToExpression("a ** b ** c")
+				pow = parse.stringToExpression("a ** b ** c", false)
 				pow = pow.sub(
 					a: 2,
 					b: 3,
 					c: 1
 				)
 				expect(pow.evaluate()).toEqual(8)
-				pow = parse.stringToExpression("(a + b) ** c")
+				pow = parse.stringToExpression("(a + b) ** c", false)
 				pow = pow.sub(
 					a: 10,
 					b: 20,
@@ -287,7 +287,7 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 				expect(pow.evaluate()).toEqual(27000)
 
 			it "can return an array of all contained variables", ->
-				pow = parse.stringToExpression("(a + b)**c")
+				pow = parse.stringToExpression("(a + b)**c", false)
 				vars = pow.getAllVariables()
 				console.log(vars)
 				expect("a" in vars).toBe(true)

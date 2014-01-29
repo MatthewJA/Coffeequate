@@ -50,11 +50,15 @@ define ["require"], (require) ->
 
 		# Any strangeness in this parser is probably because I accidentally wrote it backwards.
 
-		constructor: (string) ->
+		constructor: (string, simplify = true) ->
 			@tokens = StringToExpression.tokenise(string).reverse()
 			@upto = 0
 			@operators = require("operators")
-			return @parseAddition() # Return a node instead of returning this parser class.
+			parseResult = @parseAddition()
+			if simplify
+				parseResult = parseResult.expandAndSimplify()
+
+			return parseResult # Return a node instead of returning this parser class.
 
 		@tokenise: (string) ->
 			# Convert a string into an array of token strings.
@@ -176,8 +180,8 @@ define ["require"], (require) ->
 
 		ParseError: ParseError
 
-		stringToExpression: (string) ->
-			return new StringToExpression(string)
+		stringToExpression: (string, simplify=true) ->
+			return new StringToExpression(string, simplify)
 
 		constant: (value) ->
 			# Take a string and return [numerator, denominator].
