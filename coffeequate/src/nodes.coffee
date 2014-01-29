@@ -15,21 +15,18 @@ define ->
 			return []
 
 		getUncertainty: ->
-			Add = require("operators/Add")
-			Mul = require("operators/Mul")
-			Pow = require("operators/Pow")
-			terminals = require("terminals")
+			require ["operators/Add", "operators/Mul", "operators/Pow", "terminals"], (Add, Mul, Pow, terminals) ->
 
-			Uncertainty = terminals.Uncertainty
-			Constant = terminals.Constant
+				Uncertainty = terminals.Uncertainty
+				Constant = terminals.Constant
 
-			variables = @getAllVariables()
-			out = []
-			for variable in variables
-				stuff = new Mul(new Uncertainty(variable), @differentiate(variable))
-				out.push(new Pow(stuff, 2))
+				variables = @getAllVariables()
+				out = []
+				for variable in variables
+					stuff = new Mul(new Uncertainty(variable), @differentiate(variable))
+					out.push(new Pow(stuff, 2))
 
-			return new Pow(new Add(out...), new terminals.Constant(1,2)).expandAndSimplify()
+				return new Pow(new Add(out...), new terminals.Constant(1,2)).expandAndSimplify()
 
 	return {
 
