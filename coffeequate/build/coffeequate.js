@@ -1362,7 +1362,6 @@ define("lib/almond", function(){});
 
         _Class.prototype.toLisp = function() {
           var childrenStrings;
-          console.log(this.children);
           childrenStrings = this.children.map(function(x) {
             if (x.toLisp) {
               return x.toLisp();
@@ -2139,20 +2138,25 @@ define("lib/almond", function(){});
       };
 
       Add.prototype.replaceVariables = function(replacements) {
-        var child, index, _i, _len, _ref, _results;
+        var child, children, index, _i, _len, _ref;
+        children = [];
         _ref = this.children;
-        _results = [];
         for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
           child = _ref[index];
           if (child instanceof terminals.Variable && child.label in replacements) {
-            _results.push(this.children[index].label = replacements[child.label]);
+            children.push(child.copy());
+            children[index].label = replacements[child.label];
           } else if (child.replaceVariables != null) {
-            _results.push(child.replaceVariables(replacements));
+            children.push(child.replaceVariables(replacements));
           } else {
-            _results.push(void 0);
+            children.push(child.copy());
           }
         }
-        return _results;
+        return (function(func, args, ctor) {
+          ctor.prototype = func.prototype;
+          var child = new ctor, result = func.apply(child, args);
+          return Object(result) === result ? result : child;
+        })(Add, children, function(){});
       };
 
       Add.prototype.sub = function(substitutions, equivalencies) {
@@ -2813,20 +2817,25 @@ define("lib/almond", function(){});
       };
 
       Mul.prototype.replaceVariables = function(replacements) {
-        var child, index, _i, _len, _ref, _results;
+        var child, children, index, _i, _len, _ref;
+        children = [];
         _ref = this.children;
-        _results = [];
         for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
           child = _ref[index];
           if (child instanceof terminals.Variable && child.label in replacements) {
-            _results.push(this.children[index].label = replacements[child.label]);
+            children.push(child.copy());
+            children[index].label = replacements[child.label];
           } else if (child.replaceVariables != null) {
-            _results.push(child.replaceVariables(replacements));
+            children.push(child.replaceVariables(replacements));
           } else {
-            _results.push(void 0);
+            children.push(child.copy());
           }
         }
-        return _results;
+        return (function(func, args, ctor) {
+          ctor.prototype = func.prototype;
+          var child = new ctor, result = func.apply(child, args);
+          return Object(result) === result ? result : child;
+        })(Mul, children, function(){});
       };
 
       Mul.prototype.sub = function(substitutions, equivalencies) {
@@ -3461,16 +3470,20 @@ define("lib/almond", function(){});
       };
 
       Pow.prototype.replaceVariables = function(replacements) {
-        if (this.children.left instanceof terminals.Variable && this.children.left.label in replacements) {
-          this.children.left.label = replacements[this.children.left.label];
-        } else if (this.children.left.replaceVariables != null) {
-          this.children.left.replaceVariables(replacements);
+        var left, right;
+        left = this.children.left.copy();
+        right = this.children.right.copy();
+        if (left instanceof terminals.Variable && left.label in replacements) {
+          left.label = replacements[left.label];
+        } else if (left.replaceVariables != null) {
+          left = left.replaceVariables(replacements);
         }
-        if (this.children.right instanceof terminals.Variable && this.children.right.label in replacements) {
-          return this.children.right.label = replacements[this.children.right.label];
-        } else if (this.children.right.replaceVariables != null) {
-          return this.children.right.replaceVariables(replacements);
+        if (right instanceof terminals.Variable && right.label in replacements) {
+          right.label = replacements[right.label];
+        } else if (right.replaceVariables != null) {
+          right = right.replaceVariables(replacements);
         }
+        return new Pow(left, right);
       };
 
       Pow.prototype.substituteExpression = function(sourceExpression, variable, equivalencies, eliminate) {
@@ -3735,8 +3748,10 @@ define("lib/almond", function(){});
       };
 
       Equation.prototype.replaceVariables = function(replacements) {
-        this.left.replaceVariables(replacements);
-        return this.right.replaceVariables(replacements);
+        var left, right;
+        left = this.left.replaceVariables(replacements);
+        right = this.right.replaceVariables(replacements);
+        return new Equation(left, right);
       };
 
       Equation.prototype.getAllVariables = function() {

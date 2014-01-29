@@ -370,11 +370,17 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 			return outVariables
 
 		replaceVariables: (replacements) ->
+			children = []
 			for child, index in @children
 				if child instanceof terminals.Variable and child.label of replacements
-					@children[index].label = replacements[child.label]
+					children.push(child.copy())
+					children[index].label = replacements[child.label]
 				else if child.replaceVariables?
-					child.replaceVariables(replacements)
+					children.push(child.replaceVariables(replacements))
+				else
+					children.push(child.copy())
+
+			return new Mul(children...)
 
 		sub: (substitutions, equivalencies=null) ->
 			# subtitutions: {variable: value}

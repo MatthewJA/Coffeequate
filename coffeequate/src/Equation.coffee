@@ -53,8 +53,9 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 			return solutions.map((solution) -> new Equation(variable, solution))
 
 		replaceVariables: (replacements) ->
-			@left.replaceVariables(replacements)
-			@right.replaceVariables(replacements)
+			left = @left.replaceVariables(replacements)
+			right = @right.replaceVariables(replacements)
+			return new Equation(left, right)
 
 		getAllVariables: ->
 			leftVars = @left.getAllVariables()

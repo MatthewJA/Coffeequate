@@ -286,14 +286,19 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 
 		replaceVariables: (replacements) ->
 			# {variableLabel: replacementLabel}
-			if @children.left instanceof terminals.Variable and @children.left.label of replacements
-				@children.left.label = replacements[@children.left.label]
-			else if @children.left.replaceVariables?
-				@children.left.replaceVariables(replacements)
-			if @children.right instanceof terminals.Variable and @children.right.label of replacements
-				@children.right.label = replacements[@children.right.label]
-			else if @children.right.replaceVariables?
-				@children.right.replaceVariables(replacements)
+			left = @children.left.copy()
+			right = @children.right.copy()
+
+			if left instanceof terminals.Variable and left.label of replacements
+				left.label = replacements[left.label]
+			else if left.replaceVariables?
+				left = left.replaceVariables(replacements)
+			if right instanceof terminals.Variable and right.label of replacements
+				right.label = replacements[right.label]
+			else if right.replaceVariables?
+				right = right.replaceVariables(replacements)
+
+			return new Pow(left, right)
 
 		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
 			# Replace all instances of a variable with an expression.
