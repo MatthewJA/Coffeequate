@@ -245,8 +245,10 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 				return b.label == @label
 
 		replaceVariables: (replacements) ->
+			copy = @copy()
 			if @label of replacements
-				@label = replacements[@label]
+				copy.label = replacements[@label]
+			return copy
 
 		getAllVariables: ->
 			[@label]
@@ -361,7 +363,7 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 		# Uncertainty in the equation tree, e.g. sigma_m
 		constructor: (@label) ->
 			# Matt: what do I do here?
-			@cmp = -4
+			@cmp = -4.5
 
 		copy: ->
 			return new Uncertainty(@label)
@@ -388,8 +390,10 @@ define ["parse", "generateInfo"], (parse, generateInfo) ->
 				return b.label == @label
 
 		replaceVariables: (replacements) ->
+			copy = @copy()
 			if @label of replacements
-				@label = replacements[@label]
+				copy.label = replacements[@label]
+			return copy
 
 		getAllVariables: ->
 			[@label]

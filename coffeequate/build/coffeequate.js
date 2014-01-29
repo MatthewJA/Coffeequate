@@ -1008,9 +1008,13 @@ define("lib/almond", function(){});
       };
 
       Variable.prototype.replaceVariables = function(replacements) {
+        var copy;
+        console.log("replacing variables of " + this.label);
+        copy = this.copy();
         if (this.label in replacements) {
-          return this.label = replacements[this.label];
+          copy.label = replacements[this.label];
         }
+        return copy;
       };
 
       Variable.prototype.getAllVariables = function() {
@@ -1185,7 +1189,7 @@ define("lib/almond", function(){});
 
       function Uncertainty(label) {
         this.label = label;
-        this.cmp = -4;
+        this.cmp = -4.5;
       }
 
       Uncertainty.prototype.copy = function() {
@@ -1218,9 +1222,12 @@ define("lib/almond", function(){});
       };
 
       Uncertainty.prototype.replaceVariables = function(replacements) {
+        var copy;
+        copy = this.copy();
         if (this.label in replacements) {
-          return this.label = replacements[this.label];
+          copy.label = replacements[this.label];
         }
+        return copy;
       };
 
       Uncertainty.prototype.getAllVariables = function() {
