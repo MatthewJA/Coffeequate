@@ -422,7 +422,7 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 			@copy()
 
 		toString: ->
-			"sigma(#{@label})"
+			"σ(#{@label})"
 
 		toMathML: ->
 			dummyVar = new Variable("σ(#{label})")
