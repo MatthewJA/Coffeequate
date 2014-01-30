@@ -3856,6 +3856,13 @@ define("lib/almond", function(){});
         return this.right.getVariableUnits(variable, equivalencies);
       };
 
+      Equation.prototype.equals = function(b) {
+        if (!(b instanceof Equation)) {
+          return false;
+        }
+        return b.left.equals(this.left) && b.right.equals(this.right);
+      };
+
       Equation.prototype.toMathML = function(equationID, expression, equality, topLevel) {
         if (expression == null) {
           expression = false;

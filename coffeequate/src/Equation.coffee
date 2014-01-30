@@ -129,6 +129,11 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 				return @left.units
 			return @right.getVariableUnits(variable, equivalencies)
 
+		equals: (b) ->
+			unless b instanceof Equation
+				return false
+			return (b.left.equals(@left) and b.right.equals(@right))
+
 		toMathML: (equationID, expression=false, equality=null, topLevel=false) ->
 			# equality is here for consistency and nothing else, so we ignore it.
 			return @right.toMathML(equationID, expression, @left, topLevel)
