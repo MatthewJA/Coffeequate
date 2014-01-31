@@ -3,7 +3,7 @@
 require.config
 		baseUrl: "./"
 
-define ["Equation", "operators", "terminals", "parse"], (Equation, operators, terminals, parse) ->
+define ["Equation", "operators", "terminals", "parse", "uncertainties"], (Equation, operators, terminals, parse, uncertainties) ->
 
 	return {
 		# Public interface for Coffeequate.

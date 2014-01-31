@@ -8,20 +8,6 @@ define [
 	"compare"
 ], (nodes, terminals, generateInfo, AlgebraError, parseArgs, require, compare) ->
 
-	nodes.BasicNode.prototype.getUncertainty = () ->
-    Mul = require("operators/Mul")
-    Pow = require("operators/Pow")
-    terminals = require("terminals")
-    Uncertainty = terminals.Uncertainty
-    Constant = terminals.Constant
-
-    variables = @getAllVariables()
-    out = []
-    for variable in variables
-      stuff = new Mul(new terminals.Uncertainty(variable), @differentiate(variable))
-      out.push(new Pow(stuff, 2))
-
-    return new Pow(new Add(out...), new terminals.Constant(1,2)).expandAndSimplify()
 
 	combinations = (list) ->
 		if list.length == 1
