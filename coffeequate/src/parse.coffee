@@ -30,6 +30,8 @@ define ["require"], (require) ->
 		if CONSTANT_REGEX.test(string) or RATIO_REGEX.test(string)
 			return new terminals.Constant(string)
 		else if VARIABLE_REGEX.test(string)
+			if string[0] == "σ"
+				return new terminals.Uncertainty(string[1..])
 			return new terminals.Variable(string)
 		else if SYMBOLIC_CONSTANT_REGEX.test(string)
 			return new terminals.SymbolicConstant(string[1..])
