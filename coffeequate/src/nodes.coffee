@@ -14,20 +14,6 @@ define ->
 		getAllVariables: ->
 			return []
 
-		getUncertainty: ->
-			that = this
-			require ["operators/Add", "operators/Mul", "operators/Pow", "terminals"], (Add, Mul, Pow, terminals) ->
-
-				Uncertainty = terminals.Uncertainty
-				Constant = terminals.Constant
-
-				variables = that.getAllVariables()
-				out = []
-				for variable in variables
-					stuff = new Mul(new Uncertainty(variable), that.differentiate(variable))
-					out.push(new Pow(stuff, 2))
-
-				return new Pow(new Add(out...), new terminals.Constant(1,2)).expandAndSimplify()
 
 	return {
 
