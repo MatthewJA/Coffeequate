@@ -64,7 +64,7 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 		getAllVariables: ->
 			[]
 
-		sub: (substitutions) ->
+		sub: (substitutions, uncertaintySubstitutions) ->
 			@copy()
 
 		simplifyInPlace: ->
@@ -173,7 +173,7 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 		getAllVariables: ->
 			[]
 
-		sub: (substitutions) ->
+		sub: (substitutions, uncertaintySubstitutions) ->
 			@copy()
 
 		simplify: ->
@@ -255,7 +255,7 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 		getAllVariables: ->
 			[@label]
 
-		sub: (substitutions) ->
+		sub: (substitutions, uncertaintySubstitutions) ->
 			if @label of substitutions
 				substitute = substitutions[@label]
 				if substitute.copy?
@@ -400,8 +400,15 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 		getAllVariables: ->
 			[@label]
 
-		sub: (substitutions) ->
-			throw new Error("Can't sub uncertainties")
+		sub: (substitutions, uncertaintySubstitutions) ->
+			if @label of substitutions
+				substitute = substitutions[@label]
+				if substitute.copy?
+					return substitute.copy()
+				else
+					return new Constant(substitute)
+			else
+				return @copy()
 
 		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
 			throw new Error("Can't sub uncertainties")

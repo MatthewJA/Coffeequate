@@ -212,7 +212,7 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 			else
 				return expr.solve(variable, equivalencies)
 
-		sub: (substitutions, equivalencies=null) ->
+		sub: (substitutions, uncertaintySubstitutions, equivalencies=null) ->
 			# subtitutions: {variable: value}
 			# variable is a label, value is any object - if it is a node,
 			# it will be substituted in; otherwise it is interpreted as a
@@ -239,7 +239,7 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 				unless subbed
 					left = @children.left.copy()
 			else if @children.left.sub?
-				left = @children.left.sub(substitutions)
+				left = @children.left.sub(substitutions, uncertaintySubstitutions)
 			else
 				left = @children.left.copy()
 
@@ -254,7 +254,7 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 				unless subbed
 					right = @children.right.copy()
 			else if @children.right.sub?
-				right = @children.right.sub(substitutions)
+				right = @children.right.sub(substitutions, uncertaintySubstitutions)
 			else
 				right = @children.right.copy()
 
