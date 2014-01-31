@@ -401,8 +401,8 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 			[@label]
 
 		sub: (substitutions, uncertaintySubstitutions) ->
-			if @label of substitutions
-				substitute = substitutions[@label]
+			if @label of uncertaintySubstitutions
+				substitute = uncertaintySubstitutions[@label]
 				if substitute.copy?
 					return substitute.copy()
 				else
