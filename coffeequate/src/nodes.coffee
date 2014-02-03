@@ -14,6 +14,8 @@ define ->
 		getAllVariables: ->
 			return []
 
+		toDrawingNode: ->
+			throw new Error("toDrawingNode not implemented for #{self.toString()}")
 
 	return {
 

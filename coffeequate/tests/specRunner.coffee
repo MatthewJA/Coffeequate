@@ -19,6 +19,7 @@ require ["jquery"], ($) ->
 		"spec/parse"
 		"spec/compare"
 		"spec/differentiate"
+#		"spec/coffeequate"
 	]
 
 	jasmineEnv.specFilter = (spec) ->

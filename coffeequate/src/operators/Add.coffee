@@ -664,6 +664,10 @@ define [
 			# Return a LaTeX string representing this node.
 			return @children.map((child) -> child.toLaTeX()).join(" + ")
 
+		toDrawingNode: ->
+			AddNode = require("prettyRender").Add
+			return AddNode.makeWithBrackets(@children.map((term) -> term.toDrawingNode())...)
+
 		differentiate: (variable) ->
 			newChildren = @children.map (x) -> x.differentiate(variable)
 

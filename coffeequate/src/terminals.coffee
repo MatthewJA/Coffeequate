@@ -139,6 +139,10 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 				return "#{@numerator}/#{@denominator}"
 			return "#{@numerator}"
 
+		toDrawingNode: ->
+			NumberNode = require("prettyRender").Number
+			return new NumberNode(@numerator / (@denominator or 1))
+
 		differentiate: (variable) ->
 			return new Constant(0)
 
@@ -215,6 +219,7 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 
 		toLaTeX: ->
 			"\\text{#{@toString()}}"
+
 
 		differentiate: (variable) ->
 			return new Constant(0)
@@ -355,6 +360,10 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 			if str.length > 1
 				str = str[0] + "_{" + str[1..] + "}"
 			return str
+
+		toDrawingNode: ->
+			VariableNode = require("prettyRender").Variable
+			return new VariableNode(@label)
 
 		differentiate: (variable) ->
 			if variable == @label

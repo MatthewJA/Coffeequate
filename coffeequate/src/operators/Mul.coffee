@@ -549,6 +549,10 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 						child.toLaTeX()
 				).join(" \\cdot ")
 
+		toDrawingNode: ->
+			MulNode = require("prettyRender").Mul
+			return MulNode.makeWithBrackets(@children.map((child) -> child.toDrawingNode())...)
+
 		differentiate: (variable) ->
 			Add = require("operators/Add")
 			if @children.length == 0

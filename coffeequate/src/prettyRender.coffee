@@ -4,18 +4,42 @@ define ->
       throw new Error("not implemented")
 
     renderLaTeX: ->
+      throw new Error("not implemented")
+
+    # This tells us how strongly bound together the node is.
+    # As in, because x+y*z is parsed as x+(y*z), * binds more closely than + does.
+    # When we want to express (x+y)*z, we put the x+y Add node inside a Bracket
+    # node, which binds very tightly.
+    bindingStrength: ->
+      8
+
+  DrawingNode.makeWithBrackets = (terms...) ->
+    node = new this()
+    terms = terms.map((x) ->
+        if x.bindingStrength() <= node.bindingStrength()
+          return new Bracket(x)
+        else
+          return x)
+    node.terms = terms
+    return node
 
   class Add extends DrawingNode
     constructor: (@terms...) ->
 
+    bindingStrength: ->
+      4
+
     renderLaTeX: ->
-      @terms.map((x) -> x.renderLaTeX()).join("+")
+      return @terms.map((x) -> x.renderLaTeX()).join("+")
 
   class Mul extends DrawingNode
     constructor: (@terms...) ->
 
+    bindingStrength: ->
+      6
+
     renderLaTeX: ->
-      @terms.map((x) -> x.renderLaTeX()).join("+")
+      return @terms.map((x) -> x.renderLaTeX()).join("*")
 
   class Power extends DrawingNode
     constructor: (@left, @right) ->
@@ -33,28 +57,28 @@ define ->
     constructor: (@value) ->
 
     renderLaTeX: ->
-      @value+""
+      return @value+""
 
   class Variable extends DrawingNode
     constructor: (@label) ->
 
     renderLaTeX: ->
-      @label
+      return @label
 
   class Fraction extends DrawingNode
     constructor: (@top, @bottom) ->
 
     renderLaTeX: ->
-      "\\frac{#{@top.renderLaTeX()}}{#{@bottom.renderLaTeX()}}"
+      return "\\frac{#{@top.renderLaTeX()}}{#{@bottom.renderLaTeX()}}"
 
   class Surd extends DrawingNode
-    constructor(@contents, @power = null) ->
+    constructor: (@contents, @power = null) ->
 
     renderLaTeX: ->
       if @power and @power != 2
-        return "\\sqrt[#{power}]{#{@contents.toLaTeX()}}"
+        return "\\sqrt[#{power}]{#{@contents.renderLaTeX()}}"
       else
-        return "\\sqrt{#{@contents.toLaTeX()}}"
+        return "\\sqrt{#{@contents.renderLaTeX()}}"
 
   return {
 
@@ -66,5 +90,6 @@ define ->
     Number: Number
     Variable: Variable
     Fraction: Fraction
+    Surd: Surd
 
   }

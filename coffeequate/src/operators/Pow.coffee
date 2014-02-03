@@ -428,6 +428,16 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 					innerLaTeX = "\\frac{1}{#{innerLaTeX}}"
 				return innerLaTeX
 
+		toDrawingNode: ->
+			SurdNode = require("prettyRender").Surd
+			PowerNode = require("prettyRender").Power
+
+			if @children.right instanceof terminals.Constant
+				if @children.right.numerator == 1
+					return new SurdNode(@children.left.toDrawingNode(), @children.right.denominator)
+
+			return new PowerNode(@children.left.toDrawingNode(), @children.right.toDrawingNode())
+
 		differentiate: (variable)  ->
 			Add = require("operators/Add")
 			Mul = require("operators/Mul")
