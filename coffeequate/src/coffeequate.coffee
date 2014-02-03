@@ -3,7 +3,7 @@
 require.config
 		baseUrl: "./"
 
-define ["Equation", "operators", "terminals", "parse", "uncertainties"], (Equation, operators, terminals, parse, uncertainties) ->
+define ["Equation", "operators", "terminals", "parse", "uncertainties", "prettyRender"], (Equation, operators, terminals, parse, uncertainties, prettyRender) ->
 
 	return {
 		# Public interface for Coffeequate.
@@ -12,4 +12,13 @@ define ["Equation", "operators", "terminals", "parse", "uncertainties"], (Equati
 			operators: operators
 			terminals: terminals
 		parse: parse
+		prettyRender:
+			DrawingNode: prettyRender.DrawingNode
+			Add: prettyRender.Add
+			Mul: prettyRender.Mul
+			Power: prettyRender.Power
+			Bracket: prettyRender.Bracket
+			Number: prettyRender.Number
+			Variable: prettyRender.Variable
+			Fraction: prettyRender.Fraction
 	}
