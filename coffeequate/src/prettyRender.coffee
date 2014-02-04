@@ -30,7 +30,7 @@ define ->
       4
 
     renderLaTeX: ->
-      return @terms.map((x) -> x.renderLaTeX()).join("+")
+      return @terms.map((x) -> x.renderLaTeX()).join(" + ")
 
   class Mul extends DrawingNode
     constructor: (@terms...) ->
@@ -39,13 +39,13 @@ define ->
       6
 
     renderLaTeX: ->
-      return @terms.map((x) -> x.renderLaTeX()).join("*")
+      return @terms.map((x) -> x.renderLaTeX()).join(" \\cdot ")
 
-  class Power extends DrawingNode
+  class Pow extends DrawingNode
     constructor: (@left, @right) ->
 
     renderLaTeX: ->
-      "#{@left.renderLaTeX()}^#{@right.renderLaTeX()}"
+      "#{@left.renderLaTeX()}^{#{@right.renderLaTeX()}}"
 
   class Bracket extends DrawingNode
     constructor: (@contents) ->
@@ -60,7 +60,7 @@ define ->
       return @value+""
 
   class Variable extends DrawingNode
-    constructor: (@label) ->
+    constructor: (@label, @class="default") ->
 
     renderLaTeX: ->
       return @label
@@ -76,20 +76,26 @@ define ->
 
     renderLaTeX: ->
       if @power and @power != 2
-        return "\\sqrt[#{power}]{#{@contents.renderLaTeX()}}"
+        return "\\sqrt[#{@power}]{#{@contents.renderLaTeX()}}"
       else
         return "\\sqrt{#{@contents.renderLaTeX()}}"
+
+  class Uncertainty extends DrawingNode
+    constructor: (@label, @class="default") ->
+
+    renderLaTeX: ->
+      return "\\sigma_{#{@label}}"
 
   return {
 
     DrawingNode: DrawingNode
     Add: Add
     Mul: Mul
-    Power: Power
+    Pow: Pow
     Bracket: Bracket
     Number: Number
     Variable: Variable
     Fraction: Fraction
     Surd: Surd
-
+    Uncertainty: Uncertainty
   }

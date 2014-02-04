@@ -17,6 +17,9 @@ define ->
 		toDrawingNode: ->
 			throw new Error("toDrawingNode not implemented for #{self.toString()}")
 
+		toLaTeX: ->
+			return @toDrawingNode().renderLaTeX()
+
 	return {
 
 		BasicNode: BasicNode

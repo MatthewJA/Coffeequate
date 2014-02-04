@@ -550,8 +550,44 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 				).join(" \\cdot ")
 
 		toDrawingNode: ->
-			MulNode = require("prettyRender").Mul
-			return MulNode.makeWithBrackets(@children.map((child) -> child.toDrawingNode())...)
+			prettyRender = require("prettyRender")
+			Pow = require("operators/Pow")
+			terminals = require("terminals")
+
+			top = []
+			bottom = []
+
+			for child in @children
+				if child instanceof Pow
+					power = child.children.right
+					if power instanceof terminals.Constant
+						if power.denominator < 0
+							power.denominator *= -1
+							power.numerator *= -1
+						if power.numerator < 0
+							if power.denominator != 1
+								bottom.push(new Pow(child.children.left,
+														new terminals.Constant(power.numerator, -power.denominator)).
+																						toDrawingNode())
+							else
+								bottom.push(child.children.left.toDrawingNode())
+						else
+							top.push(child.toDrawingNode())
+					else
+						top.push(child.toDrawingNode())
+				else if child instanceof terminals.Constant
+					if child.numerator != 1
+						top.unshift(new prettyRender.Number(child.numerator))
+					if child.denominator != 1
+						bottom.unshift(new prettyRender.Number(child.denominator))
+				else
+					top.push(child.toDrawingNode())
+
+			if bottom.length == 0
+				return prettyRender.Mul.makeWithBrackets(top...)
+			else
+				return new prettyRender.Fraction(prettyRender.Mul.makeWithBrackets(top...),
+																				 prettyRender.Mul.makeWithBrackets(bottom...))
 
 		differentiate: (variable) ->
 			Add = require("operators/Add")

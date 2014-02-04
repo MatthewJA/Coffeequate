@@ -27,6 +27,10 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 			else
 				[@numerator, @denominator] = parse.constant(value)
 
+			if @denominator < 0
+				@denominator *= -1
+				@numerator *= -1
+
 			@simplifyInPlace()
 
 		evaluate: ->
@@ -141,7 +145,10 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 
 		toDrawingNode: ->
 			NumberNode = require("prettyRender").Number
-			return new NumberNode(@numerator / (@denominator or 1))
+			FractionNode = require("prettyRender").Fraction
+			if @denominator == 1
+				return new NumberNode(@numerator)
+			return new FractionNode(new NumberNode(@numerator), new NumberNode(@denominator))
 
 		differentiate: (variable) ->
 			return new Constant(0)
@@ -220,6 +227,9 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 		toLaTeX: ->
 			"\\text{#{@toString()}}"
 
+		toDrawingNode: ->
+			VariableNode = require("prettyRender").Variable
+			return new VariableNode(@value, "symbolic-constant")
 
 		differentiate: (variable) ->
 			return new Constant(0)
@@ -451,8 +461,13 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 				str = str[0] + "_{" + str[1..] + "}"
 			return "\\sigma(#{str})"
 
+		toDrawingNode: ->
+			UncertaintyNode = require("prettyRender").Uncertainty
+			return new UncertaintyNode(@label)
+
 		differentiate: (variable) ->
-			throw new Error("Can't do that with uncertainties")
+			throw new Error("Can't differentiate uncertainties!")
+
 
 	return {
 

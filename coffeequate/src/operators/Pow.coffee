@@ -430,13 +430,19 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 
 		toDrawingNode: ->
 			SurdNode = require("prettyRender").Surd
-			PowerNode = require("prettyRender").Power
+			PowNode = require("prettyRender").Pow
+			FractionNode = require("prettyRender").Fraction
+			NumberNode = require("prettyRender").Number
 
 			if @children.right instanceof terminals.Constant
 				if @children.right.numerator == 1
-					return new SurdNode(@children.left.toDrawingNode(), @children.right.denominator)
+					if @children.right.denominator > 0
+						return new SurdNode(@children.left.toDrawingNode(), @children.right.denominator)
+					else
+						return new FractionNode(new NumberNode(1),
+								new SurdNode(@children.left.toDrawingNode(), -@children.right.denominator))
 
-			return new PowerNode(@children.left.toDrawingNode(), @children.right.toDrawingNode())
+			return new PowNode(@children.left.toDrawingNode(), @children.right.toDrawingNode())
 
 		differentiate: (variable)  ->
 			Add = require("operators/Add")
