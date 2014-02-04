@@ -132,12 +132,6 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 				return html + "#{@numerator}" + closingHTML
 			return html + "(#{@numerator}/#{@denominator})" + closingHTML
 
-		toLaTeX: ->
-			# Return this constant as a LaTeX string.
-			if @denominator == 1
-				return "#{@numerator}"
-			return "\\frac{#{@numerator}}{#{@denominator}}"
-
 		toString: ->
 			unless @denominator == 1
 				return "#{@numerator}/#{@denominator}"
@@ -223,9 +217,6 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 				closingHTML = ""
 
 			"#{html}<mn class=\"constant symbolic-constant\">#{@label}</mn>#{closingHTML}"
-
-		toLaTeX: ->
-			"\\text{#{@toString()}}"
 
 		toDrawingNode: ->
 			VariableNode = require("prettyRender").Variable
@@ -364,16 +355,10 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 			labelID = if labelArray[1]? then 'id="variable-' + (if expression then "expression" else "equation") + "-#{equationID}-" + @label + '"' else ""
 			return html + '<span class="variable"' + labelID + '>' + label + '</span>' + closingHTML
 
-		toLaTeX: ->
-			# Convert -'s to _'s, and subscript everything.
-			str = @label.replace("-", "_")
-			if str.length > 1
-				str = str[0] + "_{" + str[1..] + "}"
-			return str
-
 		toDrawingNode: ->
 			VariableNode = require("prettyRender").Variable
-			return new VariableNode(@label)
+			str = @label.replace("-", "_")
+			return new VariableNode(str)
 
 		differentiate: (variable) ->
 			if variable == @label
@@ -453,13 +438,6 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 		toMathML: ->
 			dummyVar = new Variable("σ(#{label})")
 			return dummyVar.toMathML(arguments)
-
-		toLaTeX: ->
-			# Convert -'s to _'s, and subscript everything.
-			str = @label.replace("-", "_")
-			if str.length > 1
-				str = str[0] + "_{" + str[1..] + "}"
-			return "\\sigma(#{str})"
 
 		toDrawingNode: ->
 			UncertaintyNode = require("prettyRender").Uncertainty

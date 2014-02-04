@@ -407,27 +407,6 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 				innerHTML = "#{leftSide} ** #{rightSide}"
 				return html + innerHTML + closingHTML
 
-		toLaTeX: ->
-			Mul = require("operators/Mul")
-			Add = require("operators/Add")
-
-			# Return a LaTeX string representing this node.
-			if @children.right.evaluate?() == 1
-				return @children.left.toLaTeX()
-			else if @children.right.evaluate?() == 0
-				return "1"
-			else
-				if @children.left instanceof Add or @children.left instanceof Mul
-					innerLaTeX = "\\left(#{@children.left.toLaTeX()}\\right)^{#{@children.right.toLaTeX()}}"
-				else
-					innerLaTeX = "#{@children.left.toLaTeX()}^{#{@children.right.toLaTeX()}}"
-				if @children.right.evaluate?() < 0
-					right = @children.right.copy()
-					right = new Mul("-1", right)
-					right = right.simplify()
-					innerLaTeX = "\\frac{1}{#{innerLaTeX}}"
-				return innerLaTeX
-
 		toDrawingNode: ->
 			SurdNode = require("prettyRender").Surd
 			PowNode = require("prettyRender").Pow

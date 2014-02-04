@@ -660,10 +660,6 @@ define [
 
 			return html + @children.map((child) -> child.toHTML()).join("+") + closingHTML
 
-		toLaTeX: ->
-			# Return a LaTeX string representing this node.
-			return @children.map((child) -> child.toLaTeX()).join(" + ")
-
 		toDrawingNode: ->
 			AddNode = require("prettyRender").Add
 			return AddNode.makeWithBrackets(@children.map((term) -> term.toDrawingNode())...)

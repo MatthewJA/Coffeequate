@@ -537,18 +537,6 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 						child.toHTML()
 				).join("&middot;") + closingHTML
 
-		toLaTeX: ->
-			Add = require("operators/Add")
-
-			# Return a LaTeX string representing this node.
-			return @children.map(
-				(child) ->
-					if child instanceof Add
-						"\\left(" + child.toLaTeX() + "\\right)"
-					else
-						child.toLaTeX()
-				).join(" \\cdot ")
-
 		toDrawingNode: ->
 			prettyRender = require("prettyRender")
 			Pow = require("operators/Pow")
