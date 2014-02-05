@@ -1,4 +1,13 @@
-define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "require", "compare"], (nodes, terminals, generateInfo, AlgebraError, parseArgs, require, compare) ->
+define [
+	"nodes"
+	"terminals"
+	"generateInfo"
+	"AlgebraError"
+	"parseArgs"
+	"require"
+	"compare"
+	"prettyRender"
+], (nodes, terminals, generateInfo, AlgebraError, parseArgs, require, compare, prettyRender) ->
 
 	# Represent powers as a node.
 
@@ -408,10 +417,10 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 				return html + innerHTML + closingHTML
 
 		toDrawingNode: ->
-			SurdNode = require("prettyRender").Surd
-			PowNode = require("prettyRender").Pow
-			FractionNode = require("prettyRender").Fraction
-			NumberNode = require("prettyRender").Number
+			SurdNode = solid 1px #21221e.Surd
+			PowNode = prettyRender.Pow
+			FractionNode = prettyRender.Fraction
+			NumberNode = prettyRender.Number
 
 			if @children.right instanceof terminals.Constant
 				if @children.right.numerator == 1

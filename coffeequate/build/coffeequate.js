@@ -468,6 +468,9 @@ define("lib/almond", function(){});
       if (CONSTANT_REGEX.test(string) || RATIO_REGEX.test(string)) {
         return new terminals.Constant(string);
       } else if (VARIABLE_REGEX.test(string)) {
+        if (string[0] === "σ") {
+          return new terminals.Uncertainty(string.slice(1));
+        }
         return new terminals.Variable(string);
       } else if (SYMBOLIC_CONSTANT_REGEX.test(string)) {
         return new terminals.SymbolicConstant(string.slice(1));
@@ -679,26 +682,6 @@ define("lib/almond", function(){});
         return [];
       };
 
-      BasicNode.prototype.getUncertainty = function() {
-        return require(["operators/Add", "operators/Mul", "operators/Pow", "terminals"], function(Add, Mul, Pow, terminals) {
-          var Constant, Uncertainty, out, stuff, variable, variables, _i, _len;
-          Uncertainty = terminals.Uncertainty;
-          Constant = terminals.Constant;
-          variables = this.getAllVariables();
-          out = [];
-          for (_i = 0, _len = variables.length; _i < _len; _i++) {
-            variable = variables[_i];
-            stuff = new Mul(new Uncertainty(variable), this.differentiate(variable));
-            out.push(new Pow(stuff, 2));
-          }
-          return new Pow((function(func, args, ctor) {
-            ctor.prototype = func.prototype;
-            var child = new ctor, result = func.apply(child, args);
-            return Object(result) === result ? result : child;
-          })(Add, out, function(){}), new terminals.Constant(1, 2)).expandAndSimplify();
-        });
-      };
-
       return BasicNode;
 
     })();
@@ -862,7 +845,7 @@ define("lib/almond", function(){});
         return [];
       };
 
-      Constant.prototype.sub = function(substitutions) {
+      Constant.prototype.sub = function(substitutions, uncertaintySubstitutions) {
         return this.copy();
       };
 
@@ -1019,7 +1002,7 @@ define("lib/almond", function(){});
         return [];
       };
 
-      SymbolicConstant.prototype.sub = function(substitutions) {
+      SymbolicConstant.prototype.sub = function(substitutions, uncertaintySubstitutions) {
         return this.copy();
       };
 
@@ -1151,7 +1134,7 @@ define("lib/almond", function(){});
         return [this.label];
       };
 
-      Variable.prototype.sub = function(substitutions) {
+      Variable.prototype.sub = function(substitutions, uncertaintySubstitutions) {
         var substitute;
         if (this.label in substitutions) {
           substitute = substitutions[this.label];
@@ -1364,8 +1347,18 @@ define("lib/almond", function(){});
         return [this.label];
       };
 
-      Uncertainty.prototype.sub = function(substitutions) {
-        throw new Error("Can't sub uncertainties");
+      Uncertainty.prototype.sub = function(substitutions, uncertaintySubstitutions) {
+        var substitute;
+        if (this.label in uncertaintySubstitutions) {
+          substitute = uncertaintySubstitutions[this.label];
+          if (substitute.copy != null) {
+            return substitute.copy();
+          } else {
+            return new Constant(substitute);
+          }
+        } else {
+          return this.copy();
+        }
       };
 
       Uncertainty.prototype.substituteExpression = function(sourceExpression, variable, equivalencies, eliminate) {
@@ -1399,7 +1392,7 @@ define("lib/almond", function(){});
       };
 
       Uncertainty.prototype.toString = function() {
-        return "sigma(" + this.label + ")";
+        return "σ(" + this.label + ")";
       };
 
       Uncertainty.prototype.toMathML = function() {
@@ -2176,7 +2169,7 @@ define("lib/almond", function(){});
         })(Add, children, function(){});
       };
 
-      Add.prototype.sub = function(substitutions, equivalencies) {
+      Add.prototype.sub = function(substitutions, uncertaintySubstitutions, equivalencies) {
         var child, children, equiv, newAdd, subbed, variable, variableEquivalencies, _i, _j, _len, _len1, _ref;
         if (equivalencies == null) {
           equivalencies = null;
@@ -2212,7 +2205,7 @@ define("lib/almond", function(){});
               children.push(child.copy());
             }
           } else if (child.sub != null) {
-            children.push(child.sub(substitutions, equivalencies));
+            children.push(child.sub(substitutions, uncertaintySubstitutions, equivalencies));
           } else {
             children.push(child.copy());
           }
@@ -2855,7 +2848,7 @@ define("lib/almond", function(){});
         })(Mul, children, function(){});
       };
 
-      Mul.prototype.sub = function(substitutions, equivalencies) {
+      Mul.prototype.sub = function(substitutions, uncertaintySubstitutions, equivalencies) {
         var child, children, equiv, newMul, subbed, variable, variableEquivalencies, _i, _j, _len, _len1, _ref;
         if (equivalencies == null) {
           equivalencies = null;
@@ -2891,7 +2884,7 @@ define("lib/almond", function(){});
               children.push(child.copy());
             }
           } else if (child.sub != null) {
-            children.push(child.sub(substitutions, equivalencies));
+            children.push(child.sub(substitutions, uncertaintySubstitutions, equivalencies));
           } else {
             children.push(child.copy());
           }
@@ -3396,7 +3389,7 @@ define("lib/almond", function(){});
         }
       };
 
-      Pow.prototype.sub = function(substitutions, equivalencies) {
+      Pow.prototype.sub = function(substitutions, uncertaintySubstitutions, equivalencies) {
         var equiv, left, newPow, right, subbed, variable, variableEquivalencies, _i, _j, _len, _len1;
         if (equivalencies == null) {
           equivalencies = null;
@@ -3430,7 +3423,7 @@ define("lib/almond", function(){});
             left = this.children.left.copy();
           }
         } else if (this.children.left.sub != null) {
-          left = this.children.left.sub(substitutions);
+          left = this.children.left.sub(substitutions, uncertaintySubstitutions);
         } else {
           left = this.children.left.copy();
         }
@@ -3449,7 +3442,7 @@ define("lib/almond", function(){});
             right = this.children.right.copy();
           }
         } else if (this.children.right.sub != null) {
-          right = this.children.right.sub(substitutions);
+          right = this.children.right.sub(substitutions, uncertaintySubstitutions);
         } else {
           right = this.children.right.copy();
         }
@@ -3906,6 +3899,33 @@ define("lib/almond", function(){});
 }).call(this);
 
 // Generated by CoffeeScript 1.6.3
+(function() {
+  define('uncertainties',["nodes", "terminals", "operators", "require"], function(nodes, terminals, operators, require) {
+    return nodes.BasicNode.prototype.getUncertainty = function() {
+      var Add, Constant, Mul, Pow, Uncertainty, out, stuff, variable, variables, _i, _len;
+      Mul = operators.Mul;
+      Pow = operators.Pow;
+      Add = operators.Add;
+      Uncertainty = terminals.Uncertainty;
+      Constant = terminals.Constant;
+      variables = this.getAllVariables();
+      out = [];
+      for (_i = 0, _len = variables.length; _i < _len; _i++) {
+        variable = variables[_i];
+        stuff = new Mul(new terminals.Uncertainty(variable), this.differentiate(variable));
+        out.push(new Pow(stuff, 2));
+      }
+      return new Pow((function(func, args, ctor) {
+        ctor.prototype = func.prototype;
+        var child = new ctor, result = func.apply(child, args);
+        return Object(result) === result ? result : child;
+      })(Add, out, function(){}), new terminals.Constant(1, 2)).expandAndSimplify();
+    };
+  });
+
+}).call(this);
+
+// Generated by CoffeeScript 1.6.3
 /* Coffeequate - http://github.com/MatthewJA/Coffeequate*/
 
 
@@ -3914,7 +3934,7 @@ define("lib/almond", function(){});
     baseUrl: "./"
   });
 
-  define('coffeequate',["Equation", "operators", "terminals", "parse"], function(Equation, operators, terminals, parse) {
+  define('coffeequate',["Equation", "operators", "terminals", "parse", "uncertainties"], function(Equation, operators, terminals, parse, uncertainties) {
     return {
       Equation: Equation,
       tree: {

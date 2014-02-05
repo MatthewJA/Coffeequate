@@ -1,4 +1,4 @@
-define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
+define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo, nodes, prettyRender) ->
 
 	# Terminals for the equation tree.
 
@@ -130,8 +130,8 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 			return html + "(#{@numerator}/#{@denominator})" + closingHTML
 
 		toDrawingNode: ->
-			NumberNode = require("prettyRender").Number
-			FractionNode = require("prettyRender").Fraction
+			NumberNode = prettyRender.Number
+			FractionNode = prettyRender.Fraction
 			if @denominator == 1
 				return new NumberNode(@numerator)
 			return new FractionNode(new NumberNode(@numerator), new NumberNode(@denominator))
@@ -211,7 +211,7 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 			"#{html}<mn class=\"constant symbolic-constant\">#{@label}</mn>#{closingHTML}"
 
 		toDrawingNode: ->
-			VariableNode = require("prettyRender").Variable
+			VariableNode = prettyRender.Variable
 			return new VariableNode(@value, "symbolic-constant")
 
 		differentiate: (variable) ->
@@ -348,7 +348,7 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 			return html + '<span class="variable"' + labelID + '>' + label + '</span>' + closingHTML
 
 		toDrawingNode: ->
-			VariableNode = require("prettyRender").Variable
+			VariableNode = prettyRender.Variable
 			str = @label.replace("-", "_")
 			return new VariableNode(str)
 
@@ -429,7 +429,7 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 			return dummyVar.toMathML(arguments)
 
 		toDrawingNode: ->
-			UncertaintyNode = require("prettyRender").Uncertainty
+			UncertaintyNode = prettyRender.Uncertainty
 			return new UncertaintyNode(@label)
 
 		differentiate: (variable) ->

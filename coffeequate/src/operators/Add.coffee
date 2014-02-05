@@ -6,7 +6,8 @@ define [
 	"parseArgs"
 	"require"
 	"compare"
-], (nodes, terminals, generateInfo, AlgebraError, parseArgs, require, compare) ->
+	"prettyRender"
+], (nodes, terminals, generateInfo, AlgebraError, parseArgs, require, compare, prettyRender) ->
 
 
 	combinations = (list) ->
@@ -661,7 +662,7 @@ define [
 			return html + @children.map((child) -> child.toHTML()).join("+") + closingHTML
 
 		toDrawingNode: ->
-			AddNode = require("prettyRender").Add
+			AddNode = prettyRender.Add
 			return AddNode.makeWithBrackets(@children.map((term) -> term.toDrawingNode())...)
 
 		differentiate: (variable) ->

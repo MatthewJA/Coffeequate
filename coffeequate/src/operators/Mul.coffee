@@ -1,4 +1,13 @@
-define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "require", "compare"], (nodes, terminals, generateInfo, AlgebraError, parseArgs, require, compare) ->
+define [
+	"nodes"
+	"terminals"
+	"generateInfo"
+	"AlgebraError"
+	"parseArgs"
+	"require"
+	"compare"
+	"prettyRender"
+], (nodes, terminals, generateInfo, AlgebraError, parseArgs, require, compare, prettyRender) ->
 
 	# Represent multiplication as a node.
 
@@ -538,7 +547,6 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 				).join("&middot;") + closingHTML
 
 		toDrawingNode: ->
-			prettyRender = require("prettyRender")
 			Pow = require("operators/Pow")
 			terminals = require("terminals")
 
