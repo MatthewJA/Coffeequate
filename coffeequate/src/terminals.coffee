@@ -148,7 +148,7 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 			return new Constant(0)
 
 	class SymbolicConstant extends Terminal
-		# Symbolic constants in the equation tree, e.g. π
+		# Symbolic constants in the equation tree, e.g. Ï€
 		constructor: (@label, @value=null, @units=null) ->
 			@cmp = -5
 
@@ -433,10 +433,10 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 			@copy()
 
 		toString: ->
-			"σ(#{@label})"
+			"Ïƒ(#{@label})"
 
 		toMathML: ->
-			dummyVar = new Variable("σ(#{label})")
+			dummyVar = new Variable("Ïƒ(#{label})")
 			return dummyVar.toMathML(arguments)
 
 		toDrawingNode: ->

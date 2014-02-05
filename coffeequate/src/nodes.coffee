@@ -20,6 +20,11 @@ define ->
 		toLaTeX: ->
 			return @toDrawingNode().renderLaTeX()
 
+		toMathML2: ->
+			[mathClass, mathID, openingHTML] = generateInfo.getMathMLInfo(equationID, expression, equality)
+			closingHTML = "</math></div>"
+			return openingHTML + @toDrawingNode().renderMathML() + closingHTML
+
 	return {
 
 		BasicNode: BasicNode
