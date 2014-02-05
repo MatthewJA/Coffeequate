@@ -13,6 +13,11 @@ define ->
     bindingStrength: ->
       8
 
+    bracketIfNeeded: (child) ->
+      if child.bindingStrength() <= @bindingStrength()
+        return new Bracket(child)
+      return child
+
   DrawingNode.makeWithBrackets = (terms...) ->
     node = new this()
     terms = terms.map((x) ->
@@ -54,7 +59,7 @@ define ->
       "#{@left.renderLaTeX()}^{#{@right.renderLaTeX()}}"
 
     renderString: ->
-      "#{@left.renderString()}^(#{@right.renderString()})"
+      "#{@left.renderString()}**#{@bracketIfNeeded(@right.renderString())}"
 
   class Bracket extends DrawingNode
     constructor: (@contents) ->
@@ -91,7 +96,7 @@ define ->
       return "\\frac{#{@top.renderLaTeX()}}{#{@bottom.renderLaTeX()}}"
 
     renderString: ->
-      return "(#{@top.renderLaTeX()})/(#{@bottom.renderLaTeX()})"
+      return "#{@bracketIfNeeded(@top.renderString())})/(#{@bracketIfNeeded(@bottom.renderString())})"
 
   class Surd extends DrawingNode
     constructor: (@contents, @power = null) ->

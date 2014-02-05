@@ -417,7 +417,7 @@ define [
 				return html + innerHTML + closingHTML
 
 		toDrawingNode: ->
-			SurdNode = solid 1px #21221e.Surd
+			SurdNode = prettyRender?.Surd
 			PowNode = prettyRender.Pow
 			FractionNode = prettyRender.Fraction
 			NumberNode = prettyRender.Number
