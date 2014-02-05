@@ -32,6 +32,9 @@ define ->
     renderLaTeX: ->
       return @terms.map((x) -> x.renderLaTeX()).join(" + ")
 
+    renderString: ->
+      return @terms.map((x) -> x.renderString()).join(" + ")
+
   class Mul extends DrawingNode
     constructor: (@terms...) ->
 
@@ -41,11 +44,17 @@ define ->
     renderLaTeX: ->
       return @terms.map((x) -> x.renderLaTeX()).join(" \\cdot ")
 
+    renderString: ->
+      return @terms.map((x) -> x.renderString()).join("*")
+
   class Pow extends DrawingNode
     constructor: (@left, @right) ->
 
     renderLaTeX: ->
       "#{@left.renderLaTeX()}^{#{@right.renderLaTeX()}}"
+
+    renderString: ->
+      "#{@left.renderString()}^(#{@right.renderString()})"
 
   class Bracket extends DrawingNode
     constructor: (@contents) ->
@@ -53,10 +62,16 @@ define ->
     renderLaTeX: ->
       return "\\left(#{@contents.renderLaTeX()}\\right)"
 
+    renderString: ->
+      return "(#{@contents.renderString()})"
+
   class Number extends DrawingNode
     constructor: (@value) ->
 
     renderLaTeX: ->
+      return @value+""
+
+    renderString: ->
       return @value+""
 
   class Variable extends DrawingNode
@@ -65,11 +80,18 @@ define ->
     renderLaTeX: ->
       return @label
 
+    renderString: ->
+      return @label
+
+
   class Fraction extends DrawingNode
     constructor: (@top, @bottom) ->
 
     renderLaTeX: ->
       return "\\frac{#{@top.renderLaTeX()}}{#{@bottom.renderLaTeX()}}"
+
+    renderString: ->
+      return "(#{@top.renderLaTeX()})/(#{@bottom.renderLaTeX()})"
 
   class Surd extends DrawingNode
     constructor: (@contents, @power = null) ->
