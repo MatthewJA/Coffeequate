@@ -13,9 +13,6 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 		copy: ->
 			return new Terminal(@label)
 
-		toString: ->
-			@label
-
 	class Constant extends Terminal
 		# Constants in the equation tree, e.g. 1/2
 		constructor: (value, @denominator=null) ->
@@ -131,11 +128,6 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 			if @denominator == 1
 				return html + "#{@numerator}" + closingHTML
 			return html + "(#{@numerator}/#{@denominator})" + closingHTML
-
-		toString: ->
-			unless @denominator == 1
-				return "#{@numerator}/#{@denominator}"
-			return "#{@numerator}"
 
 		toDrawingNode: ->
 			NumberNode = require("prettyRender").Number
@@ -431,9 +423,6 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 
 		expandAndSimplify: ->
 			@copy()
-
-		toString: ->
-			"Ïƒ(#{@label})"
 
 		toMathML: ->
 			dummyVar = new Variable("Ïƒ(#{label})")
