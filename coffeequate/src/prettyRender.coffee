@@ -59,10 +59,13 @@ define ->
       "#{@left.renderLaTeX()}^{#{@right.renderLaTeX()}}"
 
     renderString: ->
-      "#{@left.renderString()}**#{@bracketIfNeeded(@right.renderString())}"
+      "#{@left.renderString()}**#{@bracketIfNeeded(@right).renderString()}"
 
   class Bracket extends DrawingNode
     constructor: (@contents) ->
+
+    bindingStrength: ->
+      9
 
     renderLaTeX: ->
       return "\\left(#{@contents.renderLaTeX()}\\right)"
@@ -73,6 +76,9 @@ define ->
   class Number extends DrawingNode
     constructor: (@value) ->
 
+    bindingStrength: ->
+      10
+
     renderLaTeX: ->
       return @value+""
 
@@ -81,6 +87,9 @@ define ->
 
   class Variable extends DrawingNode
     constructor: (@label, @class="default") ->
+
+    bindingStrength: ->
+      10
 
     renderLaTeX: ->
       return @label
@@ -92,11 +101,14 @@ define ->
   class Fraction extends DrawingNode
     constructor: (@top, @bottom) ->
 
+    bindingStrength: ->
+      8
+
     renderLaTeX: ->
       return "\\frac{#{@top.renderLaTeX()}}{#{@bottom.renderLaTeX()}}"
 
     renderString: ->
-      return "#{@bracketIfNeeded(@top.renderString())})/(#{@bracketIfNeeded(@bottom.renderString())})"
+      return "#{@bracketIfNeeded(@top).renderString()}/#{@bracketIfNeeded(@bottom).renderString()}"
 
   class Surd extends DrawingNode
     constructor: (@contents, @power = null) ->
@@ -107,8 +119,17 @@ define ->
       else
         return "\\sqrt{#{@contents.renderLaTeX()}}"
 
+    renderString: ->
+      if @power and @power != 2
+        return "#{@bracketIfNeeded(@contents).renderLaTeX()}**#{@power}}"
+      else
+        return "sqrt(#{@contents.renderLaTeX()})"
+
   class Uncertainty extends DrawingNode
     constructor: (@label, @class="default") ->
+
+    bindingStrength: ->
+      9
 
     renderLaTeX: ->
       return "\\sigma_{#{@label}}"

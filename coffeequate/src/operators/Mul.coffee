@@ -579,11 +579,18 @@ define [
 				else
 					top.push(child.toDrawingNode())
 
+			if bottom.length == 1
+				newBottom = bottom
+			else if bottom.length > 1
+				newBottom = prettyRender.Mul.makeWithBrackets(bottom...)
+
+			if top.length > 1
+				top = prettyRender.Mul.makeWithBrackets(top...)
+
 			if bottom.length == 0
-				return prettyRender.Mul.makeWithBrackets(top...)
+				return top
 			else
-				return new prettyRender.Fraction(prettyRender.Mul.makeWithBrackets(top...),
-																				 prettyRender.Mul.makeWithBrackets(bottom...))
+				return new prettyRender.Fraction(top, newBottom)
 
 		differentiate: (variable) ->
 			Add = require("operators/Add")
