@@ -212,7 +212,7 @@ define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo,
 
 		toDrawingNode: ->
 			VariableNode = prettyRender.Variable
-			return new VariableNode(@value, "symbolic-constant")
+			return new VariableNode(@label, "symbolic-constant")
 
 		differentiate: (variable) ->
 			return new Constant(0)
