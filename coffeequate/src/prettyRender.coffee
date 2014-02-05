@@ -108,6 +108,9 @@ define ->
     renderLaTeX: ->
       return "\\sigma_{#{@label}}"
 
+    renderString: ->
+      return "σ(#{@label})"
+
   return {
 
     DrawingNode: DrawingNode

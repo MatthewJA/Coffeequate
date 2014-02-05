@@ -425,7 +425,7 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 			@copy()
 
 		toMathML: ->
-			dummyVar = new Variable("Ïƒ(#{label})")
+			dummyVar = new Variable("σ(#{label})")
 			return dummyVar.toMathML(arguments)
 
 		toDrawingNode: ->
