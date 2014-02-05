@@ -12,7 +12,7 @@ Make expressions with the parse method `stringToExpression`:
 
     expression = coffeequate.parse.stringToExpression("a**2 + b**2 + -1*c**2")
 
-Or make *Equations* directly:
+Or make `Equations` directly:
 
     equation = new coffeequate.Equation("x", "y + z")
     equation = new coffeequate.Equation("x = y + z")
