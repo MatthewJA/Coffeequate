@@ -1,3 +1,22 @@
+# This file defines a new tree structure for printing out Coffeequate
+# expression nodes.
+#
+# This is motivated by a desire to keep the representation logic separate from
+# the display logic. For example, we want x*y**-1 to be represented as the
+# string "x/y" and as the LaTeX "\frac{x}{y}". Notice the logic that puts the
+# y on the bottom of the fraction. We don't want to have to write that in both
+# the toLaTeX and toString method. So we write a toDrawingNode method for all
+# of the expression nodes. In this case, the result of toDrawingNode would be:
+#
+# new Fraction(new Variable("x"), new Variable("y"))
+#
+# Then we implement a toLaTeX and toString method for all of the DrawingNodes.
+#
+# This means that supporting a new output format for pretty printing is easy:
+# we just need to implement the toWhatever method on the DrawingNode
+# subclasses.
+
+
 define ->
   class DrawingNode
     toString: ->
@@ -121,9 +140,9 @@ define ->
 
     renderString: ->
       if @power and @power != 2
-        return "#{@bracketIfNeeded(@contents).renderLaTeX()}**#{@power}}"
+        return "#{@bracketIfNeeded(@contents).renderString()} ** #{@power}}"
       else
-        return "sqrt(#{@contents.renderLaTeX()})"
+        return "sqrt(#{@contents.renderString()})"
 
   class Uncertainty extends DrawingNode
     constructor: (@label, @class="default") ->

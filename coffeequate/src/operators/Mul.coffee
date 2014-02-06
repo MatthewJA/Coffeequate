@@ -547,13 +547,23 @@ define [
 				).join("&middot;") + closingHTML
 
 		toDrawingNode: ->
+			# To make a drawing node out of a Mul node, we turn it into either a
+			# fraction or a long product.
+			#
+			# We put things with negative powers on the bottom of the fraction.
+			# If the constant factor in the multiplication is a fraction, we also put
+			# the denominator on the bottom.
 			Pow = require("operators/Pow")
 			terminals = require("terminals")
 
 			top = []
 			bottom = []
 
+			# We need to figure out if the things which we're multiplying should go
+			# on the top or bottom of the fraction.
 			for child in @children
+				# We only put things on the bottom if they are powers with a negative
+				# constant power, eg x**-1.
 				if child instanceof Pow
 					power = child.children.right
 					if power instanceof terminals.Constant
@@ -579,6 +589,10 @@ define [
 				else
 					top.push(child.toDrawingNode())
 
+
+			# At this point, we have a top and bottom array with stuff which should
+			# go on the top and bottom of the array respoectively.
+
 			if bottom.length == 1
 				newBottom = bottom[0]
 			else if bottom.length > 1
@@ -591,6 +605,8 @@ define [
 
 			if bottom.length == 0
 				return top
+			else if top.length == 0
+				return new prettyRender.Fraction(new prettyRender.Number(1),newBottom)
 			else
 				return new prettyRender.Fraction(top, newBottom)
 
