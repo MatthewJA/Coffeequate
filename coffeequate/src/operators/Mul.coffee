@@ -580,11 +580,13 @@ define [
 					top.push(child.toDrawingNode())
 
 			if bottom.length == 1
-				newBottom = bottom
+				newBottom = bottom[0]
 			else if bottom.length > 1
 				newBottom = prettyRender.Mul.makeWithBrackets(bottom...)
 
-			if top.length > 1
+			if top.length == 1
+				top = top[0]
+			else if top.length > 1
 				top = prettyRender.Mul.makeWithBrackets(top...)
 
 			if bottom.length == 0
