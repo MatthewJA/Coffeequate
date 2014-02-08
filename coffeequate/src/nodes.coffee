@@ -1,4 +1,4 @@
-define ->
+define ["generateInfo"], (generateInfo) ->
 
 	# Basic nodes for the expression tree.
 
@@ -23,10 +23,13 @@ define ->
 		toString: ->
 			return @toDrawingNode().renderString()
 
-		toMathML2: ->
+		toMathML2: (equationID, expression, equality="0") ->
 			[mathClass, mathID, openingHTML] = generateInfo.getMathMLInfo(equationID, expression, equality)
 			closingHTML = "</math></div>"
-			return openingHTML + @toDrawingNode().renderMathML() + closingHTML
+			return openingHTML + @toDrawingNode().renderMathML(equationID, expression) + closingHTML
+
+		stringEqual: (other) ->
+			return other.toString() == @toString()
 
 	return {
 

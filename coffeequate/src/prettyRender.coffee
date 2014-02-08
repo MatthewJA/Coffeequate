@@ -59,6 +59,10 @@ define ->
     renderString: ->
       return @terms.map((x) -> x.renderString()).join(" + ")
 
+    renderMathML: (equationID, expression) ->
+      return @terms.map((x) -> x.renderMathML(equationID, expression))
+                   .join("<mo>+</mo>")
+
   class Mul extends DrawingNode
     constructor: (@terms...) ->
 
@@ -70,6 +74,9 @@ define ->
 
     renderString: ->
       return @terms.map((x) -> x.renderString()).join("*")
+
+    renderMathML: (equationID, expression) ->
+      return
 
   class Pow extends DrawingNode
     constructor: (@left, @right) ->
@@ -92,6 +99,10 @@ define ->
     renderString: ->
       return "(#{@contents.renderString()})"
 
+    renderMathML: (equationID, expression) ->
+      return "<mfenced>#{@contents.renderMathML(equationID, expression)}" +
+                                                                "</mfenced>"
+
   class Number extends DrawingNode
     constructor: (@value) ->
 
@@ -104,6 +115,9 @@ define ->
     renderString: ->
       return @value+""
 
+    renderMathML: (equationID, expression) ->
+      return "<mn class=\"constant\">#{@value}</mn>"
+
   class Variable extends DrawingNode
     constructor: (@label, @class="default") ->
 
@@ -115,6 +129,26 @@ define ->
 
     renderString: ->
       return @label
+
+    renderMathML: (equationID, expression) ->
+      labelArray = @label.split("-")
+      label = labelArray[0]
+      labelID = (if labelArray[1]? then 'id="variable-' +
+                (if expression then "expression" else "equation") +
+                      "-#{equationID}-" + @label + '"' else "")
+
+      atCount = 0
+      while label[0] == "@"
+        atCount += 1
+        label = label[1..]
+
+      atStart = "<mover accent=\"true\">"
+      atEnd = "<mrow><mo>" + ("." for i in [0...atCount]).join("") + "</mo></mrow></mover>"
+
+      if label.length > 1
+        return atStart + '<msub class="variable"' + labelID + '><mi>' + label[0] + '</mi><mi>' + label[1..] + "</mi></msub>" + atEnd
+      else
+        return '<mi class="variable"' + labelID + '>' + label + '</mi>'
 
 
   class Fraction extends DrawingNode

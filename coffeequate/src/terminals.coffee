@@ -349,8 +349,7 @@ define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo,
 
 		toDrawingNode: ->
 			VariableNode = prettyRender.Variable
-			str = @label.replace("-", "_")
-			return new VariableNode(str)
+			return new VariableNode(@label)
 
 		differentiate: (variable) ->
 			if variable == @label
