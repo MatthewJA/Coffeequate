@@ -65,7 +65,7 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 					rightVars.unshift(variable)
 			return rightVars
 
-		sub: (substitutions, equivalencies) ->
+		sub: (substitutions, equivalencies, uncertainties) ->
 			# if @left instanceof terminals.Variable
 			# 	if equivalencies?
 			# 		for equiv in equivalencies.get(@left.label)
@@ -76,7 +76,7 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 			# 		if @left.label of substitutions
 			# 			expr = new operators.Add(@right, new operators.Mul("-1", @left))
 			# 			return new Equation(expr.sub(substitutions, equivalencies))
-			return new Equation(@left, @right.sub(substitutions, equivalencies))
+			return new Equation(@left, @right.sub(substitutions, uncertainties, equivalencies))
 
 		substituteExpression: (source, variable, equivalencies, eliminate=false) ->
 			# Substitute an equation or expression into a variable in this equation.

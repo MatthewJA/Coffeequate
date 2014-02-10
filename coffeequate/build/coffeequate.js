@@ -667,7 +667,7 @@ define("lib/almond", function(){});
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
-  define('nodes',[],function() {
+  define('nodes',["generateInfo"], function(generateInfo) {
     var BasicNode;
     BasicNode = (function() {
       function BasicNode(label) {
@@ -694,11 +694,18 @@ define("lib/almond", function(){});
         return this.toDrawingNode().renderString();
       };
 
-      BasicNode.prototype.toMathML2 = function() {
+      BasicNode.prototype.toMathML2 = function(equationID, expression, equality) {
         var closingHTML, mathClass, mathID, openingHTML, _ref;
+        if (equality == null) {
+          equality = "0";
+        }
         _ref = generateInfo.getMathMLInfo(equationID, expression, equality), mathClass = _ref[0], mathID = _ref[1], openingHTML = _ref[2];
         closingHTML = "</math></div>";
-        return openingHTML + this.toDrawingNode().renderMathML() + closingHTML;
+        return openingHTML + this.toDrawingNode().renderMathML(equationID, expression) + closingHTML;
+      };
+
+      BasicNode.prototype.stringEqual = function(other) {
+        return other.toString() === this.toString();
       };
 
       return BasicNode;
@@ -843,6 +850,12 @@ define("lib/almond", function(){});
         }).join(" + ");
       };
 
+      Add.prototype.renderMathML = function(equationID, expression) {
+        return this.terms.map(function(x) {
+          return x.renderMathML(equationID, expression);
+        }).join("<mo>+</mo>");
+      };
+
       return Add;
 
     })(DrawingNode);
@@ -870,6 +883,8 @@ define("lib/almond", function(){});
           return x.renderString();
         }).join("*");
       };
+
+      Mul.prototype.renderMathML = function(equationID, expression) {};
 
       return Mul;
 
@@ -912,6 +927,10 @@ define("lib/almond", function(){});
         return "(" + (this.contents.renderString()) + ")";
       };
 
+      Bracket.prototype.renderMathML = function(equationID, expression) {
+        return ("<mfenced>" + (this.contents.renderMathML(equationID, expression))) + "</mfenced>";
+      };
+
       return Bracket;
 
     })(DrawingNode);
@@ -932,6 +951,10 @@ define("lib/almond", function(){});
 
       Number.prototype.renderString = function() {
         return this.value + "";
+      };
+
+      Number.prototype.renderMathML = function(equationID, expression) {
+        return "<mn class=\"constant\">" + this.value + "</mn>";
       };
 
       return Number;
@@ -955,6 +978,32 @@ define("lib/almond", function(){});
 
       Variable.prototype.renderString = function() {
         return this.label;
+      };
+
+      Variable.prototype.renderMathML = function(equationID, expression) {
+        var atCount, atEnd, atStart, i, label, labelArray, labelID;
+        labelArray = this.label.split("-");
+        label = labelArray[0];
+        labelID = (labelArray[1] != null ? 'id="variable-' + (expression ? "expression" : "equation") + ("-" + equationID + "-") + this.label + '"' : "");
+        atCount = 0;
+        while (label[0] === "@") {
+          atCount += 1;
+          label = label.slice(1);
+        }
+        atStart = "<mover accent=\"true\">";
+        atEnd = "<mrow><mo>" + ((function() {
+          var _i, _results;
+          _results = [];
+          for (i = _i = 0; 0 <= atCount ? _i < atCount : _i > atCount; i = 0 <= atCount ? ++_i : --_i) {
+            _results.push(".");
+          }
+          return _results;
+        })()).join("") + "</mo></mrow></mover>";
+        if (label.length > 1) {
+          return atStart + '<msub class="variable"' + labelID + '><mi>' + label[0] + '</mi><mi>' + label.slice(1) + "</mi></msub>" + atEnd;
+        } else {
+          return '<mi class="variable"' + labelID + '>' + label + '</mi>';
+        }
       };
 
       return Variable;
@@ -1566,10 +1615,9 @@ define("lib/almond", function(){});
       };
 
       Variable.prototype.toDrawingNode = function() {
-        var VariableNode, str;
+        var VariableNode;
         VariableNode = prettyRender.Variable;
-        str = this.label.replace("-", "_");
-        return new VariableNode(str);
+        return new VariableNode(this.label);
       };
 
       Variable.prototype.differentiate = function(variable) {
@@ -4097,8 +4145,8 @@ define("lib/almond", function(){});
         return rightVars;
       };
 
-      Equation.prototype.sub = function(substitutions, equivalencies) {
-        return new Equation(this.left, this.right.sub(substitutions, equivalencies));
+      Equation.prototype.sub = function(substitutions, equivalencies, uncertainties) {
+        return new Equation(this.left, this.right.sub(substitutions, uncertainties, equivalencies));
       };
 
       Equation.prototype.substituteExpression = function(source, variable, equivalencies, eliminate) {
