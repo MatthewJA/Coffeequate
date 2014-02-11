@@ -7,46 +7,46 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 			it "represent addition", ->
 				add = new operators.Add("2", "3")
 				expect(add.label).toBe("+")
-				expect(add.toLisp()).toBe("(2 + 3)")
+				expect(add.toLisp()).toBe("(+ 2 3)")
 
 				add = new operators.Add("2", "3", "4")
 				expect(add.label).toBe("+")
-				expect(add.toLisp()).toBe("(2 + 3 + 4)")
+				expect(add.toLisp()).toBe("(+ 2 3 4)")
 
 			it "require at least two children", ->
 				expect(-> new operators.Add()).toThrow(new Error("Add nodes must have at least one child."))
 
 			it "expand", ->
 				add = parse.stringToExpression("a + (b + c)")
-				expect(add.expand().toLisp()).toBe("(a + b + c)")
+				expect(add.expand().toLisp()).toBe("(+ a b c)")
 				add = parse.stringToExpression("a + (b + (c + 4))")
-				expect(add.expand().toLisp()).toBe("(4 + a + b + c)")
+				expect(add.expand().toLisp()).toBe("(+ 4 a b c)")
 				add = parse.stringToExpression("a + ((b + e) + (c + d))")
-				expect(add.expand().toLisp()).toBe("(a + b + c + d + e)")
+				expect(add.expand().toLisp()).toBe("(+ a b c d e)")
 				add = parse.stringToExpression("((a * b) + (c * d)) + ((e * f) + (g * h))")
-				expect(add.expand().toLisp()).toBe("((a * b) + (c * d) + (e * f) + (g * h))")
+				expect(add.expand().toLisp()).toBe("(+ (* a b) (* c d) (* e f) (* g h))")
 				add = parse.stringToExpression("c + b + a")
-				expect(add.expand().toLisp()).toBe("(a + b + c)")
+				expect(add.expand().toLisp()).toBe("(+ a b c)")
 				add = parse.stringToExpression("c + x + a")
-				expect(add.expand().toLisp()).toBe("(a + c + x)")
+				expect(add.expand().toLisp()).toBe("(+ a c x)")
 
 			it "simplify", ->
 				add = parse.stringToExpression("1 + 1")
-				expect(add.simplify().toLisp()).toBe("2")
+				expect(add.simplify().toString()).toBe("2")
 				add = parse.stringToExpression("x + x")
-				expect(add.simplify().toLisp()).toBe("(2 * x)")
+				expect(add.simplify().toLisp()).toBe("(* 2 x)")
 				add = parse.stringToExpression("x + x + y + y")
-				expect(add.simplify().toLisp()).toBe("((2 * x) + (2 * y))")
+				expect(add.simplify().toLisp()).toBe("(+ (* 2 x) (* 2 y))")
 				add = parse.stringToExpression("((2 * x) + (3 * x))")
-				expect(add.simplify().toLisp()).toBe("(5 * x)")
+				expect(add.simplify().toLisp()).toBe("(* 5 x)")
 				add = parse.stringToExpression("(x + 0)")
-				expect(add.simplify().toLisp()).toBe("x")
+				expect(add.simplify().toString()).toBe("x")
 				add = parse.stringToExpression("(x + 0 + 0 + y)")
-				expect(add.simplify().toLisp()).toBe("(x + y)")
+				expect(add.simplify().toLisp()).toBe("(+ x y)")
 				add = parse.stringToExpression("(x + (2 * x))")
-				expect(add.simplify().toLisp()).toBe("(3 * x)")
+				expect(add.simplify().toLisp()).toBe("(* 3 x)")
 				add = parse.stringToExpression("(-1 + 1**1)")
-				expect(add.simplify().toLisp()).toBe("0")
+				expect(add.simplify().toString()).toBe("0")
 
 			it "can be solved", ->
 				add = new operators.Add("x") # 0 = x
@@ -54,31 +54,31 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 				add = parse.stringToExpression("x + -1") # 1 = x
 				expect(add.solve("x")[0].evaluate()).toEqual(1)
 				add = parse.stringToExpression("x + -y") # y = x
-				expect(add.solve("x")[0].toLisp()).toEqual("y")
+				expect(add.solve("x")[0].toString()).toEqual("y")
 				add = parse.stringToExpression("x + y + 2") # y = x
-				expect(add.solve("x")[0].toLisp()).toEqual("(-2 + (-1 * y))")
+				expect(add.solve("x")[0].toLisp()).toEqual("(+ -2 (* -1 y))")
 
 				# Works so far. Let's try some multiplication.
 				add = parse.stringToExpression("2 * x + -y") # x = y/2
-				expect(add.solve("x")[0].toLisp()).toEqual("(1/2 * y)")
+				expect(add.solve("x")[0].toLisp()).toEqual("(* 1/2 y)")
 
 				# Quadratics?
 				add = parse.stringToExpression("-4 + x ** 2") # Simple quadratic.
-				expect(add.solve("x").sort().toLisp()).toEqual("-2,2")
+				expect(add.solve("x").sort().toString()).toEqual("-2,2")
 				add = parse.stringToExpression("-4 * x + x ** 2") # Slightly more complex quadratic.
-				expect(add.solve("x")[0].toLisp()).toEqual("0")
-				expect(add.solve("x")[1].toLisp()).toEqual("4")
+				expect(add.solve("x")[0].toString()).toEqual("0")
+				expect(add.solve("x")[1].toString()).toEqual("4")
 				add = parse.stringToExpression("(x + 3)**2")
-				expect(add.solve("x")[0].toLisp()).toEqual("-3")
+				expect(add.solve("x")[0].toString()).toEqual("-3")
 				expect(add.solve("x").length).toEqual(1)
 				add = parse.stringToExpression("(x + 3) * (x + -2)")
-				expect(add.solve("x")[0].toLisp()).toEqual("2")
-				expect(add.solve("x")[1].toLisp()).toEqual("-3")
+				expect(add.solve("x")[0].toString()).toEqual("2")
+				expect(add.solve("x")[1].toString()).toEqual("-3")
 
 				# Projectile motion for t?
 				add = parse.stringToExpression("u * t + a * t ** 2 * 0.5 + -s")
-				expect(add.solve("t").toLisp()).toEqual(
-					"((a ** -1) * ((((u ** 2) + (2 * a * s)) ** 1/2) + (-1 * u))),((a ** -1) * ((-1 * u) + (-1 * (((u ** 2) + (2 * a * s)) ** 1/2))))")
+				expect(add.solve("t").toString()).toEqual(
+					"(sqrt(u**2 + 2*a*s) + -1*u)/a,(-1*u + -1*sqrt(u**2 + 2*a*s))/a")
 
 			it "substitute values", ->
 				add = parse.stringToExpression("a + b + c")
@@ -109,7 +109,7 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 			it "represent multiplication", ->
 				mul = new operators.Mul("b", "3")
 				expect(mul.label).toBe("*")
-				expect(mul.toString()).toBe("(b * 3)")
+				expect(mul.toString()).toBe("b * 3")
 
 				mul = new operators.Mul("b", "3", "d")
 				expect(mul.toString()).toBe("(b * 3 * d)")
