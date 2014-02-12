@@ -1169,7 +1169,6 @@ define("lib/almond", function(){});
           this.denominator *= -1;
           this.numerator *= -1;
         }
-        this.simplifyInPlace();
       }
 
       Constant.prototype.evaluate = function() {
@@ -1234,7 +1233,6 @@ define("lib/almond", function(){});
       Constant.prototype.simplify = function() {
         var constant;
         constant = this.copy();
-        constant.simplifyInPlace();
         return constant;
       };
 
@@ -1243,7 +1241,7 @@ define("lib/almond", function(){});
       };
 
       Constant.prototype.expandAndSimplify = function() {
-        return this.copy();
+        return this.simplify();
       };
 
       Constant.prototype.substituteExpression = function(sourceExpression, variable, equivalencies) {

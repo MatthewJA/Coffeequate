@@ -395,7 +395,7 @@ define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo,
 		getAllVariables: ->
 			[@label]
 
-		sub: (substitutions, uncertaintySubstitutions) ->
+		sub: (substitutions, uncertaintySubstitutions, assumeZero=false) ->
 			if @label of uncertaintySubstitutions
 				substitute = uncertaintySubstitutions[@label]
 				if substitute.copy?
@@ -403,7 +403,7 @@ define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo,
 				else
 					return new Constant(substitute)
 			else
-				return @copy()
+				unless assumeZero return @copy() else return new Constant("0")
 
 		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
 			throw new Error("Can't sub uncertainties")

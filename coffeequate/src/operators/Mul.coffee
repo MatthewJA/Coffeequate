@@ -391,7 +391,7 @@ define [
 
 			return new Mul(children...)
 
-		sub: (substitutions, uncertaintySubstitutions, equivalencies=null) ->
+		sub: (substitutions, uncertaintySubstitutions, equivalencies=null, assumeZeroUncertainty=false) ->
 			# subtitutions: {variable: value}
 			# variable is a label, value is any object - if it is a node,
 			# it will be substituted in; otherwise it is interpreted as a
@@ -418,7 +418,7 @@ define [
 					unless subbed
 						children.push(child.copy())
 				else if child.sub?
-					children.push(child.sub(substitutions, uncertaintySubstitutions, equivalencies))
+					children.push(child.sub(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty))
 				else
 					children.push(child.copy())
 
