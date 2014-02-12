@@ -306,7 +306,7 @@ define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo,
 			# Return the variable as a MathML string.
 			if topLevel
 				[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
-				closingHTML = "</div>"
+				closingHTML = "</math></div>"
 			else
 				html = ""
 				closingHTML = ""

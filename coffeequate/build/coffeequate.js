@@ -884,7 +884,11 @@ define("lib/almond", function(){});
         }).join("*");
       };
 
-      Mul.prototype.renderMathML = function(equationID, expression) {};
+      Mul.prototype.renderMathML = function(equationID, expression) {
+        return this.terms.map(function(x) {
+          return x.renderMathML(equationID, expression);
+        }).join("<mo>&middot;</mo>");
+      };
 
       return Mul;
 
@@ -903,6 +907,10 @@ define("lib/almond", function(){});
 
       Pow.prototype.renderString = function() {
         return "" + (this.left.renderString()) + "**" + (this.bracketIfNeeded(this.right).renderString());
+      };
+
+      Pow.prototype.renderMathML = function(equationID, expression) {
+        return "" + (this.left.renderMathML(equationID, expression)) + "<msup>" + innerHTML + (right.toMathML(equationID, expression)) + "</msup>";
       };
 
       return Pow;
@@ -1029,6 +1037,10 @@ define("lib/almond", function(){});
         return "" + (this.bracketIfNeeded(this.top).renderString()) + "/" + (this.bracketIfNeeded(this.bottom).renderString());
       };
 
+      Fraction.prototype.renderMathML = function(x, y) {
+        return "<mfrac>      <mrow>" + (this.top.renderMathML(x, y)) + "</mrow>      <mrow>" + (this.bottom.renderMathML(x, y)) + "</mrow>      </mfrac>";
+      };
+
       return Fraction;
 
     })(DrawingNode);
@@ -1056,6 +1068,16 @@ define("lib/almond", function(){});
         }
       };
 
+      Surd.prototype.renderMathML = function() {
+        var x, _ref, _ref1, _ref2;
+        x = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+        if (this.power && this.power !== 2) {
+          return "<mroot>                  <mrow>                    " + ((_ref = this.power).renderMathML.apply(_ref, x)) + "                  </mrow>                  <mrow>                    " + ((_ref1 = this.contents).renderMathML.apply(_ref1, x)) + "                  </mrow>                </mroot>";
+        } else {
+          return "<msqrt>                  " + ((_ref2 = this.contents).renderMathML.apply(_ref2, x)) + "                </msqrt>";
+        }
+      };
+
       return Surd;
 
     })(DrawingNode);
@@ -1077,6 +1099,13 @@ define("lib/almond", function(){});
 
       Uncertainty.prototype.renderString = function() {
         return "σ(" + this.label + ")";
+      };
+
+      Uncertainty.prototype.renderMathML = function() {
+        var dummy, x;
+        x = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+        dummy = new Variable(this.label);
+        return "&sigma;[" + (dummy.renderMathML.apply(dummy, x)) + "]";
       };
 
       return Uncertainty;
@@ -1562,7 +1591,7 @@ define("lib/almond", function(){});
         }
         if (topLevel) {
           _ref = generateInfo.getMathMLInfo(equationID, expression, equality), mathClass = _ref[0], mathID = _ref[1], html = _ref[2];
-          closingHTML = "</div>";
+          closingHTML = "</math></div>";
         } else {
           html = "";
           closingHTML = "";
@@ -3806,7 +3835,7 @@ define("lib/almond", function(){});
             left = this.children.left.copy();
           }
         } else if (this.children.left.sub != null) {
-          left = this.children.left.sub(substitutions, uncertaintySubstitutions);
+          left = this.children.left.sub(substitutions, uncertaintySubstitutions, equivalencies);
         } else {
           left = this.children.left.copy();
         }
@@ -3825,7 +3854,7 @@ define("lib/almond", function(){});
             right = this.children.right.copy();
           }
         } else if (this.children.right.sub != null) {
-          right = this.children.right.sub(substitutions, uncertaintySubstitutions);
+          right = this.children.right.sub(substitutions, uncertaintySubstitutions, equivalencies);
         } else {
           right = this.children.right.copy();
         }
