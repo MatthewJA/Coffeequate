@@ -28,7 +28,7 @@ define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo,
 				@denominator *= -1
 				@numerator *= -1
 
-			@simplifyInPlace()
+			# @simplifyInPlace()
 
 		evaluate: ->
 			@numerator/@denominator
@@ -84,14 +84,14 @@ define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo,
 
 		simplify: ->
 			constant = @copy()
-			constant.simplifyInPlace()
+			# constant.simplifyInPlace()
 			return constant
 
 		expand: ->
 			@copy()
 
 		expandAndSimplify: ->
-			@copy()
+			@simplify()
 
 		substituteExpression: (sourceExpression, variable, equivalencies) ->
 			[@copy()]
