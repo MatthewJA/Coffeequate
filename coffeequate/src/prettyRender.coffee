@@ -76,7 +76,7 @@ define ->
       return @terms.map((x) -> x.renderString()).join("*")
 
     renderMathML: (equationID, expression) ->
-      return
+      return @terms.map((x) -> x.renderMathML(equationID, expression)).join("<mo>&middot;</mo>")
 
   class Pow extends DrawingNode
     constructor: (@left, @right) ->
@@ -86,6 +86,10 @@ define ->
 
     renderString: ->
       "#{@left.renderString()}**#{@bracketIfNeeded(@right).renderString()}"
+
+    renderMathML: (equationID, expression) ->
+      "#{@left.renderMathML(equationID, expression)}<msup>#{innerHTML}#{right.toMathML(equationID, expression)}</msup>"
+
 
   class Bracket extends DrawingNode
     constructor: (@contents) ->
@@ -163,6 +167,14 @@ define ->
     renderString: ->
       return "#{@bracketIfNeeded(@top).renderString()}/#{@bracketIfNeeded(@bottom).renderString()}"
 
+    renderMathML: (x,y) ->
+      "<mfrac>
+      <mrow>#{@top.renderMathML(x,y)}</mrow>
+      <mrow>#{@bottom.renderMathML(x,y)}</mrow>
+      </mfrac>"
+
+
+
   class Surd extends DrawingNode
     constructor: (@contents, @power = null) ->
 
@@ -178,6 +190,21 @@ define ->
       else
         return "sqrt(#{@contents.renderString()})"
 
+    renderMathML: (x...) ->
+      if @power and @power != 2
+        return "<mroot>
+                  <mrow>
+                    #{@power.renderMathML(x...)}
+                  </mrow>
+                  <mrow>
+                    #{@contents.renderMathML(x...)}
+                  </mrow>
+                </mroot>"
+      else
+        return "<msqrt>
+                  #{@contents.renderMathML(x...)}
+                </msqrt>"
+
   class Uncertainty extends DrawingNode
     constructor: (@label, @class="default") ->
 
@@ -189,6 +216,11 @@ define ->
 
     renderString: ->
       return "σ(#{@label})"
+
+    renderMathML: (x...)->
+      dummy = new Variable(@label)
+      return "&sigma;[#{dummy.renderMathML(x...)}]"
+
 
   return {
 
