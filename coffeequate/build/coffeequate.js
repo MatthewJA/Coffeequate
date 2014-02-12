@@ -1102,7 +1102,8 @@ define("lib/almond", function(){});
 (function() {
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
+    __slice = [].slice;
 
   define('terminals',["parse", "generateInfo", "nodes", "prettyRender"], function(parse, generateInfo, nodes, prettyRender) {
     var Constant, SymbolicConstant, Terminal, Uncertainty, Variable;
@@ -1725,9 +1726,17 @@ define("lib/almond", function(){});
       };
 
       Uncertainty.prototype.toMathML = function() {
-        var dummyVar;
-        dummyVar = new Variable("σ(" + label + ")");
-        return dummyVar.toMathML(arguments);
+        var args, dummyVar;
+        args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+        dummyVar = new Variable("σ" + this.label);
+        return dummyVar.toMathML.apply(dummyVar, args);
+      };
+
+      Uncertainty.prototype.toHTML = function() {
+        var args, dummyVar;
+        args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+        dummyVar = new Variable("σ" + this.label);
+        return dummyVar.toHTML.apply(dummyVar, args);
       };
 
       Uncertainty.prototype.toDrawingNode = function() {
@@ -4145,7 +4154,7 @@ define("lib/almond", function(){});
         return rightVars;
       };
 
-      Equation.prototype.sub = function(substitutions, equivalencies, uncertainties) {
+      Equation.prototype.sub = function(substitutions, uncertainties, equivalencies) {
         return new Equation(this.left, this.right.sub(substitutions, uncertainties, equivalencies));
       };
 

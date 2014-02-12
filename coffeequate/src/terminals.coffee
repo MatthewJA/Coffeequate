@@ -423,9 +423,13 @@ define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo,
 		expandAndSimplify: ->
 			@copy()
 
-		toMathML: ->
-			dummyVar = new Variable("σ(#{label})")
-			return dummyVar.toMathML(arguments)
+		toMathML: (args...) ->
+			dummyVar = new Variable("σ#{@label}")
+			return dummyVar.toMathML(args...)
+
+		toHTML: (args...) ->
+			dummyVar = new Variable("σ#{@label}")
+			return dummyVar.toHTML(args...)
 
 		toDrawingNode: ->
 			UncertaintyNode = prettyRender.Uncertainty

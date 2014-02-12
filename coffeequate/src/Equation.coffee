@@ -65,7 +65,7 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 					rightVars.unshift(variable)
 			return rightVars
 
-		sub: (substitutions, equivalencies, uncertainties) ->
+		sub: (substitutions, uncertainties, equivalencies) ->
 			# if @left instanceof terminals.Variable
 			# 	if equivalencies?
 			# 		for equiv in equivalencies.get(@left.label)
