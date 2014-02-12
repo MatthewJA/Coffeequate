@@ -1708,8 +1708,11 @@ define("lib/almond", function(){});
         return [this.label];
       };
 
-      Uncertainty.prototype.sub = function(substitutions, uncertaintySubstitutions) {
+      Uncertainty.prototype.sub = function(substitutions, uncertaintySubstitutions, assumeZero) {
         var substitute;
+        if (assumeZero == null) {
+          assumeZero = false;
+        }
         if (this.label in uncertaintySubstitutions) {
           substitute = uncertaintySubstitutions[this.label];
           if (substitute.copy != null) {
@@ -1718,7 +1721,11 @@ define("lib/almond", function(){});
             return new Constant(substitute);
           }
         } else {
-          return this.copy();
+          if (!assumeZero) {
+            return this.copy();
+          } else {
+            return new Constant("0");
+          }
         }
       };
 
@@ -2531,10 +2538,13 @@ define("lib/almond", function(){});
         })(Add, children, function(){});
       };
 
-      Add.prototype.sub = function(substitutions, uncertaintySubstitutions, equivalencies) {
+      Add.prototype.sub = function(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty) {
         var child, children, equiv, newAdd, subbed, variable, variableEquivalencies, _i, _j, _len, _len1, _ref;
         if (equivalencies == null) {
           equivalencies = null;
+        }
+        if (assumeZeroUncertainty == null) {
+          assumeZeroUncertainty = false;
         }
         for (variable in substitutions) {
           if (!(substitutions[variable] instanceof terminals.Terminal || substitutions[variable] instanceof nodes.BasicNode)) {
@@ -2567,7 +2577,7 @@ define("lib/almond", function(){});
               children.push(child.copy());
             }
           } else if (child.sub != null) {
-            children.push(child.sub(substitutions, uncertaintySubstitutions, equivalencies));
+            children.push(child.sub(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty));
           } else {
             children.push(child.copy());
           }
@@ -3212,10 +3222,13 @@ define("lib/almond", function(){});
         })(Mul, children, function(){});
       };
 
-      Mul.prototype.sub = function(substitutions, uncertaintySubstitutions, equivalencies) {
+      Mul.prototype.sub = function(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty) {
         var child, children, equiv, newMul, subbed, variable, variableEquivalencies, _i, _j, _len, _len1, _ref;
         if (equivalencies == null) {
           equivalencies = null;
+        }
+        if (assumeZeroUncertainty == null) {
+          assumeZeroUncertainty = false;
         }
         for (variable in substitutions) {
           if (!(substitutions[variable] instanceof terminals.Terminal || substitutions[variable] instanceof nodes.BasicNode)) {
@@ -3248,7 +3261,7 @@ define("lib/almond", function(){});
               children.push(child.copy());
             }
           } else if (child.sub != null) {
-            children.push(child.sub(substitutions, uncertaintySubstitutions, equivalencies));
+            children.push(child.sub(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty));
           } else {
             children.push(child.copy());
           }
@@ -3799,10 +3812,13 @@ define("lib/almond", function(){});
         }
       };
 
-      Pow.prototype.sub = function(substitutions, uncertaintySubstitutions, equivalencies) {
+      Pow.prototype.sub = function(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty) {
         var equiv, left, newPow, right, subbed, variable, variableEquivalencies, _i, _j, _len, _len1;
         if (equivalencies == null) {
           equivalencies = null;
+        }
+        if (assumeZeroUncertainty == null) {
+          assumeZeroUncertainty = false;
         }
         for (variable in substitutions) {
           if (!(substitutions[variable] instanceof terminals.Terminal || substitutions[variable] instanceof nodes.BasicNode)) {
@@ -3833,7 +3849,7 @@ define("lib/almond", function(){});
             left = this.children.left.copy();
           }
         } else if (this.children.left.sub != null) {
-          left = this.children.left.sub(substitutions, uncertaintySubstitutions, equivalencies);
+          left = this.children.left.sub(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty);
         } else {
           left = this.children.left.copy();
         }
@@ -3852,7 +3868,7 @@ define("lib/almond", function(){});
             right = this.children.right.copy();
           }
         } else if (this.children.right.sub != null) {
-          right = this.children.right.sub(substitutions, uncertaintySubstitutions, equivalencies);
+          right = this.children.right.sub(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty);
         } else {
           right = this.children.right.copy();
         }
@@ -4181,8 +4197,11 @@ define("lib/almond", function(){});
         return rightVars;
       };
 
-      Equation.prototype.sub = function(substitutions, uncertainties, equivalencies) {
-        return new Equation(this.left, this.right.sub(substitutions, uncertainties, equivalencies));
+      Equation.prototype.sub = function(substitutions, uncertainties, equivalencies, assumeZeroUncertainty) {
+        if (assumeZeroUncertainty == null) {
+          assumeZeroUncertainty = false;
+        }
+        return new Equation(this.left, this.right.sub(substitutions, uncertainties, equivalencies, assumeZeroUncertainty));
       };
 
       Equation.prototype.substituteExpression = function(source, variable, equivalencies, eliminate) {

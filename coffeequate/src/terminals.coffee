@@ -403,7 +403,7 @@ define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo,
 				else
 					return new Constant(substitute)
 			else
-				unless assumeZero return @copy() else return new Constant("0")
+				unless assumeZero then return @copy() else return new Constant("0")
 
 		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
 			throw new Error("Can't sub uncertainties")
