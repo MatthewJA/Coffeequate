@@ -248,7 +248,7 @@ define [
 				unless subbed
 					left = @children.left.copy()
 			else if @children.left.sub?
-				left = @children.left.sub(substitutions, uncertaintySubstitutions)
+				left = @children.left.sub(substitutions, uncertaintySubstitutions, equivalencies)
 			else
 				left = @children.left.copy()
 
@@ -263,7 +263,7 @@ define [
 				unless subbed
 					right = @children.right.copy()
 			else if @children.right.sub?
-				right = @children.right.sub(substitutions, uncertaintySubstitutions)
+				right = @children.right.sub(substitutions, uncertaintySubstitutions, equivalencies)
 			else
 				right = @children.right.copy()
 
