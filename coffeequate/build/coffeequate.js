@@ -1708,8 +1708,11 @@ define("lib/almond", function(){});
         return [this.label];
       };
 
-      Uncertainty.prototype.sub = function(substitutions, uncertaintySubstitutions, assumeZero) {
+      Uncertainty.prototype.sub = function(substitutions, uncertaintySubstitutions, equivalencies, assumeZero) {
         var substitute;
+        if (equivalencies == null) {
+          equivalencies = null;
+        }
         if (assumeZero == null) {
           assumeZero = false;
         }
@@ -1721,6 +1724,7 @@ define("lib/almond", function(){});
             return new Constant(substitute);
           }
         } else {
+          console.log(assumeZero);
           if (!assumeZero) {
             return this.copy();
           } else {
@@ -3261,6 +3265,7 @@ define("lib/almond", function(){});
               children.push(child.copy());
             }
           } else if (child.sub != null) {
+            console.log(assumeZeroUncertainty);
             children.push(child.sub(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty));
           } else {
             children.push(child.copy());
