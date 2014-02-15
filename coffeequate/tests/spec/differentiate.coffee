@@ -1,6 +1,6 @@
 define ["operators", "terminals", "parse", "AlgebraError"], (operators, terminals, parse, AlgebraError) ->
   diffString = (string, variable) ->
-    return parse.stringToExpression(string).differentiate(variable).toString()
+    return parse.stringToExpression(string).differentiate(variable).toLisp()
 
   describe "Differentiation", ->
     describe "of terminals", ->
