@@ -129,6 +129,12 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 				return @left.units
 			return @right.getVariableUnits(variable, equivalencies)
 
+		setVariableUnits: (variable, equivalencies, units) ->
+			equivalencies = {get: (z) -> [z]} unless equivalencies?
+			if @left.label == variable
+				@left.units = units
+			@right.setVariableUnits(variable, equivalencies, units)
+
 		equals: (b) ->
 			unless b instanceof Equation
 				return false

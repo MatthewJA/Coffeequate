@@ -62,6 +62,11 @@ define [
 						return childVariableUnits
 			return null
 
+		setVariableUnits: (variable, equivalencies, units) ->
+			variableEquivalencies = if equivalencies? then equivalencies.get(variable) else {get: (z) -> [z]}
+			@children.left.setVariableUnits(variable, equivalencies, units)
+			@children.right.setVariableUnits(variable, equivalencies, units)
+
 		expand: ->
 			# Addition is associative, so expand (+ (+ a b) c) into (+ a b c).
 			children = []

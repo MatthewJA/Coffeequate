@@ -447,10 +447,10 @@ define("lib/almond", function(){});
       return ParseError;
 
     })(Error);
-    VARIABLE_REGEX = /^@*[a-zA-Zα-ω][a-zA-Zα-ω_\-\d]*$/;
+    VARIABLE_REGEX = /^@*[a-zA-Zα-ωΑ-Ζ][a-zA-Zα-ωΑ-Ζ_\-\d]*$/;
     CONSTANT_REGEX = /^-?\d+(\.\d+)?$/;
     RATIO_REGEX = /^-?\d+(\.\d+)?\/\d+(\.\d+)?$/;
-    SYMBOLIC_CONSTANT_REGEX = /^\\@*[a-zA-Zα-ω][a-zA-Zα-ω_\-\d]*$/;
+    SYMBOLIC_CONSTANT_REGEX = /^\\@*[a-zA-Zα-ωΑ-Ζ][a-zA-Zα-ωΑ-Ζ_\-\d]*$/;
     DIMENSIONS_REGEX = /^[^:]*::\{[^:+]*\}$/;
     stringToTerminal = function(string) {
       var segments, terminal, terminals;
@@ -468,6 +468,9 @@ define("lib/almond", function(){});
       if (CONSTANT_REGEX.test(string) || RATIO_REGEX.test(string)) {
         return new terminals.Constant(string);
       } else if (VARIABLE_REGEX.test(string)) {
+        if (string[0] === "σ") {
+          return new terminals.Uncertainty(string.slice(1));
+        }
         return new terminals.Variable(string);
       } else if (SYMBOLIC_CONSTANT_REGEX.test(string)) {
         return new terminals.SymbolicConstant(string.slice(1));
@@ -679,24 +682,12 @@ define("lib/almond", function(){});
         return [];
       };
 
-      BasicNode.prototype.getUncertainty = function() {
-        return require(["operators/Add", "operators/Mul", "operators/Pow", "terminals"], function(Add, Mul, Pow, terminals) {
-          var Constant, Uncertainty, out, stuff, variable, variables, _i, _len;
-          Uncertainty = terminals.Uncertainty;
-          Constant = terminals.Constant;
-          variables = this.getAllVariables();
-          out = [];
-          for (_i = 0, _len = variables.length; _i < _len; _i++) {
-            variable = variables[_i];
-            stuff = new Mul(new Uncertainty(variable), this.differentiate(variable));
-            out.push(new Pow(stuff, 2));
-          }
-          return new Pow((function(func, args, ctor) {
-            ctor.prototype = func.prototype;
-            var child = new ctor, result = func.apply(child, args);
-            return Object(result) === result ? result : child;
-          })(Add, out, function(){}), new terminals.Constant(1, 2)).expandAndSimplify();
-        });
+      BasicNode.prototype.toDrawingNode = function() {
+        throw new Error("toDrawingNode not implemented for " + (self.toString()));
+      };
+
+      BasicNode.prototype.toLaTeX = function() {
+        return this.toDrawingNode().renderLaTeX();
       };
 
       return BasicNode;
@@ -818,6 +809,10 @@ define("lib/almond", function(){});
         } else {
           _ref1 = parse.constant(value), this.numerator = _ref1[0], this.denominator = _ref1[1];
         }
+        if (this.denominator < 0) {
+          this.denominator *= -1;
+          this.numerator *= -1;
+        }
         this.simplifyInPlace();
       }
 
@@ -862,7 +857,7 @@ define("lib/almond", function(){});
         return [];
       };
 
-      Constant.prototype.sub = function(substitutions) {
+      Constant.prototype.sub = function(substitutions, uncertaintySubstitutions) {
         return this.copy();
       };
 
@@ -904,6 +899,10 @@ define("lib/almond", function(){});
       };
 
       Constant.prototype.getVariableUnits = function() {
+        return null;
+      };
+
+      Constant.prototype.setVariableUnits = function(variable, equivalencies, units) {
         return null;
       };
 
@@ -955,18 +954,21 @@ define("lib/almond", function(){});
         return html + ("(" + this.numerator + "/" + this.denominator + ")") + closingHTML;
       };
 
-      Constant.prototype.toLaTeX = function() {
-        if (this.denominator === 1) {
-          return "" + this.numerator;
-        }
-        return "\\frac{" + this.numerator + "}{" + this.denominator + "}";
-      };
-
       Constant.prototype.toString = function() {
         if (this.denominator !== 1) {
           return "" + this.numerator + "/" + this.denominator;
         }
         return "" + this.numerator;
+      };
+
+      Constant.prototype.toDrawingNode = function() {
+        var FractionNode, NumberNode;
+        NumberNode = require("prettyRender").Number;
+        FractionNode = require("prettyRender").Fraction;
+        if (this.denominator === 1) {
+          return new NumberNode(this.numerator);
+        }
+        return new FractionNode(new NumberNode(this.numerator), new NumberNode(this.denominator));
       };
 
       Constant.prototype.differentiate = function(variable) {
@@ -1019,7 +1021,7 @@ define("lib/almond", function(){});
         return [];
       };
 
-      SymbolicConstant.prototype.sub = function(substitutions) {
+      SymbolicConstant.prototype.sub = function(substitutions, uncertaintySubstitutions) {
         return this.copy();
       };
 
@@ -1044,6 +1046,10 @@ define("lib/almond", function(){});
       };
 
       SymbolicConstant.prototype.getVariableUnits = function() {
+        return null;
+      };
+
+      SymbolicConstant.prototype.setVariableUnits = function(variable, equivalencies, units) {
         return null;
       };
 
@@ -1089,8 +1095,10 @@ define("lib/almond", function(){});
         return "" + html + "<mn class=\"constant symbolic-constant\">" + this.label + "</mn>" + closingHTML;
       };
 
-      SymbolicConstant.prototype.toLaTeX = function() {
-        return "\\text{" + (this.toString()) + "}";
+      SymbolicConstant.prototype.toDrawingNode = function() {
+        var VariableNode;
+        VariableNode = require("prettyRender").Variable;
+        return new VariableNode(this.value, "symbolic-constant");
       };
 
       SymbolicConstant.prototype.differentiate = function(variable) {
@@ -1151,7 +1159,7 @@ define("lib/almond", function(){});
         return [this.label];
       };
 
-      Variable.prototype.sub = function(substitutions) {
+      Variable.prototype.sub = function(substitutions, uncertaintySubstitutions) {
         var substitute;
         if (this.label in substitutions) {
           substitute = substitutions[this.label];
@@ -1215,6 +1223,17 @@ define("lib/almond", function(){});
           return this.units;
         }
         return null;
+      };
+
+      Variable.prototype.setVariableUnits = function(variable, equivalencies, units) {
+        var _ref;
+        if (equivalencies != null) {
+          if (_ref = this.label, __indexOf.call(equivalencies.get(variable), _ref) >= 0) {
+            return this.units = units;
+          }
+        } else if (this.label === variable) {
+          return this.units = units;
+        }
       };
 
       Variable.prototype.simplify = function() {
@@ -1295,13 +1314,11 @@ define("lib/almond", function(){});
         return html + '<span class="variable"' + labelID + '>' + label + '</span>' + closingHTML;
       };
 
-      Variable.prototype.toLaTeX = function() {
-        var str;
+      Variable.prototype.toDrawingNode = function() {
+        var VariableNode, str;
+        VariableNode = require("prettyRender").Variable;
         str = this.label.replace("-", "_");
-        if (str.length > 1) {
-          str = str[0] + "_{" + str.slice(1) + "}";
-        }
-        return str;
+        return new VariableNode(str);
       };
 
       Variable.prototype.differentiate = function(variable) {
@@ -1364,8 +1381,18 @@ define("lib/almond", function(){});
         return [this.label];
       };
 
-      Uncertainty.prototype.sub = function(substitutions) {
-        throw new Error("Can't sub uncertainties");
+      Uncertainty.prototype.sub = function(substitutions, uncertaintySubstitutions) {
+        var substitute;
+        if (this.label in uncertaintySubstitutions) {
+          substitute = uncertaintySubstitutions[this.label];
+          if (substitute.copy != null) {
+            return substitute.copy();
+          } else {
+            return new Constant(substitute);
+          }
+        } else {
+          return this.copy();
+        }
       };
 
       Uncertainty.prototype.substituteExpression = function(sourceExpression, variable, equivalencies, eliminate) {
@@ -1386,6 +1413,10 @@ define("lib/almond", function(){});
         throw new Error("Can't do that with uncertainties");
       };
 
+      Uncertainty.prototype.setVariableUnits = function(variable, equivalencies, units) {
+        throw new Error("Can't do that with uncertainties");
+      };
+
       Uncertainty.prototype.simplify = function() {
         return this.copy();
       };
@@ -1399,7 +1430,7 @@ define("lib/almond", function(){});
       };
 
       Uncertainty.prototype.toString = function() {
-        return "sigma(" + this.label + ")";
+        return "σ(" + this.label + ")";
       };
 
       Uncertainty.prototype.toMathML = function() {
@@ -1408,17 +1439,14 @@ define("lib/almond", function(){});
         return dummyVar.toMathML(arguments);
       };
 
-      Uncertainty.prototype.toLaTeX = function() {
-        var str;
-        str = this.label.replace("-", "_");
-        if (str.length > 1) {
-          str = str[0] + "_{" + str.slice(1) + "}";
-        }
-        return "\\sigma(" + str + ")";
+      Uncertainty.prototype.toDrawingNode = function() {
+        var UncertaintyNode;
+        UncertaintyNode = require("prettyRender").Uncertainty;
+        return new UncertaintyNode(this.label);
       };
 
       Uncertainty.prototype.differentiate = function(variable) {
-        throw new Error("Can't do that with uncertainties");
+        throw new Error("Can't differentiate uncertainties!");
       };
 
       return Uncertainty;
@@ -1624,6 +1652,17 @@ define("lib/almond", function(){});
           }
         }
         return null;
+      };
+
+      Add.prototype.setVariableUnits = function(variable, equivalencies, units) {
+        var variableEquivalencies;
+        variableEquivalencies = equivalencies != null ? equivalencies.get(variable) : {
+          get: function(z) {
+            return [z];
+          }
+        };
+        this.children.left.setVariableUnits(variable, equivalencies, units);
+        return this.children.right.setVariableUnits(variable, equivalencies, units);
       };
 
       Add.prototype.expand = function() {
@@ -2176,7 +2215,7 @@ define("lib/almond", function(){});
         })(Add, children, function(){});
       };
 
-      Add.prototype.sub = function(substitutions, equivalencies) {
+      Add.prototype.sub = function(substitutions, uncertaintySubstitutions, equivalencies) {
         var child, children, equiv, newAdd, subbed, variable, variableEquivalencies, _i, _j, _len, _len1, _ref;
         if (equivalencies == null) {
           equivalencies = null;
@@ -2212,7 +2251,7 @@ define("lib/almond", function(){});
               children.push(child.copy());
             }
           } else if (child.sub != null) {
-            children.push(child.sub(substitutions, equivalencies));
+            children.push(child.sub(substitutions, uncertaintySubstitutions, equivalencies));
           } else {
             children.push(child.copy());
           }
@@ -2322,10 +2361,12 @@ define("lib/almond", function(){});
         }).join("+") + closingHTML;
       };
 
-      Add.prototype.toLaTeX = function() {
-        return this.children.map(function(child) {
-          return child.toLaTeX();
-        }).join(" + ");
+      Add.prototype.toDrawingNode = function() {
+        var AddNode;
+        AddNode = require("prettyRender").Add;
+        return AddNode.makeWithBrackets.apply(AddNode, this.children.map(function(term) {
+          return term.toDrawingNode();
+        }));
       };
 
       Add.prototype.differentiate = function(variable) {
@@ -2482,6 +2523,17 @@ define("lib/almond", function(){});
           }
         }
         return null;
+      };
+
+      Mul.prototype.setVariableUnits = function(variable, equivalencies, units) {
+        var variableEquivalencies;
+        variableEquivalencies = equivalencies != null ? equivalencies.get(variable) : {
+          get: function(z) {
+            return [z];
+          }
+        };
+        this.children.left.setVariableUnits(variable, equivalencies, units);
+        return this.children.right.setVariableUnits(variable, equivalencies, units);
       };
 
       Mul.expandMulAdd = function(mul, add) {
@@ -2855,7 +2907,7 @@ define("lib/almond", function(){});
         })(Mul, children, function(){});
       };
 
-      Mul.prototype.sub = function(substitutions, equivalencies) {
+      Mul.prototype.sub = function(substitutions, uncertaintySubstitutions, equivalencies) {
         var child, children, equiv, newMul, subbed, variable, variableEquivalencies, _i, _j, _len, _len1, _ref;
         if (equivalencies == null) {
           equivalencies = null;
@@ -2891,7 +2943,7 @@ define("lib/almond", function(){});
               children.push(child.copy());
             }
           } else if (child.sub != null) {
-            children.push(child.sub(substitutions, equivalencies));
+            children.push(child.sub(substitutions, uncertaintySubstitutions, equivalencies));
           } else {
             children.push(child.copy());
           }
@@ -3093,16 +3145,51 @@ define("lib/almond", function(){});
         }).join("&middot;") + closingHTML;
       };
 
-      Mul.prototype.toLaTeX = function() {
-        var Add;
-        Add = require("operators/Add");
-        return this.children.map(function(child) {
-          if (child instanceof Add) {
-            return "\\left(" + child.toLaTeX() + "\\right)";
+      Mul.prototype.toDrawingNode = function() {
+        var Pow, bottom, child, power, prettyRender, top, _i, _len, _ref, _ref1, _ref2, _ref3;
+        prettyRender = require("prettyRender");
+        Pow = require("operators/Pow");
+        terminals = require("terminals");
+        top = [];
+        bottom = [];
+        _ref = this.children;
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          child = _ref[_i];
+          if (child instanceof Pow) {
+            power = child.children.right;
+            if (power instanceof terminals.Constant) {
+              if (power.denominator < 0) {
+                power.denominator *= -1;
+                power.numerator *= -1;
+              }
+              if (power.numerator < 0) {
+                if (power.denominator !== 1) {
+                  bottom.push(new Pow(child.children.left, new terminals.Constant(power.numerator, -power.denominator)).toDrawingNode());
+                } else {
+                  bottom.push(child.children.left.toDrawingNode());
+                }
+              } else {
+                top.push(child.toDrawingNode());
+              }
+            } else {
+              top.push(child.toDrawingNode());
+            }
+          } else if (child instanceof terminals.Constant) {
+            if (child.numerator !== 1) {
+              top.unshift(new prettyRender.Number(child.numerator));
+            }
+            if (child.denominator !== 1) {
+              bottom.unshift(new prettyRender.Number(child.denominator));
+            }
           } else {
-            return child.toLaTeX();
+            top.push(child.toDrawingNode());
           }
-        }).join(" \\cdot ");
+        }
+        if (bottom.length === 0) {
+          return (_ref1 = prettyRender.Mul).makeWithBrackets.apply(_ref1, top);
+        } else {
+          return new prettyRender.Fraction((_ref2 = prettyRender.Mul).makeWithBrackets.apply(_ref2, top), (_ref3 = prettyRender.Mul).makeWithBrackets.apply(_ref3, bottom));
+        }
       };
 
       Mul.prototype.differentiate = function(variable) {
@@ -3228,6 +3315,17 @@ define("lib/almond", function(){});
           }
         }
         return null;
+      };
+
+      Pow.prototype.setVariableUnits = function(variable, equivalencies, units) {
+        var variableEquivalencies;
+        variableEquivalencies = equivalencies != null ? equivalencies.get(variable) : {
+          get: function(z) {
+            return [z];
+          }
+        };
+        this.children.left.setVariableUnits(variable, equivalencies, units);
+        return this.children.right.setVariableUnits(variable, equivalencies, units);
       };
 
       Pow.prototype.expand = function() {
@@ -3396,7 +3494,7 @@ define("lib/almond", function(){});
         }
       };
 
-      Pow.prototype.sub = function(substitutions, equivalencies) {
+      Pow.prototype.sub = function(substitutions, uncertaintySubstitutions, equivalencies) {
         var equiv, left, newPow, right, subbed, variable, variableEquivalencies, _i, _j, _len, _len1;
         if (equivalencies == null) {
           equivalencies = null;
@@ -3430,7 +3528,7 @@ define("lib/almond", function(){});
             left = this.children.left.copy();
           }
         } else if (this.children.left.sub != null) {
-          left = this.children.left.sub(substitutions);
+          left = this.children.left.sub(substitutions, uncertaintySubstitutions);
         } else {
           left = this.children.left.copy();
         }
@@ -3449,7 +3547,7 @@ define("lib/almond", function(){});
             right = this.children.right.copy();
           }
         } else if (this.children.right.sub != null) {
-          right = this.children.right.sub(substitutions);
+          right = this.children.right.sub(substitutions, uncertaintySubstitutions);
         } else {
           right = this.children.right.copy();
         }
@@ -3637,28 +3735,22 @@ define("lib/almond", function(){});
         }
       };
 
-      Pow.prototype.toLaTeX = function() {
-        var Add, Mul, innerLaTeX, right, _base, _base1, _base2;
-        Mul = require("operators/Mul");
-        Add = require("operators/Add");
-        if ((typeof (_base = this.children.right).evaluate === "function" ? _base.evaluate() : void 0) === 1) {
-          return this.children.left.toLaTeX();
-        } else if ((typeof (_base1 = this.children.right).evaluate === "function" ? _base1.evaluate() : void 0) === 0) {
-          return "1";
-        } else {
-          if (this.children.left instanceof Add || this.children.left instanceof Mul) {
-            innerLaTeX = "\\left(" + (this.children.left.toLaTeX()) + "\\right)^{" + (this.children.right.toLaTeX()) + "}";
-          } else {
-            innerLaTeX = "" + (this.children.left.toLaTeX()) + "^{" + (this.children.right.toLaTeX()) + "}";
+      Pow.prototype.toDrawingNode = function() {
+        var FractionNode, NumberNode, PowNode, SurdNode;
+        SurdNode = require("prettyRender").Surd;
+        PowNode = require("prettyRender").Pow;
+        FractionNode = require("prettyRender").Fraction;
+        NumberNode = require("prettyRender").Number;
+        if (this.children.right instanceof terminals.Constant) {
+          if (this.children.right.numerator === 1) {
+            if (this.children.right.denominator > 0) {
+              return new SurdNode(this.children.left.toDrawingNode(), this.children.right.denominator);
+            } else {
+              return new FractionNode(new NumberNode(1), new SurdNode(this.children.left.toDrawingNode(), -this.children.right.denominator));
+            }
           }
-          if ((typeof (_base2 = this.children.right).evaluate === "function" ? _base2.evaluate() : void 0) < 0) {
-            right = this.children.right.copy();
-            right = new Mul("-1", right);
-            right = right.simplify();
-            innerLaTeX = "\\frac{1}{" + innerLaTeX + "}";
-          }
-          return innerLaTeX;
         }
+        return new PowNode(this.children.left.toDrawingNode(), this.children.right.toDrawingNode());
       };
 
       Pow.prototype.differentiate = function(variable) {
@@ -3856,6 +3948,20 @@ define("lib/almond", function(){});
         return this.right.getVariableUnits(variable, equivalencies);
       };
 
+      Equation.prototype.setVariableUnits = function(variable, equivalencies, units) {
+        if (equivalencies == null) {
+          equivalencies = {
+            get: function(z) {
+              return [z];
+            }
+          };
+        }
+        if (this.left.label === variable) {
+          this.left.units = units;
+        }
+        return this.right.setVariableUnits(variable, equivalencies, units);
+      };
+
       Equation.prototype.equals = function(b) {
         if (!(b instanceof Equation)) {
           return false;
@@ -3906,6 +4012,240 @@ define("lib/almond", function(){});
 }).call(this);
 
 // Generated by CoffeeScript 1.6.3
+(function() {
+  define('uncertainties',["nodes", "terminals", "operators", "require"], function(nodes, terminals, operators, require) {
+    return nodes.BasicNode.prototype.getUncertainty = function() {
+      var Add, Constant, Mul, Pow, Uncertainty, out, stuff, variable, variables, _i, _len;
+      Mul = operators.Mul;
+      Pow = operators.Pow;
+      Add = operators.Add;
+      Uncertainty = terminals.Uncertainty;
+      Constant = terminals.Constant;
+      variables = this.getAllVariables();
+      out = [];
+      for (_i = 0, _len = variables.length; _i < _len; _i++) {
+        variable = variables[_i];
+        stuff = new Mul(new terminals.Uncertainty(variable), this.differentiate(variable));
+        out.push(new Pow(stuff, 2));
+      }
+      return new Pow((function(func, args, ctor) {
+        ctor.prototype = func.prototype;
+        var child = new ctor, result = func.apply(child, args);
+        return Object(result) === result ? result : child;
+      })(Add, out, function(){}), new terminals.Constant(1, 2)).expandAndSimplify();
+    };
+  });
+
+}).call(this);
+
+// Generated by CoffeeScript 1.6.3
+(function() {
+  var __slice = [].slice,
+    __hasProp = {}.hasOwnProperty,
+    __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
+
+  define('prettyRender',[],function() {
+    var Add, Bracket, DrawingNode, Fraction, Mul, Number, Pow, Surd, Uncertainty, Variable;
+    DrawingNode = (function() {
+      function DrawingNode() {}
+
+      DrawingNode.prototype.toString = function() {
+        throw new Error("not implemented");
+      };
+
+      DrawingNode.prototype.renderLaTeX = function() {
+        throw new Error("not implemented");
+      };
+
+      DrawingNode.prototype.bindingStrength = function() {
+        return 8;
+      };
+
+      return DrawingNode;
+
+    })();
+    DrawingNode.makeWithBrackets = function() {
+      var node, terms;
+      terms = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+      node = new this();
+      terms = terms.map(function(x) {
+        if (x.bindingStrength() <= node.bindingStrength()) {
+          return new Bracket(x);
+        } else {
+          return x;
+        }
+      });
+      node.terms = terms;
+      return node;
+    };
+    Add = (function(_super) {
+      __extends(Add, _super);
+
+      function Add() {
+        var terms;
+        terms = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+        this.terms = terms;
+      }
+
+      Add.prototype.bindingStrength = function() {
+        return 4;
+      };
+
+      Add.prototype.renderLaTeX = function() {
+        return this.terms.map(function(x) {
+          return x.renderLaTeX();
+        }).join(" + ");
+      };
+
+      return Add;
+
+    })(DrawingNode);
+    Mul = (function(_super) {
+      __extends(Mul, _super);
+
+      function Mul() {
+        var terms;
+        terms = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
+        this.terms = terms;
+      }
+
+      Mul.prototype.bindingStrength = function() {
+        return 6;
+      };
+
+      Mul.prototype.renderLaTeX = function() {
+        return this.terms.map(function(x) {
+          return x.renderLaTeX();
+        }).join(" \\cdot ");
+      };
+
+      return Mul;
+
+    })(DrawingNode);
+    Pow = (function(_super) {
+      __extends(Pow, _super);
+
+      function Pow(left, right) {
+        this.left = left;
+        this.right = right;
+      }
+
+      Pow.prototype.renderLaTeX = function() {
+        return "" + (this.left.renderLaTeX()) + "^{" + (this.right.renderLaTeX()) + "}";
+      };
+
+      return Pow;
+
+    })(DrawingNode);
+    Bracket = (function(_super) {
+      __extends(Bracket, _super);
+
+      function Bracket(contents) {
+        this.contents = contents;
+      }
+
+      Bracket.prototype.renderLaTeX = function() {
+        return "\\left(" + (this.contents.renderLaTeX()) + "\\right)";
+      };
+
+      return Bracket;
+
+    })(DrawingNode);
+    Number = (function(_super) {
+      __extends(Number, _super);
+
+      function Number(value) {
+        this.value = value;
+      }
+
+      Number.prototype.renderLaTeX = function() {
+        return this.value + "";
+      };
+
+      return Number;
+
+    })(DrawingNode);
+    Variable = (function(_super) {
+      __extends(Variable, _super);
+
+      function Variable(label, _class) {
+        this.label = label;
+        this["class"] = _class != null ? _class : "default";
+      }
+
+      Variable.prototype.renderLaTeX = function() {
+        return this.label;
+      };
+
+      return Variable;
+
+    })(DrawingNode);
+    Fraction = (function(_super) {
+      __extends(Fraction, _super);
+
+      function Fraction(top, bottom) {
+        this.top = top;
+        this.bottom = bottom;
+      }
+
+      Fraction.prototype.renderLaTeX = function() {
+        return "\\frac{" + (this.top.renderLaTeX()) + "}{" + (this.bottom.renderLaTeX()) + "}";
+      };
+
+      return Fraction;
+
+    })(DrawingNode);
+    Surd = (function(_super) {
+      __extends(Surd, _super);
+
+      function Surd(contents, power) {
+        this.contents = contents;
+        this.power = power != null ? power : null;
+      }
+
+      Surd.prototype.renderLaTeX = function() {
+        if (this.power && this.power !== 2) {
+          return "\\sqrt[" + this.power + "]{" + (this.contents.renderLaTeX()) + "}";
+        } else {
+          return "\\sqrt{" + (this.contents.renderLaTeX()) + "}";
+        }
+      };
+
+      return Surd;
+
+    })(DrawingNode);
+    Uncertainty = (function(_super) {
+      __extends(Uncertainty, _super);
+
+      function Uncertainty(label, _class) {
+        this.label = label;
+        this["class"] = _class != null ? _class : "default";
+      }
+
+      Uncertainty.prototype.renderLaTeX = function() {
+        return "\\sigma_{" + this.label + "}";
+      };
+
+      return Uncertainty;
+
+    })(DrawingNode);
+    return {
+      DrawingNode: DrawingNode,
+      Add: Add,
+      Mul: Mul,
+      Pow: Pow,
+      Bracket: Bracket,
+      Number: Number,
+      Variable: Variable,
+      Fraction: Fraction,
+      Surd: Surd,
+      Uncertainty: Uncertainty
+    };
+  });
+
+}).call(this);
+
+// Generated by CoffeeScript 1.6.3
 /* Coffeequate - http://github.com/MatthewJA/Coffeequate*/
 
 
@@ -3914,14 +4254,24 @@ define("lib/almond", function(){});
     baseUrl: "./"
   });
 
-  define('coffeequate',["Equation", "operators", "terminals", "parse"], function(Equation, operators, terminals, parse) {
+  define('coffeequate',["Equation", "operators", "terminals", "parse", "uncertainties", "prettyRender"], function(Equation, operators, terminals, parse, uncertainties, prettyRender) {
     return {
       Equation: Equation,
       tree: {
         operators: operators,
         terminals: terminals
       },
-      parse: parse
+      parse: parse,
+      prettyRender: {
+        DrawingNode: prettyRender.DrawingNode,
+        Add: prettyRender.Add,
+        Mul: prettyRender.Mul,
+        Power: prettyRender.Power,
+        Bracket: prettyRender.Bracket,
+        Number: prettyRender.Number,
+        Variable: prettyRender.Variable,
+        Fraction: prettyRender.Fraction
+      }
     };
   });
 

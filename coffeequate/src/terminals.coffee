@@ -105,6 +105,9 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 		getVariableUnits: ->
 			null
 
+		setVariableUnits: (variable, equivalencies, units) ->
+			null
+
 		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return this constant as a MathML string.
 			if topLevel
@@ -197,6 +200,9 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 			new Constant(0)
 
 		getVariableUnits: ->
+			null
+
+		setVariableUnits: (variable, equivalencies, units) ->
 			null
 
 		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
@@ -300,6 +306,13 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 			else if @label == variable
 				return @units
 			return null
+
+		setVariableUnits: (variable, equivalencies, units) ->
+			if equivalencies?
+				if @label in equivalencies.get(variable)
+					@units = units
+			else if @label == variable
+				@units = units
 
 		simplify: ->
 			@copy()
@@ -421,6 +434,9 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 			throw new Error("Can't take uncertainty of an uncertainty")
 
 		getVariableUnits: (variable, equivalencies) ->
+			throw new Error("Can't do that with uncertainties")
+
+		setVariableUnits: (variable, equivalencies, units) ->
 			throw new Error("Can't do that with uncertainties")
 
 		simplify: ->

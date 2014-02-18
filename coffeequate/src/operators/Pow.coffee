@@ -70,6 +70,11 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 					return rightVariableUnits
 			return null
 
+		setVariableUnits: (variable, equivalencies, units) ->
+			variableEquivalencies = if equivalencies? then equivalencies.get(variable) else {get: (z) -> [z]}
+			@children.left.setVariableUnits(variable, equivalencies, units)
+			@children.right.setVariableUnits(variable, equivalencies, units)
+
 		expand: ->
 			Mul = require("operators/Mul")
 			Add = require("operators/Add")
