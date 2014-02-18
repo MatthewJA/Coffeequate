@@ -1,4 +1,4 @@
-define ->
+define ["generateInfo"], (generateInfo) ->
 
 	# Basic nodes for the expression tree.
 
@@ -20,6 +20,17 @@ define ->
 		toLaTeX: ->
 			return @toDrawingNode().renderLaTeX()
 
+		toString: ->
+			return @toDrawingNode().renderString()
+
+		toMathML2: (equationID, expression, equality="0") ->
+			[mathClass, mathID, openingHTML] = generateInfo.getMathMLInfo(equationID, expression, equality)
+			closingHTML = "</math></div>"
+			return openingHTML + @toDrawingNode().renderMathML(equationID, expression) + closingHTML
+
+		stringEqual: (other) ->
+			return other.toString() == @toString()
+
 	return {
 
 		BasicNode: BasicNode
@@ -40,9 +51,6 @@ define ->
 				childrenStrings = @children.map((x) -> if x.toLisp then x.toLisp() else x)
 				"(#{@label}#{if @children then " " else ""}#{childrenStrings.join(" ")})"
 
-			toString: ->
-				"(#{@children.join(" #{@label} ")})"
-
 
 		BinaryNode: class extends BasicNode
 			# A node with exactly two children, a left and a right child.
@@ -58,8 +66,5 @@ define ->
 			toLisp: ->
 				lispify = (x) -> if x.toLisp then x.toLisp() else x
 				"(#{@label} #{lispify(@children.left)} #{lispify(@children.right)})"
-
-			toString: ->
-				"(#{@children.left} #{@label} #{@children.right})"
 
 	}

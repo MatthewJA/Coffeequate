@@ -1,4 +1,13 @@
-define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "require", "compare"], (nodes, terminals, generateInfo, AlgebraError, parseArgs, require, compare) ->
+define [
+	"nodes"
+	"terminals"
+	"generateInfo"
+	"AlgebraError"
+	"parseArgs"
+	"require"
+	"compare"
+	"prettyRender"
+], (nodes, terminals, generateInfo, AlgebraError, parseArgs, require, compare, prettyRender) ->
 
 	# Represent powers as a node.
 
@@ -217,7 +226,7 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 			else
 				return expr.solve(variable, equivalencies)
 
-		sub: (substitutions, uncertaintySubstitutions, equivalencies=null) ->
+		sub: (substitutions, uncertaintySubstitutions, equivalencies=null, assumeZeroUncertainty=false) ->
 			# subtitutions: {variable: value}
 			# variable is a label, value is any object - if it is a node,
 			# it will be substituted in; otherwise it is interpreted as a
@@ -244,7 +253,7 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 				unless subbed
 					left = @children.left.copy()
 			else if @children.left.sub?
-				left = @children.left.sub(substitutions, uncertaintySubstitutions)
+				left = @children.left.sub(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty)
 			else
 				left = @children.left.copy()
 
@@ -259,7 +268,7 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 				unless subbed
 					right = @children.right.copy()
 			else if @children.right.sub?
-				right = @children.right.sub(substitutions, uncertaintySubstitutions)
+				right = @children.right.sub(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty)
 			else
 				right = @children.right.copy()
 
@@ -413,10 +422,10 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 				return html + innerHTML + closingHTML
 
 		toDrawingNode: ->
-			SurdNode = require("prettyRender").Surd
-			PowNode = require("prettyRender").Pow
-			FractionNode = require("prettyRender").Fraction
-			NumberNode = require("prettyRender").Number
+			SurdNode = prettyRender?.Surd
+			PowNode = prettyRender.Pow
+			FractionNode = prettyRender.Fraction
+			NumberNode = prettyRender.Number
 
 			if @children.right instanceof terminals.Constant
 				if @children.right.numerator == 1

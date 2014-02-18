@@ -1,4 +1,13 @@
-define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "require", "compare"], (nodes, terminals, generateInfo, AlgebraError, parseArgs, require, compare) ->
+define [
+	"nodes"
+	"terminals"
+	"generateInfo"
+	"AlgebraError"
+	"parseArgs"
+	"require"
+	"compare"
+	"prettyRender"
+], (nodes, terminals, generateInfo, AlgebraError, parseArgs, require, compare, prettyRender) ->
 
 	# Represent multiplication as a node.
 
@@ -387,7 +396,7 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 
 			return new Mul(children...)
 
-		sub: (substitutions, uncertaintySubstitutions, equivalencies=null) ->
+		sub: (substitutions, uncertaintySubstitutions, equivalencies=null, assumeZeroUncertainty=false) ->
 			# subtitutions: {variable: value}
 			# variable is a label, value is any object - if it is a node,
 			# it will be substituted in; otherwise it is interpreted as a
@@ -414,7 +423,8 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 					unless subbed
 						children.push(child.copy())
 				else if child.sub?
-					children.push(child.sub(substitutions, uncertaintySubstitutions, equivalencies))
+					console.log assumeZeroUncertainty
+					children.push(child.sub(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty))
 				else
 					children.push(child.copy())
 
@@ -543,14 +553,23 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 				).join("&middot;") + closingHTML
 
 		toDrawingNode: ->
-			prettyRender = require("prettyRender")
+			# To make a drawing node out of a Mul node, we turn it into either a
+			# fraction or a long product.
+			#
+			# We put things with negative powers on the bottom of the fraction.
+			# If the constant factor in the multiplication is a fraction, we also put
+			# the denominator on the bottom.
 			Pow = require("operators/Pow")
 			terminals = require("terminals")
 
 			top = []
 			bottom = []
 
+			# We need to figure out if the things which we're multiplying should go
+			# on the top or bottom of the fraction.
 			for child in @children
+				# We only put things on the bottom if they are powers with a negative
+				# constant power, eg x**-1.
 				if child instanceof Pow
 					power = child.children.right
 					if power instanceof terminals.Constant
@@ -576,11 +595,26 @@ define ["nodes", "terminals", "generateInfo", "AlgebraError", "parseArgs", "requ
 				else
 					top.push(child.toDrawingNode())
 
+
+			# At this point, we have a top and bottom array with stuff which should
+			# go on the top and bottom of the array respoectively.
+
+			if bottom.length == 1
+				newBottom = bottom[0]
+			else if bottom.length > 1
+				newBottom = prettyRender.Mul.makeWithBrackets(bottom...)
+
+			if top.length == 1
+				top = top[0]
+			else if top.length > 1
+				top = prettyRender.Mul.makeWithBrackets(top...)
+
 			if bottom.length == 0
-				return prettyRender.Mul.makeWithBrackets(top...)
+				return top
+			else if top.length == 0
+				return new prettyRender.Fraction(new prettyRender.Number(1),newBottom)
 			else
-				return new prettyRender.Fraction(prettyRender.Mul.makeWithBrackets(top...),
-																				 prettyRender.Mul.makeWithBrackets(bottom...))
+				return new prettyRender.Fraction(top, newBottom)
 
 		differentiate: (variable) ->
 			Add = require("operators/Add")

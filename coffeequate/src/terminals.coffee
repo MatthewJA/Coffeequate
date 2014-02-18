@@ -1,4 +1,4 @@
-define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
+define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo, nodes, prettyRender) ->
 
 	# Terminals for the equation tree.
 
@@ -12,9 +12,6 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 
 		copy: ->
 			return new Terminal(@label)
-
-		toString: ->
-			@label
 
 	class Constant extends Terminal
 		# Constants in the equation tree, e.g. 1/2
@@ -31,7 +28,7 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 				@denominator *= -1
 				@numerator *= -1
 
-			@simplifyInPlace()
+			# @simplifyInPlace()
 
 		evaluate: ->
 			@numerator/@denominator
@@ -87,14 +84,14 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 
 		simplify: ->
 			constant = @copy()
-			constant.simplifyInPlace()
+			# constant.simplifyInPlace()
 			return constant
 
 		expand: ->
 			@copy()
 
 		expandAndSimplify: ->
-			@copy()
+			@simplify()
 
 		substituteExpression: (sourceExpression, variable, equivalencies) ->
 			[@copy()]
@@ -135,14 +132,9 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 				return html + "#{@numerator}" + closingHTML
 			return html + "(#{@numerator}/#{@denominator})" + closingHTML
 
-		toString: ->
-			unless @denominator == 1
-				return "#{@numerator}/#{@denominator}"
-			return "#{@numerator}"
-
 		toDrawingNode: ->
-			NumberNode = require("prettyRender").Number
-			FractionNode = require("prettyRender").Fraction
+			NumberNode = prettyRender.Number
+			FractionNode = prettyRender.Fraction
 			if @denominator == 1
 				return new NumberNode(@numerator)
 			return new FractionNode(new NumberNode(@numerator), new NumberNode(@denominator))
@@ -151,7 +143,7 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 			return new Constant(0)
 
 	class SymbolicConstant extends Terminal
-		# Symbolic constants in the equation tree, e.g. π
+		# Symbolic constants in the equation tree, e.g. Ï€
 		constructor: (@label, @value=null, @units=null) ->
 			@cmp = -5
 
@@ -225,8 +217,8 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 			"#{html}<mn class=\"constant symbolic-constant\">#{@label}</mn>#{closingHTML}"
 
 		toDrawingNode: ->
-			VariableNode = require("prettyRender").Variable
-			return new VariableNode(@value, "symbolic-constant")
+			VariableNode = prettyRender.Variable
+			return new VariableNode(@label, "symbolic-constant")
 
 		differentiate: (variable) ->
 			return new Constant(0)
@@ -327,7 +319,7 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 			# Return the variable as a MathML string.
 			if topLevel
 				[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
-				closingHTML = "</div>"
+				closingHTML = "</math></div>"
 			else
 				html = ""
 				closingHTML = ""
@@ -369,9 +361,8 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 			return html + '<span class="variable"' + labelID + '>' + label + '</span>' + closingHTML
 
 		toDrawingNode: ->
-			VariableNode = require("prettyRender").Variable
-			str = @label.replace("-", "_")
-			return new VariableNode(str)
+			VariableNode = prettyRender.Variable
+			return new VariableNode(@label)
 
 		differentiate: (variable) ->
 			if variable == @label
@@ -417,7 +408,7 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 		getAllVariables: ->
 			[@label]
 
-		sub: (substitutions, uncertaintySubstitutions) ->
+		sub: (substitutions, uncertaintySubstitutions, equivalencies=null, assumeZero=false) ->
 			if @label of uncertaintySubstitutions
 				substitute = uncertaintySubstitutions[@label]
 				if substitute.copy?
@@ -425,7 +416,7 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 				else
 					return new Constant(substitute)
 			else
-				return @copy()
+				return if not assumeZero then @copy() else new Constant("0")
 
 		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
 			throw new Error("Can't sub uncertainties")
@@ -448,15 +439,16 @@ define ["parse", "generateInfo", "nodes"], (parse, generateInfo, nodes) ->
 		expandAndSimplify: ->
 			@copy()
 
-		toString: ->
-			"σ(#{@label})"
+		toMathML: (args...) ->
+			dummyVar = new Variable("σ#{@label}")
+			return dummyVar.toMathML(args...)
 
-		toMathML: ->
-			dummyVar = new Variable("σ(#{label})")
-			return dummyVar.toMathML(arguments)
+		toHTML: (args...) ->
+			dummyVar = new Variable("σ#{@label}")
+			return dummyVar.toHTML(args...)
 
 		toDrawingNode: ->
-			UncertaintyNode = require("prettyRender").Uncertainty
+			UncertaintyNode = prettyRender.Uncertainty
 			return new UncertaintyNode(@label)
 
 		differentiate: (variable) ->
