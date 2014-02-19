@@ -40,13 +40,13 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 				add = parse.stringToExpression("((2 * x) + (3 * x))")
 				expect(add.simplify().toLisp()).toBe("(* 5 x)")
 				add = parse.stringToExpression("(x + 0)")
-				expect(add.simplify().toString()).toBe("x")
+				expect(add.simplify().toLisp()).toBe("x")
 				add = parse.stringToExpression("(x + 0 + 0 + y)")
 				expect(add.simplify().toLisp()).toBe("(+ x y)")
 				add = parse.stringToExpression("(x + (2 * x))")
 				expect(add.simplify().toLisp()).toBe("(* 3 x)")
 				add = parse.stringToExpression("(-1 + 1**1)")
-				expect(add.simplify().toString()).toBe("0")
+				expect(add.simplify().toLisp()).toBe("0")
 
 			it "can be solved", ->
 				add = new operators.Add("x") # 0 = x
@@ -54,7 +54,7 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 				add = parse.stringToExpression("x + -1") # 1 = x
 				expect(add.solve("x")[0].evaluate()).toEqual(1)
 				add = parse.stringToExpression("x + -y") # y = x
-				expect(add.solve("x")[0].toString()).toEqual("y")
+				expect(add.solve("x")[0].toLisp()).toEqual("y")
 				add = parse.stringToExpression("x + y + 2") # y = x
 				expect(add.solve("x")[0].toLisp()).toEqual("(+ -2 (* -1 y))")
 
@@ -109,10 +109,10 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 			it "represent multiplication", ->
 				mul = new operators.Mul("b", "3")
 				expect(mul.label).toBe("*")
-				expect(mul.toString()).toBe("b * 3")
+				expect(mul.toLisp()).toBe("(* b 3)")
 
 				mul = new operators.Mul("b", "3", "d")
-				expect(mul.toString()).toBe("(b * 3 * d)")
+				expect(mul.toLisp()).toBe("(* b 3 d)")
 
 			it "require at least one child", ->
 				expect(-> new operators.Mul()).toThrow(new Error("Mul nodes must have at least one child."))
@@ -121,41 +121,41 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 
 				it "associative expressions of multiplication", ->
 					mul = parse.stringToExpression("a * (b * 3)", false)
-					expect(mul.expand().toLisp()).toBe("(3 * a * b)")
+					expect(mul.expand().toLisp()).toBe("(* 3 a b)")
 					mul = parse.stringToExpression("(a * b) * (b * 3)", false)
-					expect(mul.expand().toLisp()).toBe('(3 * a * b * b)')
+					expect(mul.expand().toLisp()).toBe('(* 3 a b b)')
 
 				it "distributive expressions over addition", ->
 					mul = parse.stringToExpression("1 * (2 + 3)", false)
-					expect(mul.expand().toLisp()).toBe("((1 * 2) + (1 * 3))")
+					expect(mul.expand().toLisp()).toBe("(+ (* 1 2) (* 1 3))")
 					mul = parse.stringToExpression("1 * (2 + 3 ** 2)", false)
-					expect(mul.expand().toLisp()).toBe("((1 * 2) + (1 * (3 ** 2)))")
+					expect(mul.expand().toLisp()).toBe("(+ (* 1 2) (* 1 (** 3 2)))")
 					mul = parse.stringToExpression("(1 + 2) * (2 + 3)", false)
-					expect(mul.expand().toLisp()).toBe("((1 * 2) + (1 * 3) + (2 * 2) + (2 * 3))")
+					expect(mul.expand().toLisp()).toBe("(+ (* 1 2) (* 1 3) (* 2 2) (* 2 3))")
 
 				it "more complex expressions", ->
 					mul = parse.stringToExpression("-(x + (x * 4) ** 2) + 7", false)
-					expect(mul.expand().toLisp()).toBe("(7 + (-1 * x) + (-1 * (4 ** 2) * (x ** 2)))")
+					expect(mul.expand().toLisp()).toBe("(+ 7 (* -1 x) (* -1 (** 4 2) (** x 2)))")
 					mul = parse.stringToExpression("(((x + 4) * 2)**(x + - 2) + - 2)**x", false)
-					expect(mul.expand().toLisp()).toBe("(((-1 * 2) + ((2 ** (x + (-1 * 2))) * ((4 + x) ** (x + (-1 * 2))))) ** x)")
+					expect(mul.expand().toLisp()).toBe("(** (+ (* -1 2) (* (** 2 (+ x (* -1 2))) (** (+ 4 x) (+ x (* -1 2))))) x)")
 
 				it "expressions into a sorted form", ->
 					mul = parse.stringToExpression("3 * 2 * 1", false)
-					expect(mul.expand().toLisp()).toBe("(1 * 2 * 3)")
+					expect(mul.expand().toLisp()).toBe("(* 1 2 3)")
 					mul = parse.stringToExpression("3 * x * 1", false)
-					expect(mul.expand().toLisp()).toBe("(1 * 3 * x)")
+					expect(mul.expand().toLisp()).toBe("(* 1 3 x)")
 
 			it "simplify", ->
 				mul = parse.stringToExpression("1 * x", false)
-				expect(mul.simplify().toLisp()).toBe("x")
+				expect(mul.simplify().toString()).toBe("x")
 				mul = parse.stringToExpression("1 * x * 1", false)
-				expect(mul.simplify().toLisp()).toBe("x")
+				expect(mul.simplify().toString()).toBe("x")
 				mul = parse.stringToExpression("x * x", false)
-				expect(mul.simplify().toLisp()).toBe("(x ** 2)")
+				expect(mul.simplify().toLisp()).toBe("(** x 2)")
 				mul = parse.stringToExpression("x * y * x", false)
-				expect(mul.simplify().toLisp()).toBe("(y * (x ** 2))")
+				expect(mul.simplify().toLisp()).toBe("(* y (** x 2))")
 				mul = parse.stringToExpression("x * 1 * y * 1 ** 1", false)
-				expect(mul.simplify().toLisp()).toBe("(x * y)")
+				expect(mul.simplify().toLisp()).toBe("(* x y)")
 
 			it "can be solved", ->
 				mul = parse.stringToExpression("x * y * z", false)
@@ -199,18 +199,18 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 
 		it "expand and simplify into reasonably-canonical forms", ->
 			add = parse.stringToExpression("(a * b)*(2*x + 1)", false)
-			expect(add.expandAndSimplify().toLisp()).toBe("((2 * a * b * x) + (a * b))")
+			expect(add.expandAndSimplify().toLisp()).toBe("(+ (* 2 a b x) (* a b))")
 			add = parse.stringToExpression("(3*x+2)*(4*y**2+7)", false)
-			expect(add.expand().simplify().toLisp()).toBe("(14 + (8 * (y ** 2)) + (12 * x * (y ** 2)) + (21 * x))")
+			expect(add.expand().simplify().toLisp()).toBe("(+ 14 (* 8 (** y 2)) (* 12 x (** y 2)) (* 21 x))")
 			add = parse.stringToExpression("(3*x+2)*(4*y**2+7)*(x+2*y)**-1", false)
-			expect(add.expand().simplify().toLisp()).toBe("(((x + (2 * y)) ** -1) * (14 + (8 * (y ** 2)) + (12 * x * (y ** 2)) + (21 * x)))")
+			expect(add.expand().simplify().toLisp()).toBe("(* (** (+ x (* 2 y)) -1) (+ 14 (* 8 (** y 2)) (* 12 x (** y 2)) (* 21 x)))")
 
 		describe "representing powers", ->
 
 			it "represent powers", ->
 				pow = new operators.Pow("2", "3")
 				expect(pow.label).toBe("**")
-				expect(pow.toLisp()).toBe("(2 ** 3)")
+				expect(pow.toLisp()).toBe("(** 2 3)")
 
 			it "require two children", ->
 				expect(-> new operators.Pow()).toThrow(new Error("Pow nodes must have two children."))
@@ -219,21 +219,21 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 
 			it "expand", ->
 				pow = new operators.Pow("x", 2)
-				expect(pow.expand().toLisp()).toBe("(x ** 2)")
+				expect(pow.expand().toLisp()).toBe("(** x 2)")
 				pow = parse.stringToExpression("(1 + x)**2", false)
-				expect(pow.expand().toLisp()).toBe("((1 * 1) + (1 * x) + (1 * x) + (x * x))")
+				expect(pow.expand().toLisp()).toBe("(+ (* 1 1) (* 1 x) (* 1 x) (* x x))")
 				pow = parse.stringToExpression("(a * b * c)**d", false)
-				expect(pow.expand().toLisp()).toBe("((a ** d) * (b ** d) * (c ** d))")
+				expect(pow.expand().toLisp()).toBe("(* (** a d) (** b d) (** c d))")
 
 			it "simplify", ->
 				pow = parse.stringToExpression("x ** 2", false)
-				expect(pow.simplify().toLisp()).toBe("(x ** 2)")
+				expect(pow.simplify().toLisp()).toBe("(** x 2)")
 				pow = parse.stringToExpression("((2 * x) + (3 * x))**2", false)
-				expect(pow.simplify().toLisp()).toBe("((5 * x) ** 2)")
+				expect(pow.simplify().toLisp()).toBe("(** (* 5 x) 2)")
 				pow = parse.stringToExpression("2**((2 * x) + (3 * x))", false)
-				expect(pow.simplify().toLisp()).toBe("(2 ** (5 * x))")
+				expect(pow.simplify().toLisp()).toBe("(** 2 (* 5 x))")
 				pow = parse.stringToExpression("((2 * x) + (3 * x))**((2 * x) + (3 * x))", false)
-				expect(pow.simplify().toLisp()).toBe("((5 * x) ** (5 * x))")
+				expect(pow.simplify().toLisp()).toBe("(** (* 5 x) (* 5 x))")
 				pow = parse.stringToExpression("(x ** 1)", false)
 				expect(pow.simplify().toLisp()).toBe("x")
 				pow = parse.stringToExpression("(4 ** 0.5)", false)
@@ -245,7 +245,7 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 				pow = parse.stringToExpression("(x ** 2) ** 0.5", false)
 				expect(pow.simplify().toLisp()).toBe("x")
 				pow = parse.stringToExpression("(x ** 2) ** y", false)
-				expect(pow.simplify().toLisp()).toBe("(x ** (2 * y))")
+				expect(pow.simplify().toLisp()).toBe("(** x (* 2 y))")
 				pow = parse.stringToExpression("(1 ** 2)", false)
 				expect(pow.simplify().toLisp()).toBe("1")
 				pow = parse.stringToExpression("(1 ** x)", false)
@@ -297,6 +297,6 @@ define ["operators", "parse", "AlgebraError"], (operators, parse, AlgebraError) 
 
 		it "can be formed into a tree", ->
 			# (+ 1 (* 2 3))
-			expect((new operators.Add(1, new operators.Mul(2, 3))).toLisp()).toBe("(1 + (2 * 3))")
+			expect((new operators.Add(1, new operators.Mul(2, 3))).toLisp()).toBe("(+ 1 (* 2 3))")
 			# (* m (** c 2))
-			expect((new operators.Mul("m", new operators.Pow("c", 2))).toLisp()).toBe("(m * (c ** 2))")
+			expect((new operators.Mul("m", new operators.Pow("c", 2))).toLisp()).toBe("(* m (** c 2))")

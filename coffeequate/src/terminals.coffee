@@ -136,6 +136,11 @@ define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo,
 				return new NumberNode(@numerator)
 			return new FractionNode(new NumberNode(@numerator), new NumberNode(@denominator))
 
+		toLisp: ->
+			if @denominator == 1
+				return "#{@numerator}"
+			return "#{@numerator}/#{@denominator}"
+
 		differentiate: (variable) ->
 			return new Constant(0)
 
