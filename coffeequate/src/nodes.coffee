@@ -34,6 +34,12 @@ define ["generateInfo"], (generateInfo) ->
 		stringEqual: (other) ->
 			return other.toString() == @toString()
 
+		# monteCarloEqual: (other) ->
+		# 	myVars = @getAllVariables().sort()
+		# 	otherVars = other.getAllVariables().sort()
+
+		# 	if @getAllVariables().sort() == other.getAllVariables().sort()
+
 	return {
 
 		BasicNode: BasicNode
