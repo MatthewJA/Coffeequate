@@ -464,7 +464,7 @@ define [
 			console.log results
 			return results
 
-		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
+		toMathML2: (equationID, expression=false, equality="0", topLevel=false) ->
 			Add = require("operators/Add")
 			Pow = require("operators/Pow")
 
@@ -491,16 +491,16 @@ define [
 					(child) ->
 						# Fence nodes with lower precedence - that is, addition nodes.
 						if child instanceof Add
-							"<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>"
+							"<mfenced>" + child.toMathML2(equationID, expression) + "</mfenced>"
 						else
-							child.toMathML(equationID, expression)
+							child.toMathML2(equationID, expression)
 				).join("<mo>&middot;</mo>") + "</mrow><mrow>" + denominatorWithoutNegatives.map(
 					(child) ->
 						# Fence nodes with lower precedence - that is, addition nodes.
 						if child instanceof Add
-							"<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>"
+							"<mfenced>" + child.toMathML2(equationID, expression) + "</mfenced>"
 						else
-							child.toMathML(equationID, expression)
+							child.toMathML2(equationID, expression)
 				).join("<mo>&middot;</mo>") + "</mrow></mfrac>" + closingHTML
 
 			else if denominator.length > 0
@@ -508,9 +508,9 @@ define [
 					(child) ->
 						# Fence nodes with lower precedence - that is, addition nodes.
 						if child instanceof Add
-							"<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>"
+							"<mfenced>" + child.toMathML2(equationID, expression) + "</mfenced>"
 						else
-							child.toMathML(equationID, expression)
+							child.toMathML2(equationID, expression)
 				).join("<mo>&middot;</mo>") + "</mrow></mfrac>" + closingHTML
 
 			else if numerator.length > 0
@@ -518,9 +518,9 @@ define [
 					(child) ->
 						# Fence nodes with lower precedence - that is, addition nodes.
 						if child instanceof Add
-							"<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>"
+							"<mfenced>" + child.toMathML2(equationID, expression) + "</mfenced>"
 						else
-							child.toMathML(equationID, expression)
+							child.toMathML2(equationID, expression)
 				).join("<mo>&middot;</mo>") + "</mrow>" + closingHTML
 
 			else

@@ -102,7 +102,7 @@ define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo,
 		getVariableUnits: ->
 			null
 
-		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
+		toMathML2: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return this constant as a MathML string.
 			if topLevel
 				[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
@@ -205,7 +205,7 @@ define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo,
 				closingHTML = ""
 			return html + "<span class=\"constant symbolic-constant\">" + @toString() + "</span>" + closingHTML
 
-		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
+		toMathML2: (equationID, expression=false, equality="0", topLevel=false) ->
 			if topLevel
 				[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
 				closingHTML = "</math></div>"
@@ -307,7 +307,7 @@ define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo,
 		expandAndSimplify: ->
 			@copy()
 
-		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
+		toMathML2: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return the variable as a MathML string.
 			if topLevel
 				[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
@@ -428,9 +428,9 @@ define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo,
 		expandAndSimplify: ->
 			@copy()
 
-		toMathML: ->
+		toMathML2: ->
 			dummyVar = new Variable("σ(#{label})")
-			return dummyVar.toMathML(arguments)
+			return dummyVar.toMathML2(arguments)
 
 		toDrawingNode: ->
 			UncertaintyNode = prettyRender.Uncertainty

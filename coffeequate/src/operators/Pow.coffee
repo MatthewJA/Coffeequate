@@ -349,7 +349,7 @@ define [
 
 			return results
 
-		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
+		toMathML2: (equationID, expression=false, equality="0", topLevel=false) ->
 			Mul = require("operators/Mul")
 			Add = require("operators/Add")
 
@@ -366,7 +366,7 @@ define [
 				closingHTML = "</math></div>"
 
 			if @children.right.evaluate?() == 1
-				return html + @children.left.toMathML(equationID, expression) + closingHTML
+				return html + @children.left.toMathML2(equationID, expression) + closingHTML
 			else if @children.right.evaluate?() == 0
 				return html + "<mn>1</mn>" + closingHTML
 			else
@@ -379,11 +379,11 @@ define [
 
 				# Fence if lower precedence, i.e. Add or Mul.
 				if @children.left instanceof Add or @children.left instanceof Mul
-					innerHTML = "<mfenced>#{@children.left.toMathML(equationID, expression)}</mfenced>"
+					innerHTML = "<mfenced>#{@children.left.toMathML2(equationID, expression)}</mfenced>"
 				else
-					innerHTML = "#{@children.left.toMathML(equationID, expression)}"
+					innerHTML = "#{@children.left.toMathML2(equationID, expression)}"
 				unless right.evaluate?() == 1
-					innerHTML = "<msup>#{innerHTML}#{right.toMathML(equationID, expression)}</msup>"
+					innerHTML = "<msup>#{innerHTML}#{right.toMathML2(equationID, expression)}</msup>"
 				if @children.right.evaluate?() < 0
 					innerHTML = "<mfrac><mn>1</mn>#{innerHTML}</mfrac>"
 				return html + innerHTML + closingHTML
