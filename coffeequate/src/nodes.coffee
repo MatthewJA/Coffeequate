@@ -23,13 +23,22 @@ define ["generateInfo"], (generateInfo) ->
 		toString: ->
 			return @toDrawingNode().renderString()
 
-		toMathML2: (equationID, expression, equality="0") ->
+		toLisp: ->
+			return @label
+
+		toMathML: (equationID, expression, equality="0") ->
 			[mathClass, mathID, openingHTML] = generateInfo.getMathMLInfo(equationID, expression, equality)
 			closingHTML = "</math></div>"
 			return openingHTML + @toDrawingNode().renderMathML(equationID, expression) + closingHTML
 
 		stringEqual: (other) ->
 			return other.toString() == @toString()
+
+		# monteCarloEqual: (other) ->
+		# 	myVars = @getAllVariables().sort()
+		# 	otherVars = other.getAllVariables().sort()
+
+		# 	if @getAllVariables().sort() == other.getAllVariables().sort()
 
 	return {
 

@@ -638,7 +638,7 @@ define [
 
 			return results
 
-		toMathML: (equationID, expression=false, equality="0", topLevel=false) ->
+		toMathML2: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return a MathML string representing this node.
 			[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
 
@@ -651,7 +651,7 @@ define [
 			return html + "<mrow>" + @children.map(
 				(child) ->
 					# Don't fence addition nodes.
-					child.toMathML(equationID, expression)
+					child.toMathML2(equationID, expression)
 				).join("<mo>+</mo>") + "</mrow>" + closingHTML
 
 		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
