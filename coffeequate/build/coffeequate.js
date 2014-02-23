@@ -9,6 +9,7 @@
         //Browser globals case. Just assign the
         //result to a property on the global.
         root.libGlobalName = factory();
+        window.coffeequate = factory();
     }
 }(this, function () {
     //almond, and modules will be inlined here
