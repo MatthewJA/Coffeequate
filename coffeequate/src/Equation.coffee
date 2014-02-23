@@ -125,6 +125,9 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 				@left.units = units
 			@right.setVariableUnits(variable, equivalencies, units)
 
+		copy: ->
+			return new Equation(@left.copy(), @right.copy())
+
 		equals: (b) ->
 			unless b instanceof Equation
 				return false

@@ -1182,10 +1182,11 @@ define("lib/almond", function(){});
           this.denominator *= -1;
           this.numerator *= -1;
         }
+        this.numerator = parseFloat(this.numerator.toPrecision(6));
       }
 
       Constant.prototype.evaluate = function() {
-        return this.numerator / this.denominator;
+        return parseFloat((this.numerator / this.denominator).toPrecision(6));
       };
 
       Constant.prototype.copy = function() {
@@ -1755,7 +1756,7 @@ define("lib/almond", function(){});
         if (assumeZero == null) {
           assumeZero = false;
         }
-        if (this.label in uncertaintySubstitutions) {
+        if (this.label in uncertaintySubstitutions && (uncertaintySubstitutions[this.label] != null)) {
           substitute = uncertaintySubstitutions[this.label];
           if (substitute.copy != null) {
             return substitute.copy();
@@ -4373,6 +4374,10 @@ define("lib/almond", function(){});
           this.left.units = units;
         }
         return this.right.setVariableUnits(variable, equivalencies, units);
+      };
+
+      Equation.prototype.copy = function() {
+        return new Equation(this.left.copy(), this.right.copy());
       };
 
       Equation.prototype.equals = function(b) {

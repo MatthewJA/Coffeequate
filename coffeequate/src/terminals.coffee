@@ -29,9 +29,10 @@ define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo,
 				@numerator *= -1
 
 			# @simplifyInPlace()
+			@numerator = parseFloat((@numerator).toPrecision(6)) # Temporary, until we have better numerical output.
 
 		evaluate: ->
-			@numerator/@denominator
+			parseFloat((@numerator/@denominator).toPrecision(6)) # Temporary, until we have better numerical output.
 
 		copy: ->
 			return new Constant(@numerator, @denominator)
@@ -415,7 +416,7 @@ define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo,
 			[@label]
 
 		sub: (substitutions, uncertaintySubstitutions, equivalencies=null, assumeZero=false) ->
-			if @label of uncertaintySubstitutions
+			if @label of uncertaintySubstitutions and uncertaintySubstitutions[@label]?
 				substitute = uncertaintySubstitutions[@label]
 				if substitute.copy?
 					return substitute.copy()
