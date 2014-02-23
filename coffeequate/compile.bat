@@ -1,7 +1,6 @@
 REM CoffeeScript version 1.6.3
 
 CALL coffee -c .
-CALL coffee -b -c .\src\build.coffee
 
 REM Node v0.10.21
 REM r.js 2.1.9
