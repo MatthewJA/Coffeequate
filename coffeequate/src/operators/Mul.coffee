@@ -86,8 +86,8 @@ define [
 
 		setVariableUnits: (variable, equivalencies, units) ->
 			variableEquivalencies = if equivalencies? then equivalencies.get(variable) else {get: (z) -> [z]}
-			@children.left.setVariableUnits(variable, equivalencies, units)
-			@children.right.setVariableUnits(variable, equivalencies, units)
+			for child in @children
+				child.setVariableUnits(variable, equivalencies, units)
 
 		@expandMulAdd: (mul, add) ->
 			Add = require("operators/Add")

@@ -2015,14 +2015,19 @@ define("lib/almond", function(){});
       };
 
       Add.prototype.setVariableUnits = function(variable, equivalencies, units) {
-        var variableEquivalencies;
+        var child, variableEquivalencies, _i, _len, _ref, _results;
         variableEquivalencies = equivalencies != null ? equivalencies.get(variable) : {
           get: function(z) {
             return [z];
           }
         };
-        this.children.left.setVariableUnits(variable, equivalencies, units);
-        return this.children.right.setVariableUnits(variable, equivalencies, units);
+        _ref = this.children;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          child = _ref[_i];
+          _results.push(child.setVariableUnits(variable, equivalencies, units));
+        }
+        return _results;
       };
 
       Add.prototype.expand = function() {
@@ -2889,14 +2894,19 @@ define("lib/almond", function(){});
       };
 
       Mul.prototype.setVariableUnits = function(variable, equivalencies, units) {
-        var variableEquivalencies;
+        var child, variableEquivalencies, _i, _len, _ref, _results;
         variableEquivalencies = equivalencies != null ? equivalencies.get(variable) : {
           get: function(z) {
             return [z];
           }
         };
-        this.children.left.setVariableUnits(variable, equivalencies, units);
-        return this.children.right.setVariableUnits(variable, equivalencies, units);
+        _ref = this.children;
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          child = _ref[_i];
+          _results.push(child.setVariableUnits(variable, equivalencies, units));
+        }
+        return _results;
       };
 
       Mul.expandMulAdd = function(mul, add) {
