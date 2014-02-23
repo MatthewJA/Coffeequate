@@ -21,4 +21,5 @@ define ["Equation", "operators", "terminals", "parse", "uncertainties", "prettyR
 			Number: prettyRender.Number
 			Variable: prettyRender.Variable
 			Fraction: prettyRender.Fraction
+		C: parse.stringToExpression
 	}
