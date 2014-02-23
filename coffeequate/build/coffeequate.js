@@ -694,13 +694,25 @@ define("lib/almond", function(){});
         return this.toDrawingNode().renderString();
       };
 
-      BasicNode.prototype.toMathML2 = function(equationID, expression, equality) {
+      BasicNode.prototype.toLisp = function() {
+        return this.label;
+      };
+
+      BasicNode.prototype.toMathML = function(equationID, expression, equality, topLevel) {
         var closingHTML, mathClass, mathID, openingHTML, _ref;
         if (equality == null) {
           equality = "0";
         }
+        if (topLevel == null) {
+          topLevel = false;
+        }
         _ref = generateInfo.getMathMLInfo(equationID, expression, equality), mathClass = _ref[0], mathID = _ref[1], openingHTML = _ref[2];
-        closingHTML = "</math></div>";
+        if (!topLevel) {
+          openingHTML = "";
+          closingHTML = "";
+        } else {
+          closingHTML = "</math></div>";
+        }
         return openingHTML + this.toDrawingNode().renderMathML(equationID, expression) + closingHTML;
       };
 
@@ -910,7 +922,7 @@ define("lib/almond", function(){});
       };
 
       Pow.prototype.renderMathML = function(equationID, expression) {
-        return "" + (this.left.renderMathML(equationID, expression)) + "<msup>" + innerHTML + (right.toMathML(equationID, expression)) + "</msup>";
+        return "<msup>" + (this.left.renderMathML(equationID, expression)) + (this.right.renderMathML(equationID, expression)) + "</msup>";
       };
 
       return Pow;
@@ -1260,7 +1272,7 @@ define("lib/almond", function(){});
         return null;
       };
 
-      Constant.prototype.toMathML = function(equationID, expression, equality, topLevel) {
+      Constant.prototype.toMathML2 = function(equationID, expression, equality, topLevel) {
         var closingHTML, html, mathClass, mathID, _ref;
         if (expression == null) {
           expression = false;
@@ -1316,6 +1328,13 @@ define("lib/almond", function(){});
           return new NumberNode(this.numerator);
         }
         return new FractionNode(new NumberNode(this.numerator), new NumberNode(this.denominator));
+      };
+
+      Constant.prototype.toLisp = function() {
+        if (this.denominator === 1) {
+          return "" + this.numerator;
+        }
+        return "" + this.numerator + "/" + this.denominator;
       };
 
       Constant.prototype.differentiate = function(variable) {
@@ -1421,7 +1440,7 @@ define("lib/almond", function(){});
         return html + "<span class=\"constant symbolic-constant\">" + this.toString() + "</span>" + closingHTML;
       };
 
-      SymbolicConstant.prototype.toMathML = function(equationID, expression, equality, topLevel) {
+      SymbolicConstant.prototype.toMathML2 = function(equationID, expression, equality, topLevel) {
         var closingHTML, html, mathClass, mathID, _ref;
         if (expression == null) {
           expression = false;
@@ -1595,7 +1614,7 @@ define("lib/almond", function(){});
         return this.copy();
       };
 
-      Variable.prototype.toMathML = function(equationID, expression, equality, topLevel) {
+      Variable.prototype.toMathML2 = function(equationID, expression, equality, topLevel) {
         var atCount, atEnd, atStart, closingHTML, html, i, label, labelArray, labelID, mathClass, mathID, _ref;
         if (expression == null) {
           expression = false;
@@ -1785,18 +1804,17 @@ define("lib/almond", function(){});
         return this.copy();
       };
 
-      Uncertainty.prototype.toMathML = function() {
-        var args, dummyVar;
-        args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-        dummyVar = new Variable("σ" + this.label);
-        return dummyVar.toMathML.apply(dummyVar, args);
-      };
-
       Uncertainty.prototype.toHTML = function() {
         var args, dummyVar;
         args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
         dummyVar = new Variable("σ" + this.label);
         return dummyVar.toHTML.apply(dummyVar, args);
+      };
+
+      Uncertainty.prototype.toMathML2 = function() {
+        var dummyVar;
+        dummyVar = new Variable("σ(" + label + ")");
+        return dummyVar.toMathML2(arguments);
       };
 
       Uncertainty.prototype.toDrawingNode = function() {
@@ -2683,7 +2701,7 @@ define("lib/almond", function(){});
         return results;
       };
 
-      Add.prototype.toMathML = function(equationID, expression, equality, topLevel) {
+      Add.prototype.toMathML2 = function(equationID, expression, equality, topLevel) {
         var closingHTML, html, mathClass, mathID, _ref;
         if (expression == null) {
           expression = false;
@@ -2702,7 +2720,7 @@ define("lib/almond", function(){});
           closingHTML = "</math></div>";
         }
         return html + "<mrow>" + this.children.map(function(child) {
-          return child.toMathML(equationID, expression);
+          return child.toMathML2(equationID, expression);
         }).join("<mo>+</mo>") + "</mrow>" + closingHTML;
       };
 
@@ -3387,7 +3405,7 @@ define("lib/almond", function(){});
         return results;
       };
 
-      Mul.prototype.toMathML = function(equationID, expression, equality, topLevel) {
+      Mul.prototype.toMathML2 = function(equationID, expression, equality, topLevel) {
         var Add, Pow, child, closingHTML, denominator, denominatorWithoutNegatives, html, i, mathClass, mathID, negativeCount, numerator, numeratorWithoutNegatives, _ref;
         if (expression == null) {
           expression = false;
@@ -3448,15 +3466,15 @@ define("lib/almond", function(){});
             return _results;
           })()).join("") + "<mfrac><mrow>" + numeratorWithoutNegatives.map(function(child) {
             if (child instanceof Add) {
-              return "<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>";
+              return "<mfenced>" + child.toMathML2(equationID, expression) + "</mfenced>";
             } else {
-              return child.toMathML(equationID, expression);
+              return child.toMathML2(equationID, expression);
             }
           }).join("<mo>&middot;</mo>") + "</mrow><mrow>" + denominatorWithoutNegatives.map(function(child) {
             if (child instanceof Add) {
-              return "<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>";
+              return "<mfenced>" + child.toMathML2(equationID, expression) + "</mfenced>";
             } else {
-              return child.toMathML(equationID, expression);
+              return child.toMathML2(equationID, expression);
             }
           }).join("<mo>&middot;</mo>") + "</mrow></mfrac>" + closingHTML;
         } else if (denominator.length > 0) {
@@ -3469,9 +3487,9 @@ define("lib/almond", function(){});
             return _results;
           })()).join("") + "<mfrac><mn>1</mn><mrow>" + denominatorWithoutNegatives.map(function(child) {
             if (child instanceof Add) {
-              return "<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>";
+              return "<mfenced>" + child.toMathML2(equationID, expression) + "</mfenced>";
             } else {
-              return child.toMathML(equationID, expression);
+              return child.toMathML2(equationID, expression);
             }
           }).join("<mo>&middot;</mo>") + "</mrow></mfrac>" + closingHTML;
         } else if (numerator.length > 0) {
@@ -3484,9 +3502,9 @@ define("lib/almond", function(){});
             return _results;
           })()).join("") + "<mrow>" + numeratorWithoutNegatives.map(function(child) {
             if (child instanceof Add) {
-              return "<mfenced>" + child.toMathML(equationID, expression) + "</mfenced>";
+              return "<mfenced>" + child.toMathML2(equationID, expression) + "</mfenced>";
             } else {
-              return child.toMathML(equationID, expression);
+              return child.toMathML2(equationID, expression);
             }
           }).join("<mo>&middot;</mo>") + "</mrow>" + closingHTML;
         } else {
@@ -3539,7 +3557,7 @@ define("lib/almond", function(){});
                 power.numerator *= -1;
               }
               if (power.numerator < 0) {
-                if (power.denominator !== 1) {
+                if (Math.abs(power.numerator / power.denominator) - 1 > 0.000001) {
                   bottom.push(new Pow(child.children.left, new terminals.Constant(power.numerator, -power.denominator)).toDrawingNode());
                 } else {
                   bottom.push(child.children.left.toDrawingNode());
@@ -4041,7 +4059,7 @@ define("lib/almond", function(){});
         return results;
       };
 
-      Pow.prototype.toMathML = function(equationID, expression, equality, topLevel) {
+      Pow.prototype.toMathML2 = function(equationID, expression, equality, topLevel) {
         var Add, Mul, closingHTML, html, innerHTML, mathClass, mathID, right, _base, _base1, _base2, _base3, _ref;
         if (expression == null) {
           expression = false;
@@ -4062,7 +4080,7 @@ define("lib/almond", function(){});
           closingHTML = "</math></div>";
         }
         if ((typeof (_base = this.children.right).evaluate === "function" ? _base.evaluate() : void 0) === 1) {
-          return html + this.children.left.toMathML(equationID, expression) + closingHTML;
+          return html + this.children.left.toMathML2(equationID, expression) + closingHTML;
         } else if ((typeof (_base1 = this.children.right).evaluate === "function" ? _base1.evaluate() : void 0) === 0) {
           return html + "<mn>1</mn>" + closingHTML;
         } else {
@@ -4074,12 +4092,12 @@ define("lib/almond", function(){});
             right = this.children.right.copy();
           }
           if (this.children.left instanceof Add || this.children.left instanceof Mul) {
-            innerHTML = "<mfenced>" + (this.children.left.toMathML(equationID, expression)) + "</mfenced>";
+            innerHTML = "<mfenced>" + (this.children.left.toMathML2(equationID, expression)) + "</mfenced>";
           } else {
-            innerHTML = "" + (this.children.left.toMathML(equationID, expression));
+            innerHTML = "" + (this.children.left.toMathML2(equationID, expression));
           }
           if ((typeof right.evaluate === "function" ? right.evaluate() : void 0) !== 1) {
-            innerHTML = "<msup>" + innerHTML + (right.toMathML(equationID, expression)) + "</msup>";
+            innerHTML = "<msup>" + innerHTML + (right.toMathML2(equationID, expression)) + "</msup>";
           }
           if ((typeof (_base3 = this.children.right).evaluate === "function" ? _base3.evaluate() : void 0) < 0) {
             innerHTML = "<mfrac><mn>1</mn>" + innerHTML + "</mfrac>";
@@ -4458,7 +4476,8 @@ define("lib/almond", function(){});
         Number: prettyRender.Number,
         Variable: prettyRender.Variable,
         Fraction: prettyRender.Fraction
-      }
+      },
+      C: parse.stringToExpression
     };
   });
 

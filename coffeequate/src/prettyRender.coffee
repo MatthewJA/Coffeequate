@@ -88,7 +88,7 @@ define ->
       "#{@left.renderString()}**#{@bracketIfNeeded(@right).renderString()}"
 
     renderMathML: (equationID, expression) ->
-      "#{@left.renderMathML(equationID, expression)}<msup>#{innerHTML}#{right.toMathML(equationID, expression)}</msup>"
+      "<msup>#{@left.renderMathML(equationID, expression)}#{@right.renderMathML(equationID, expression)}</msup>"
 
 
   class Bracket extends DrawingNode

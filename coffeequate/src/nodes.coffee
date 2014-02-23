@@ -26,9 +26,15 @@ define ["generateInfo"], (generateInfo) ->
 		toLisp: ->
 			return @label
 
-		toMathML: (equationID, expression, equality="0") ->
+		toMathML: (equationID, expression, equality="0", topLevel=false) ->
 			[mathClass, mathID, openingHTML] = generateInfo.getMathMLInfo(equationID, expression, equality)
-			closingHTML = "</math></div>"
+
+			unless topLevel
+				openingHTML = ""
+				closingHTML = ""
+			else
+				closingHTML = "</math></div>"
+
 			return openingHTML + @toDrawingNode().renderMathML(equationID, expression) + closingHTML
 
 		stringEqual: (other) ->
