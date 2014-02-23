@@ -71,7 +71,25 @@
 
 <div class="highlight highlight-javascript"><pre><span class="c1">// If E = mc**2, then what does m equal?</span>
 <span class="nx">E</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">coffeequate</span><span class="p">.</span><span class="nx">Equation</span><span class="p">(</span><span class="s2">"E = m * c ** 2"</span><span class="p">);</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">E</span><span class="p">.</span><span class="nx">solve</span><span class="p">(</span><span class="s2">"m"</span><span class="p">).</span><span class="nx">toString</span><span class="p">());</span> <span class="c1">// m = E/(c**2)</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">E</span><span class="p">.</span><span class="nx">solve</span><span class="p">(</span><span class="s2">"m"</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="nx">toString</span><span class="p">());</span> <span class="c1">// m = E/(c**2)</span>
+</pre></div>
+
+<h4>
+<a name="substituting-an-expression-into-an-equation" class="anchor" href="#substituting-an-expression-into-an-equation"><span class="octicon octicon-link"></span></a>Substituting an expression into an equation</h4>
+
+<div class="highlight highlight-javascript"><pre><span class="c1">// I want to find the equation for velocity of freefall.</span>
+<span class="nx">Ek</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">coffeequate</span><span class="p">.</span><span class="nx">Equation</span><span class="p">(</span><span class="s2">"Ek = 1/2 * m * v**2"</span><span class="p">);</span> <span class="c1">// Kinetic energy</span>
+<span class="nx">Ep</span> <span class="o">=</span> <span class="nx">coffeequate</span><span class="p">.</span><span class="nx">C</span><span class="p">(</span><span class="s2">"m * g * h"</span><span class="p">);</span> <span class="c1">// Gravitational potential energy</span>
+<span class="nx">v</span> <span class="o">=</span> <span class="nx">Ek</span><span class="p">.</span><span class="nx">solve</span><span class="p">(</span><span class="s2">"v"</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span>
+<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">v</span><span class="p">.</span><span class="nx">substituteExpression</span><span class="p">(</span><span class="nx">Ep</span><span class="p">,</span> <span class="s2">"Ek"</span><span class="p">).</span><span class="nx">toString</span><span class="p">());</span> <span class="c1">// v = -1.414213562373095*sqrt(g)*sqrt(h)</span>
+</pre></div>
+
+<h4>
+<a name="simplifying-expressions" class="anchor" href="#simplifying-expressions"><span class="octicon octicon-link"></span></a>Simplifying expressions</h4>
+
+<div class="highlight highlight-javascript"><pre><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span>
+    <span class="nx">coffeequate</span><span class="p">.</span><span class="nx">C</span><span class="p">(</span><span class="s2">"x * (x + y) + -x * y + - (x ** 2)"</span><span class="p">).</span><span class="nx">expandAndSimplify</span><span class="p">().</span><span class="nx">toString</span><span class="p">()</span>
+<span class="p">);</span> <span class="c1">// 0</span>
 </pre></div>
 
 <h2>
