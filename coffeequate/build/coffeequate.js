@@ -447,10 +447,10 @@ define("lib/almond", function(){});
       return ParseError;
 
     })(Error);
-    VARIABLE_REGEX = /^@*[a-zA-Zα-ωΑ-Ω][a-zA-Zα-ωΑ-Ω_\-\d]*$/;
+    VARIABLE_REGEX = /^@*[a-zA-Z\u0391-\u03A9\u03B1-\u03C9][a-zA-Z\u0391-\u03A9\u03B1-\u03C9_\-\d]*$/;
     CONSTANT_REGEX = /^-?\d+(\.\d+)?$/;
     RATIO_REGEX = /^-?\d+(\.\d+)?\/\d+(\.\d+)?$/;
-    SYMBOLIC_CONSTANT_REGEX = /^\\@*[a-zA-Zα-ωΑ-Ω][a-zA-Zα-ωΑ-Ω_\-\d]*$/;
+    SYMBOLIC_CONSTANT_REGEX = /^\\@*[a-zA-Z\u0391-\u03A9\u03B1-\u03C9][a-zA-Z\u0391-\u03A9\u03B1-\u03C9_\-\d]*$/;
     DIMENSIONS_REGEX = /^[^:]*::\{[^:+]*\}$/;
     stringToTerminal = function(string) {
       var segments, terminal, terminals;
