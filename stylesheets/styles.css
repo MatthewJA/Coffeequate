@@ -305,7 +305,11 @@ a.buttons {
 }
 
 a.github {
-	background: url(../images/octocat-small.png) no-repeat 1px;
+  background: url(../images/octocat-small.png) no-repeat 1px;
+}
+
+a.issues {
+	background: url(../images/issues.png) no-repeat 1px;
 }
 
 a.buttons:hover {
