@@ -577,12 +577,9 @@ define [
 							power.denominator *= -1
 							power.numerator *= -1
 						if power.numerator < 0
-							if Math.abs(power.numerator/power.denominator) - 1 > 0.000001
-								bottom.push(new Pow(child.children.left,
-														new terminals.Constant(power.numerator, -power.denominator)).
-																						toDrawingNode())
-							else
-								bottom.push(child.children.left.toDrawingNode())
+							bottom.push(new Pow(child.children.left,
+													new terminals.Constant(power.numerator, -power.denominator)).
+																					toDrawingNode())
 						else
 							top.push(child.toDrawingNode())
 					else

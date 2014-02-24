@@ -429,6 +429,8 @@ define [
 
 			if @children.right instanceof terminals.Constant
 				if @children.right.numerator == 1
+					if @children.right.denominator == 1
+						return @children.left.toDrawingNode()
 					if @children.right.denominator > 0
 						return new SurdNode(@children.left.toDrawingNode(), @children.right.denominator)
 					else
