@@ -25,78 +25,71 @@
           <li><a class="buttons github" href="https://github.com/MatthewJA/Coffeequate">View On GitHub</a></li>
         </ul>
 
-        <p class="header">This project is maintained by <a class="header name" href="https://github.com/MatthewJA">MatthewJA</a></p>
+        <p class="header">This project is maintained by <a class="header name" href="https://github.com/MatthewJA">MatthewJA</a> and <a class="header name" href="https://github.com/BuckSchlegeris">BuckSchlegeris</a>.</p>
 
 
       </header>
       <section>
-        <h1>
-<a name="algebra-in-the-browser" class="anchor" href="#algebra-in-the-browser"><span class="octicon octicon-link"></span></a>Algebra in the browser.</h1>
+        <h1><a name="algebra-in-the-browser" class="anchor" href="#algebra-in-the-browser"><span class="octicon octicon-link"></span></a>Algebra in the browser.</h1>
 
-<p>No matter how hard you try, <code>-webkit-calc()</code> is not going to be able to solve an equation. Neither is JavaScript.</p>
+        <p>No matter how hard you try, <code>-webkit-calc()</code> is not going to be able to solve an equation. Neither is JavaScript.</p>
 
-<p>That's where Coffeequate comes in.</p>
+        <p>That's where Coffeequate comes in.</p>
 
-<p>Coffeequate is a computer algebra system (CAS) for JavaScript. It can manipulate algebraic expressions, and solve and simplify equations.</p>
+        <p>Coffeequate is a computer algebra system (CAS) for JavaScript. It can manipulate algebraic expressions, and solve and simplify equations.</p>
 
-<h2>
-<a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
+        <h2><a name="features" class="anchor" href="#features"><span class="octicon octicon-link"></span></a>Features</h2>
 
-<ul>
-<li>Solve quadratic and linear equations.</li>
-<li>Simplify algebraic expressions.</li>
-<li>Propagate uncertainties in an expression.</li>
-<li>Substitute numbers and other expressions into existing expressions.</li>
-<li>Handle variables, constants, and symbolic constants (like π or G).</li>
-</ul><h2>
-<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
+        <ul>
+        <li>Solve quadratic and linear equations.</li>
+        <li>Simplify algebraic expressions.</li>
+        <li>Propagate uncertainties in an expression.</li>
+        <li>Substitute numbers and other expressions into existing expressions.</li>
+        <li>Handle variables, constants, and symbolic constants (like π or G).</li>
+        </ul>
 
-<p>Loading Coffeequate into your webpage is as simple as including it in a script tag:</p>
+        <h2><a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h2>
 
-<div class="highlight highlight-html"><pre><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"text/javascript"</span> <span class="na">src=</span><span class="s">"coffeequate.min.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
-</pre></div>
+        <p>Loading Coffeequate into your webpage is as simple as including it in a script tag:</p>
 
-<p>You can also load it with an AMD loader like <a href="http://requirejs.org/">RequireJS</a>:</p>
+        <div class="highlight highlight-html"><pre><span class="nt">&lt;script </span><span class="na">type=</span><span class="s">"text/javascript"</span> <span class="na">src=</span><span class="s">"coffeequate.min.js"</span><span class="nt">&gt;&lt;/script&gt;</span>
+        </pre></div>
 
-<div class="highlight highlight-javascript"><pre><span class="nx">define</span><span class="p">([</span><span class="s2">"lib/coffeequate.min"</span><span class="p">],</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">coffeequate</span><span class="p">)</span> <span class="p">{</span>
-    <span class="c1">// Use Coffeequate here!</span>
-<span class="p">});</span>
-</pre></div>
+        <p>You can also load it with an AMD loader like <a href="http://requirejs.org/">RequireJS</a>:</p>
 
-<h3>
-<a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h3>
+        <div class="highlight highlight-javascript"><pre><span class="nx">define</span><span class="p">([</span><span class="s2">"lib/coffeequate.min"</span><span class="p">],</span> <span class="kd">function</span> <span class="p">(</span><span class="nx">coffeequate</span><span class="p">)</span> <span class="p">{</span>
+            <span class="c1">// Use Coffeequate here!</span>
+        <span class="p">});</span>
+        </pre></div>
 
-<h4>
-<a name="solving-an-equation" class="anchor" href="#solving-an-equation"><span class="octicon octicon-link"></span></a>Solving an equation</h4>
+        <h3><a name="examples" class="anchor" href="#examples"><span class="octicon octicon-link"></span></a>Examples</h3>
 
-<div class="highlight highlight-javascript"><pre><span class="c1">// If E = mc**2, then what does m equal?</span>
-<span class="nx">E</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">coffeequate</span><span class="p">.</span><span class="nx">Equation</span><span class="p">(</span><span class="s2">"E = m * c ** 2"</span><span class="p">);</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">E</span><span class="p">.</span><span class="nx">solve</span><span class="p">(</span><span class="s2">"m"</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="nx">toString</span><span class="p">());</span> <span class="c1">// m = E/(c**2)</span>
-</pre></div>
+        <h4><a name="solving-an-equation" class="anchor" href="#solving-an-equation"><span class="octicon octicon-link"></span></a>Solving an equation</h4>
 
-<h4>
-<a name="substituting-an-expression-into-an-equation" class="anchor" href="#substituting-an-expression-into-an-equation"><span class="octicon octicon-link"></span></a>Substituting an expression into an equation</h4>
+        <div class="highlight highlight-javascript"><pre><span class="c1">// If E = mc**2, then what does m equal?</span>
+        <span class="nx">E</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">coffeequate</span><span class="p">.</span><span class="nx">Equation</span><span class="p">(</span><span class="s2">"E = m * c ** 2"</span><span class="p">);</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">E</span><span class="p">.</span><span class="nx">solve</span><span class="p">(</span><span class="s2">"m"</span><span class="p">)[</span><span class="mi">0</span><span class="p">].</span><span class="nx">toString</span><span class="p">());</span> <span class="c1">// m = E/(c**2)</span>
+        </pre></div>
 
-<div class="highlight highlight-javascript"><pre><span class="c1">// I want to find the equation for velocity of freefall.</span>
-<span class="nx">Ek</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">coffeequate</span><span class="p">.</span><span class="nx">Equation</span><span class="p">(</span><span class="s2">"Ek = 1/2 * m * v**2"</span><span class="p">);</span> <span class="c1">// Kinetic energy</span>
-<span class="nx">Ep</span> <span class="o">=</span> <span class="nx">coffeequate</span><span class="p">.</span><span class="nx">C</span><span class="p">(</span><span class="s2">"m * g * h"</span><span class="p">);</span> <span class="c1">// Gravitational potential energy</span>
-<span class="nx">v</span> <span class="o">=</span> <span class="nx">Ek</span><span class="p">.</span><span class="nx">solve</span><span class="p">(</span><span class="s2">"v"</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span>
-<span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">v</span><span class="p">.</span><span class="nx">substituteExpression</span><span class="p">(</span><span class="nx">Ep</span><span class="p">,</span> <span class="s2">"Ek"</span><span class="p">).</span><span class="nx">toString</span><span class="p">());</span> <span class="c1">// v = -1.414213562373095*sqrt(g)*sqrt(h)</span>
-</pre></div>
+        <h4><a name="substituting-an-expression-into-an-equation" class="anchor" href="#substituting-an-expression-into-an-equation"><span class="octicon octicon-link"></span></a>Substituting an expression into an equation</h4>
 
-<h4>
-<a name="simplifying-expressions" class="anchor" href="#simplifying-expressions"><span class="octicon octicon-link"></span></a>Simplifying expressions</h4>
+        <div class="highlight highlight-javascript"><pre><span class="c1">// I want to find the equation for velocity of freefall.</span>
+        <span class="nx">Ek</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">coffeequate</span><span class="p">.</span><span class="nx">Equation</span><span class="p">(</span><span class="s2">"Ek = 1/2 * m * v**2"</span><span class="p">);</span> <span class="c1">// Kinetic energy</span>
+        <span class="nx">Ep</span> <span class="o">=</span> <span class="nx">coffeequate</span><span class="p">.</span><span class="nx">C</span><span class="p">(</span><span class="s2">"m * g * h"</span><span class="p">);</span> <span class="c1">// Gravitational potential energy</span>
+        <span class="nx">v</span> <span class="o">=</span> <span class="nx">Ek</span><span class="p">.</span><span class="nx">solve</span><span class="p">(</span><span class="s2">"v"</span><span class="p">)[</span><span class="mi">0</span><span class="p">];</span>
+        <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">v</span><span class="p">.</span><span class="nx">substituteExpression</span><span class="p">(</span><span class="nx">Ep</span><span class="p">,</span> <span class="s2">"Ek"</span><span class="p">).</span><span class="nx">toString</span><span class="p">());</span> <span class="c1">// v = -1.414213562373095*sqrt(g)*sqrt(h)</span>
+        </pre></div>
 
-<div class="highlight highlight-javascript"><pre><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span>
-    <span class="nx">coffeequate</span><span class="p">.</span><span class="nx">C</span><span class="p">(</span><span class="s2">"x * (x + y) + -x * y + - (x ** 2)"</span><span class="p">).</span><span class="nx">expandAndSimplify</span><span class="p">().</span><span class="nx">toString</span><span class="p">()</span>
-<span class="p">);</span> <span class="c1">// 0</span>
-</pre></div>
+        <h4><a name="simplifying-expressions" class="anchor" href="#simplifying-expressions"><span class="octicon octicon-link"></span></a>Simplifying expressions</h4>
 
-<h2>
-<a name="upcoming-features" class="anchor" href="#upcoming-features"><span class="octicon octicon-link"></span></a>Upcoming Features</h2>
+        <div class="highlight highlight-javascript"><pre><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span>
+            <span class="nx">coffeequate</span><span class="p">.</span><span class="nx">C</span><span class="p">(</span><span class="s2">"x * (x + y) + -x * y + - (x ** 2)"</span><span class="p">).</span><span class="nx">expandAndSimplify</span><span class="p">().</span><span class="nx">toString</span><span class="p">()</span>
+        <span class="p">);</span> <span class="c1">// 0</span>
+        </pre></div>
 
-<h2>
-<a name="frequently-asked-questions" class="anchor" href="#frequently-asked-questions"><span class="octicon octicon-link"></span></a>Frequently Asked Questions</h2>
+        <h2><a name="upcoming-features" class="anchor" href="#upcoming-features"><span class="octicon octicon-link"></span></a>Upcoming Features</h2>
+
+        <h2><a name="frequently-asked-questions" class="anchor" href="#frequently-asked-questions"><span class="octicon octicon-link"></span></a>Frequently Asked Questions</h2>
       </section>
       <footer>
         <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
