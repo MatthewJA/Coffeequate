@@ -56,5 +56,14 @@ console.log(
 ```
 
 ## Upcoming Features
+We plan to add lots of things!
+
+* Differentiation. This already exists, but needs refining!
+* Trigonometry and other functions.
+* Support for fancier equations.
+* Better parsing of expressions.
 
 ## Frequently Asked Questions
+
+### I put an expression into `coffeequate.C`, and half of it didn't get read at all!
+The most likely cause is that Coffeequate's parser doesn't yet support subtraction. Replace your `-` signs with `+ -` and it should work!
