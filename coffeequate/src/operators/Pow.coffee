@@ -226,7 +226,7 @@ define [
 			else
 				return expr.solve(variable, equivalencies)
 
-		sub: (substitutions, uncertaintySubstitutions, equivalencies=null, assumeZeroUncertainty=false) ->
+		sub: (substitutions, uncertaintySubstitutions, equivalencies=null, assumeZeroUncertainty=false, evaluateSymbolicConstants=false) ->
 			# subtitutions: {variable: value}
 			# variable is a label, value is any object - if it is a node,
 			# it will be substituted in; otherwise it is interpreted as a
@@ -253,7 +253,7 @@ define [
 				unless subbed
 					left = @children.left.copy()
 			else if @children.left.sub?
-				left = @children.left.sub(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty)
+				left = @children.left.sub(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty, evaluateSymbolicConstants)
 			else
 				left = @children.left.copy()
 
@@ -268,7 +268,7 @@ define [
 				unless subbed
 					right = @children.right.copy()
 			else if @children.right.sub?
-				right = @children.right.sub(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty)
+				right = @children.right.sub(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty, evaluateSymbolicConstants)
 			else
 				right = @children.right.copy()
 

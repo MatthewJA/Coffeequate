@@ -396,7 +396,7 @@ define [
 
 			return new Mul(children...)
 
-		sub: (substitutions, uncertaintySubstitutions, equivalencies=null, assumeZeroUncertainty=false) ->
+		sub: (substitutions, uncertaintySubstitutions, equivalencies=null, assumeZeroUncertainty=false, evaluateSymbolicConstants=false) ->
 			# subtitutions: {variable: value}
 			# variable is a label, value is any object - if it is a node,
 			# it will be substituted in; otherwise it is interpreted as a
@@ -424,7 +424,7 @@ define [
 						children.push(child.copy())
 				else if child.sub?
 					console.log assumeZeroUncertainty
-					children.push(child.sub(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty))
+					children.push(child.sub(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty, evaluateSymbolicConstants))
 				else
 					children.push(child.copy())
 

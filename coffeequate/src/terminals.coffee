@@ -1,4 +1,4 @@
-define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo, nodes, prettyRender) ->
+define ["parse", "generateInfo", "nodes", "prettyRender", "constants"], (parse, generateInfo, nodes, prettyRender, constants) ->
 
 	# Terminals for the equation tree.
 
@@ -180,8 +180,11 @@ define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo,
 		getAllVariables: ->
 			[]
 
-		sub: (substitutions, uncertaintySubstitutions) ->
-			@copy()
+		sub: (substitutions, uncertaintySubstitutions, equivalencies=null, assumeZeroUncertainty=false, evaluateSymbolicConstants=false) ->
+			unless evaluateSymbolicConstants
+				return @copy()
+			if @label of constants
+				return new Constant(constants[@label])
 
 		simplify: ->
 			@copy()
@@ -225,7 +228,7 @@ define ["parse", "generateInfo", "nodes", "prettyRender"], (parse, generateInfo,
 
 		toDrawingNode: ->
 			VariableNode = prettyRender.Variable
-			return new VariableNode(@label, "symbolic-constant")
+			return new VariableNode(@label, "constant symbolic-constant")
 
 		differentiate: (variable) ->
 			return new Constant(0)

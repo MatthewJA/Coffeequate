@@ -65,8 +65,8 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 					rightVars.unshift(variable)
 			return rightVars
 
-		sub: (substitutions, uncertainties, equivalencies, assumeZeroUncertainty=false) ->
-			return new Equation(@left, @right.sub(substitutions, uncertainties, equivalencies, assumeZeroUncertainty))
+		sub: (substitutions, uncertainties, equivalencies, assumeZeroUncertainty=false, evaluate=false) ->
+			return new Equation(@left, @right.sub(substitutions, uncertainties, equivalencies, assumeZeroUncertainty, evaluate))
 
 		substituteExpression: (source, variable, equivalencies, eliminate=false) ->
 			# Substitute an equation or expression into a variable in this equation.
