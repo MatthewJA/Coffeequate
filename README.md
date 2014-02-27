@@ -1,7 +1,7 @@
 Coffeequate
 ===========
 
-A computer algebra system for JavaScript.
+A computer algebra system for JavaScript. More information at [the webpage](http://matthewja.com/Coffeequate).
 
 ## Installation
 Include Coffeequate with an AMD loader. It provides a `coffeequate` object, with a `parse` object, an `Equation` object, and some exposed `tree` code.
