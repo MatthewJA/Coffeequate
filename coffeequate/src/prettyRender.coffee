@@ -104,8 +104,8 @@ define ->
       return "(#{@contents.renderString()})"
 
     renderMathML: (equationID, expression) ->
-      return "<mfenced>#{@contents.renderMathML(equationID, expression)}" +
-                                                                "</mfenced>"
+      return "<mfenced><mrow>#{@contents.renderMathML(equationID, expression)}" +
+                                                                "</mrow></mfenced>"
 
   class Number extends DrawingNode
     constructor: (@value) ->
@@ -219,7 +219,7 @@ define ->
 
     renderMathML: (x...)->
       dummy = new Variable(@label)
-      return "&sigma;[#{dummy.renderMathML(x...)}]"
+      return "<msub><mo>&sigma;</mo>#{dummy.renderMathML(x...)}</msub>"
 
 
   return {

@@ -949,7 +949,7 @@ define("lib/almond", function(){});
       };
 
       Bracket.prototype.renderMathML = function(equationID, expression) {
-        return ("<mfenced>" + (this.contents.renderMathML(equationID, expression))) + "</mfenced>";
+        return ("<mfenced><mrow>" + (this.contents.renderMathML(equationID, expression))) + "</mrow></mfenced>";
       };
 
       return Bracket;
@@ -1118,7 +1118,7 @@ define("lib/almond", function(){});
         var dummy, x;
         x = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
         dummy = new Variable(this.label);
-        return "&sigma;[" + (dummy.renderMathML.apply(dummy, x)) + "]";
+        return "<msub><mo>&sigma;</mo>" + (dummy.renderMathML.apply(dummy, x)) + "</msub>";
       };
 
       return Uncertainty;
