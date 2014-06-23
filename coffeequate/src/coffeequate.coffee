@@ -3,23 +3,20 @@
 require.config
 		baseUrl: "./"
 
-define ["Equation", "operators", "terminals", "parse", "uncertainties", "prettyRender"], (Equation, operators, terminals, parse, uncertainties, prettyRender) ->
+define ["operators", "Expression", "parse"], (operators, Expression, parse) ->
 
-	return {
-		# Public interface for Coffeequate.
-		Equation: Equation
-		tree:
-			operators: operators
-			terminals: terminals
-		parse: parse
-		prettyRender:
-			DrawingNode: prettyRender.DrawingNode
-			Add: prettyRender.Add
-			Mul: prettyRender.Mul
-			Power: prettyRender.Power
-			Bracket: prettyRender.Bracket
-			Number: prettyRender.Number
-			Variable: prettyRender.Variable
-			Fraction: prettyRender.Fraction
-		C: parse.stringToExpression
-	}
+	# This defines the CQ function, which converts inputs into Expressions.
+	# (Public interface for Coffeequate - this is all that the user will see!)
+
+	return (args...) ->
+		if args.length == 1 and (typeof args[0] == "string" or args[0] instanceof String)
+			# Parse as complete expression or equation.
+			if /\=/.test(args[0])
+				# This is an equation.
+				[left, right] = args[0].split("=")
+				val = new operators.Add(parse.stringToExpression(right),
+						new operators.Mul(parse.stringToExpression(left), "-1"))
+				return new Expression(val)
+			else
+				# This is an expression.
+				return new Expression(args[0])
