@@ -15,4 +15,16 @@ define ["parse", "nodes"], (parse, nodes) ->
 		toString: ->
 			@expr.toString()
 
+		solve: (variable) ->
+			# TODO: Equivalencies.
+			@expr.solve(variable)
+
+		sub: (substitutions) ->
+			# TODO: Uncertainties, equivalencies, options.
+			# TODO: Seems that the way I implemented substituting expressions was different last time for no real reason. Fix.
+			@expr.sub(substitutions, null, null).simplify()
+
+		simplify: ->
+			@expr.simplify()
+
 	return Expression
