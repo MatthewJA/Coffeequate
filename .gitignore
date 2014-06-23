@@ -5,6 +5,7 @@
 
 ### Editor Specific ###
 *.sublime-workspace
+.DS_Store/*
 
 ### Libraries ###
 !coffeequate/src/lib/**/*.js

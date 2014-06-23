@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Coffeequate Test Page</title>
+	<script src="./lib/require.js"></script>
+	<script>
+		require.config({
+			baseUrl: ".",
+			paths: {
+				"coffeequate": "../coffeequate.min"
+			}
+		});
+
+		require( ["coffeequate"], function(CQ) {
+			window.CQ = CQ;
+		});
+	</script>
+</head>
+<body>
+</body>
+</html>
