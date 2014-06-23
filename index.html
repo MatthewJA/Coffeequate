@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Coffeequate</title>
+
+    <meta charset="utf-8">
+    <link href='http://fonts.googleapis.com/css?family=Oxygen' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" type="text/css" href="stylesheets/css3reset.css">
+    <link rel="stylesheet" type="text/css" href="stylesheets/styles.css">
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+    <script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css"></script>
+    <style type="text/css">
+      #title img {
+        margin: 20pt auto 10pt auto;
+        display: block;
+      }
+      #authors {
+        text-align: center;
+      }
+      section article p, section article ul {
+        padding-left: 20pt;
+      }
+      section article ul {
+        margin-left: 20pt;
+      }
+      .cb {
+        display: block;
+        margin: 10pt auto;
+      }
+    </style>
+  </head>
+  <body>
+    <header id="title">
+      <h1>Coffeequate</h1>
+      A computer algebra system for JavaScript.
+      <img src="images/coffeequate_small.png" alt="Coffeequate">
+
+      <nav>
+        <a href="https://github.com/MatthewJA/Coffeequate/releases">Releases</a> -
+        <a href="https://github.com/MatthewJA/Coffeequate">GitHub</a> -
+        <a href="https://github.com/MatthewJA/Coffeequate/issues">Issues</a>
+      </nav>
+    </header>
+
+    <section>
+      <header><h2>Algebra in the browser</h2></header>
+      <article>
+        <p>
+          No matter how hard you try, `-webkit-calc()` is not going to be able to solve an equation. Neither is JavaScript.
+
+          That's where Coffeequate comes in.
+
+          Coffeequate is a computer algebra system (CAS) for JavaScript. It can manipulate algebraic expressions, and solve and simplify equations.
+        </p>
+      </article>
+
+      <header><h2>Features</h2></header>
+      <article>
+        <ul>
+          <li>Solve quadratic and linear equations.</li>
+          <li>Simplify most algebraic expressions.</li>
+          <li>Propagate uncertainties in an expression.</li>
+          <li>Substitute numbers and other expressions into existing expressions.</li>
+          <li>Handle variables, constants, and symbolic constants (like π or G).</li>
+        </ul>
+      </article>
+
+      <header><h2>Usage</h2></header>
+      <article>
+        <header><h3>Installation</h3></header>
+        <p>
+          To include Coffeequate on your page, just use a script tag:
+          <code class="cb prettyprint">
+            &lt;script type="text/javascript" src="coffeequate.min.js"&gt;&lt;/script&gt;
+          </code>
+
+          You can also load it with an AMD loader like <a href="http://requirejs.org/">RequireJS</a>.
+          <code class="cb prettyprint">
+            define(["lib/coffeequate.min"], function (CQ) {<br>
+              // Use Coffeequate here!<br>
+            });
+          </code>
+        </p>
+
+        <header><h3>Using Coffeequate</h3></header>
+        <p>
+          Coffeequate gives you a <code class="prettyprint">CQ</code> function (or <code class="prettyprint">coffeequate</code> if you'd prefer). This function converts strings to Coffeequate expressions, which you can then operate on with methods.
+
+          <code class="cb prettyprint">
+            equ = CQ("Ek = 1/2 * m * v**2");<br>
+            m = equ.solve("m"); // 2 * Ek * v**-2<br><br>
+            expr = CQ("m * c**2");<br>
+            expr = expr.sub({"m": CQ("F * a**-1"), "c": 100}); // 100 * F * a**-1
+          </code>
+
+          The methods of an expression are listed below.
+          <ul>
+            <li><code class="prettyprint">expr.sub(substitutions)</code> - Takes an object mapping variable names to values, and returns a new expression with each variable replaced by its value. Values can be numbers, other variables, or even other expressions.</li>
+            <li><code class="prettyprint">expr.solve(variable)</code> - Takes the name of a variable as a string, and returns the expression solved for this variable. Expressions are automatically equated to zero.</li>
+            <li><code class="prettyprint">expr.simplify()</code> - Return a simplified version of the expression.</li>
+          </ul>
+        </p>
+      </article>
+    </section>
+
+      <div id="authors">This project is maintained by <a href="http://matthewja.com/">Matthew Alger</a> and <a href="https://github.com/bshlgrs">Buck Shlegeris</a>.</div><br>
+
+  </body>
+</html>
