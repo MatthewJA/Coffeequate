@@ -24,26 +24,26 @@ define ["terminals", "nodes", "operators", "parse"], (terminals, nodes, operator
 								@right = parse.stringToExpression(sides[1])
 								@right = @right.simplify()
 							else
-								throw new Error("Too many '=' signs.")
+								throw new Error("Too many `=' signs.")
 					else if args[0] instanceof terminals.Terminal or args[0] instanceof nodes.BasicNode
 						@left = new terminals.Constant("0")
 						@right = args[0].copy()
 					else
-						throw new Error("Argument #{args[0]} must be a String, Terminal, or Node.")
+						throw new Error("Argument `#{args[0]}' must be a String, Terminal, or Node.")
 				when 2
 					if args[0] instanceof String or typeof args[0] == "string"
 						@left = parse.stringToTerminal(args[0])
 					else if args[0] instanceof terminals.Terminal or args[0] instanceof nodes.BasicNode
 						@left = args[0].copy()
 					else
-						throw new Error("Argument #{args[0]} must be a String, Terminal, or Node.")
+						throw new Error("Argument `#{args[0]}' must be a String, Terminal, or Node.")
 					if args[1] instanceof String or typeof args[1] == "string"
 						@right = parse.stringToExpression(args[1])
 						@right = @right.simplify()
 					else if args[1] instanceof terminals.Terminal or args[1] instanceof nodes.BasicNode
 						@right = args[1].copy()
 					else
-						throw new Error("Argument #{args[1]} must be a String, Terminal, or Node.")
+						throw new Error("Argument `#{args[1]}' must be a String, Terminal, or Node.")
 				else
 					throw new Error("Too many arguments.")
 
