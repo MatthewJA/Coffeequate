@@ -19,7 +19,7 @@
       #authors {
         text-align: center;
       }
-      section article p, section article ul {
+      section article p, section article ul, .indent {
         padding-left: 20pt;
       }
       section article ul {
@@ -98,18 +98,40 @@
           The methods of an expression are listed below.
           <ul>
             <li><code class="prettyprint">expr.sub(substitutions)</code> - Takes an object mapping variable names to values, and returns a new expression with each variable replaced by its value. Values can be numbers, other variables, or even other expressions.</li>
-            <li><code class="prettyprint">expr.solve(variable)</code> - Takes the name of a variable as a string, and returns the expression solved for this variable. Expressions are automatically equated to zero.</li>
+            <li><code class="prettyprint">expr.solve(variable)</code> - Takes the name of a variable as a string, and returns the expression solved for this variable as an array of solutions. Expressions are automatically equated to zero.</li>
             <li><code class="prettyprint">expr.simplify()</code> - Return a simplified version of the expression.</li>
+            <li><code class="prettyprint">expr.toMathML()</code> - Return a MathML string of the expression.</li>
+            <li><code class="prettyprint">expr.toLaTeX()</code> - Return a LaTeX string of the expression.</li>
+            <li><code class="prettyprint">expr.copy()</code> - Recursively deep-copy the expression.</li>
           </ul>
         </p>
       </article>
 
-      <header><h2>Demo</h2></header>
+      <header><h2>Examples and REPL</h2></header>
       <article>
+        <header><h3>REPL</h3></header>
         <p>
           Here's a JS REPL with Coffeequate already loaded. Try it out!
         </p>
         <div id="repl"></div>
+      </article>
+      <article>
+        <header><h3>Examples</h3></header>
+        <p>
+          Here are some examples of Coffeequate in use.
+        </p>
+
+        <div class="indent">
+          <h4>Finding freefall speed</h4>
+          <code class="cb prettyprint">
+            kineticEnergy = CQ("Ek = 1/2 * m * v**2");<br>
+            potentialEnergy = CQ("Ep = m * g * h");<br>
+            // Substitute the potential energy into the kinetic energy.<br>
+            // Then solve for v.<br>
+            v = kineticEnergy.sub({Ek: potentialEnergy.solve("Ep")[0]}).solve("v");<br>
+            v.toString(); // -1*sqrt(g*h*m)/sqrt(m/2), sqrt(g*h*m)/sqrt(m/2)
+          </code>
+        </div>
       </article>
     </section>
 
