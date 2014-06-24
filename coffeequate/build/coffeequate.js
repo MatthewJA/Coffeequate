@@ -2652,7 +2652,7 @@ define("lib/almond", function(){});
           evaluateSymbolicConstants = false;
         }
         for (variable in substitutions) {
-          if (!(substitutions[variable] instanceof terminals.Terminal || substitutions[variable] instanceof nodes.BasicNode)) {
+          if (substitutions[variable].copy == null) {
             substitutions[variable] = new terminals.Constant(substitutions[variable]);
           }
         }
@@ -3355,7 +3355,7 @@ define("lib/almond", function(){});
           evaluateSymbolicConstants = false;
         }
         for (variable in substitutions) {
-          if (!(substitutions[variable] instanceof terminals.Terminal || substitutions[variable] instanceof nodes.BasicNode)) {
+          if (substitutions[variable].copy == null) {
             substitutions[variable] = new terminals.Constant(substitutions[variable]);
           }
         }
@@ -3956,7 +3956,7 @@ define("lib/almond", function(){});
           evaluateSymbolicConstants = false;
         }
         for (variable in substitutions) {
-          if (!(substitutions[variable] instanceof terminals.Terminal || substitutions[variable] instanceof nodes.BasicNode)) {
+          if (substitutions[variable].copy == null) {
             substitutions[variable] = new terminals.Constant(substitutions[variable]);
           }
         }
@@ -4253,7 +4253,7 @@ define("lib/almond", function(){});
       function Expression(val) {
         if (val instanceof String || typeof val === "string") {
           this.expr = parse.stringToExpression(val);
-        } else if (val instanceof nodes.BasicNode) {
+        } else if (val.copy != null) {
           this.expr = val.copy();
         } else {
           throw new Error("Unknown argument: `" + val + "'.");
@@ -4262,6 +4262,31 @@ define("lib/almond", function(){});
 
       Expression.prototype.toString = function() {
         return this.expr.toString();
+      };
+
+      Expression.prototype.solve = function(variable) {
+        return this.expr.solve(variable);
+      };
+
+      Expression.prototype.sub = function(substitutions) {
+        var key, newsubs;
+        newsubs = {};
+        for (key in substitutions) {
+          if (substitutions[key] instanceof Expression) {
+            newsubs[key] = substitutions[key].expr;
+          } else {
+            newsubs[key] = substitutions[key];
+          }
+        }
+        return this.expr.sub(newsubs, null, null).simplify();
+      };
+
+      Expression.prototype.copy = function() {
+        return new Expression(this.expr.copy());
+      };
+
+      Expression.prototype.simplify = function() {
+        return this.expr.simplify();
       };
 
       return Expression;

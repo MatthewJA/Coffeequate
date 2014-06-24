@@ -234,7 +234,7 @@ define [
 
 			# Interpret substitutions.
 			for variable of substitutions
-				unless substitutions[variable] instanceof terminals.Terminal or substitutions[variable] instanceof nodes.BasicNode
+				unless substitutions[variable].copy?
 					substitutions[variable] = new terminals.Constant(substitutions[variable])
 
 			unless equivalencies?

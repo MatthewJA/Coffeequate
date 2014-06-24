@@ -576,7 +576,7 @@ define [
 
 			# Interpret substitutions.
 			for variable of substitutions
-				unless substitutions[variable] instanceof terminals.Terminal or substitutions[variable] instanceof nodes.BasicNode
+				unless substitutions[variable].copy? # All nodes and terminals should implement this.
 					substitutions[variable] = new terminals.Constant(substitutions[variable])
 
 			unless equivalencies?
