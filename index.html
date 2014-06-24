@@ -131,6 +131,14 @@
             v = kineticEnergy.sub({Ek: potentialEnergy.solve("Ep")[0]}).solve("v");<br>
             v.toString(); // -1*sqrt(g*h*m)/sqrt(m/2), sqrt(g*h*m)/sqrt(m/2)
           </code>
+
+          <h4>Finding freefall time</h4>
+          <code class="cb prettyprint">
+            projectile = CQ("s = u * t + 1/2 * a * t**2");<br>
+            freefall = projectile.sub({u: 0, a: CQ("g")});<br>
+            time = freefall.solve("t");<br>
+            time.toString(); // -1*sqrt(s)/sqrt(g/2),sqrt(s)/sqrt(g/2)
+          </code>
         </div>
       </article>
     </section>
