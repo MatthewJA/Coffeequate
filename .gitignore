@@ -8,9 +8,14 @@
 ### Editor Specific ###
 *.sublime-workspace
 .DS_Store/*
+*/**/.DS_Store/*
 
 ### Libraries ###
 !coffeequate/src/lib/**/*.js
+
+### Tests ###
+# This is temporary, while these are outdated.
+coffeequate/tests/*
 
 ### Workspace ###
 progress/*
