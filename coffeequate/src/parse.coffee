@@ -8,10 +8,10 @@ define ["require"], (require) ->
 		toString: ->
 			"Could not parse '#{@input}' as #{@type}"
 
-	VARIABLE_REGEX = /^@*[a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ🍌🐄][a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ🍌🐄_\-\d]*$/
+	VARIABLE_REGEX = /^@*[a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ][a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ_\-\d]*$/
 	CONSTANT_REGEX = /^-?\d+(\.\d+)?(e-?\d+(\.\d+)?)?$/
 	RATIO_REGEX = /^-?\d+(\.\d+)?\/\d+(\.\d+)?$/
-	SYMBOLIC_CONSTANT_REGEX = /^\\@*[a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ🍌🐄][a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ🍌🐄_\-\d]*$/
+	SYMBOLIC_CONSTANT_REGEX = /^\\@*[a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ][a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ_\-\d]*$/
 	DIMENSIONS_REGEX = /^[^:]*::\{[^:+]*\}$/
 
 	stringToTerminal = (string) ->
