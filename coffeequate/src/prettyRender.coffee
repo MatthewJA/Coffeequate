@@ -17,6 +17,62 @@
 # subclasses.
 
 
+#A dictionary of Greek Characters to escape when printing to LaTeX
+greekLatexDictionary = {
+  "α":"\\alpha ",
+  "A":"A",
+  "β":"\\beta ",
+  "B":"B",
+  "χ":"\\chi ",
+  "Δ":"\\Delta ",
+  "δ":"\\delta ",
+  "ε":"\\varepsilon ",
+  "ϵ":"\\epsilon ",
+  "E":"E",
+  "Η":"\\Eta ",
+  "γ":"\\gamma ",
+  "Γ":"\\Gamma ",
+  "ι":"\\iota ",
+  "Ι":"I",
+  "κ":"\\kappa ",
+  "ϰ":"\\varkappa ",
+  "Κ":"K",
+  "λ":"\\lambda ",
+  "Λ":"\\Lambda ",
+  "μ":"\\mu ",
+  "Μ":"M",
+  "ν":"\\nu ",
+  "Ν":"N",
+  "ω":"\\omega ",
+  "Ω":"\\Omega ",
+  "ℴ":"o",
+  "O":"O",
+  "ϕ":"\\phi ",
+  "φ":"\\varphi ",
+  "Φ":"\\Phi ",
+  "π":"\\pi ",
+  "Π":"\\Pi ",
+  "ψ":"\\psi ",
+  "Ψ":"\\Psi ",
+  "ρ":"\\rho ",
+  "Ρ":"P",
+  "σ":"\\sigma ",
+  "ς":"\\varsigma ",
+  "Σ":"\\Sigma ",
+  "τ":"\\tau ",
+  "Τ":"T",
+  "θ":"\\theta ",
+  "Θ":"\\Theta ",
+  "υ":"\\upsilon ",
+  "ξ":"\\xi ",
+  "Ξ":"\\Xi ",
+  "ζ":"\\zeta ",
+  "Ζ":"Z",
+  "ϖ":"\\varpi ",
+  "ϱ":"\\varrho ",
+  "ϑ":"\\vartheta "
+}
+
 define ->
   class DrawingNode
     toString: ->
@@ -129,7 +185,14 @@ define ->
       10
 
     renderLaTeX: ->
-      return @label
+      #Renders the LaTeX checking for Greek characters
+      mlabel = ""
+      for char in @label
+        if char of greekLatexDictionary
+          mlabel+=greekLatexDictionary[char]
+        else
+          mlabel+=char
+      return mlabel
 
     renderString: ->
       return @label
