@@ -19,7 +19,7 @@
 	var $entry = $(entry);
 
 	var style = document.createElement("style");
-	style.innerHTML = ".entry {width: 90%; height: 32px; display: inline-block; font-family: monospace; padding: 0; border: 0; font-size: 28px;}";
+	style.innerHTML = ".entry {width: 90%; height: 32px; display: inline-block; font-family: monospace; padding: 0; border: 0; font-size: 16px;}";
 	style.innerHTML += ".entry:focus {background-color: #EFEFFF;}";
 	style.innerHTML += ".entry-area {width: 100%; height: 32px; border: 1px solid #EAEAEA; padding: 0;}";
 	style.innerHTML += ".entry-button {width: 10%; height: 32px; padding: 0; border: 0; margin: 0; vertical-align: top;}";
@@ -33,16 +33,16 @@
 	var history = [];
 	var positionInHistory = 0
 
-	function submit() {
-		history.push(entry.value);
+	function submit(value) {
+		history.push(value);
 		positionInHistory = history.length;
 		try {
-			var ret = eval(entry.value);
+			var ret = eval(value);
 		} catch (err) {
 			var ret = err.toString();
 		}
 		var li2 = document.createElement("li");
-		li2.innerHTML = prettyPrintOne(entry.value, "js");
+		li2.innerHTML = prettyPrintOne(value, "js");
 		scrollback.appendChild(li2);
 		var li = document.createElement("li");
 		li.innerHTML = "&#8594; " + prettyPrintOne(ret, "js");
@@ -54,7 +54,9 @@
 
 	$entry.on('keydown', function (e) {
 		if (e.keyCode == 13) {
-			submit();
+			if (entry.value) {
+				submit(entry.value);
+			}
 		} else if (e.keyCode == 38) {
 			positionInHistory = Math.max(positionInHistory - 1, 0);
 			$entry.val(history[positionInHistory] || "");
@@ -64,4 +66,8 @@
 		}
 	});
 	entryButton.addEventListener('click', submit);
+
+	submit("1 + 2");
+	submit("CQ(\"(x+y)**2\").simplify()");
+	submit('CQ("(x+y)**2").simplify().toLaTeX()')
 }).call()
