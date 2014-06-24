@@ -23,9 +23,6 @@ define ["generateInfo"], (generateInfo) ->
 		toString: ->
 			return @toDrawingNode().renderString()
 
-		toLisp: ->
-			return @label
-
 		toMathML: ->
 			@toDrawingNode().renderMathML()
 

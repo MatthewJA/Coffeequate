@@ -18,6 +18,9 @@ define ["parse", "nodes"], (parse, nodes) ->
 		toMathML: ->
 			@expr.toMathML()
 
+		toLaTeX: ->
+			@expr.toLaTeX()
+
 		solve: (variable) ->
 			# TODO: Equivalencies.
 			new Expression(@expr.solve(variable))
