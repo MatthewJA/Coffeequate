@@ -60,9 +60,11 @@
 		} else if (e.keyCode == 38) {
 			positionInHistory = Math.max(positionInHistory - 1, 0);
 			$entry.val(history[positionInHistory] || "");
+			event.preventDefault();
 		} else if (e.keyCode == 40) {
 			positionInHistory = Math.min(positionInHistory + 1, history.length);
 			$entry.val(history[positionInHistory] || "");
+			event.preventDefault();
 		}
 	});
 	entryButton.addEventListener('click', submit);
