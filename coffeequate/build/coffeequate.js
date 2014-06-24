@@ -489,10 +489,6 @@ define("lib/almond", function(){});
         return this.toDrawingNode().renderString();
       };
 
-      BasicNode.prototype.toLisp = function() {
-        return this.label;
-      };
-
       BasicNode.prototype.toMathML = function() {
         return this.toDrawingNode().renderMathML();
       };
@@ -1292,13 +1288,6 @@ define("lib/almond", function(){});
           return new NumberNode(this.numerator);
         }
         return new FractionNode(new NumberNode(this.numerator), new NumberNode(this.denominator));
-      };
-
-      Constant.prototype.toLisp = function() {
-        if (this.denominator === 1) {
-          return "" + this.numerator;
-        }
-        return "" + this.numerator + "/" + this.denominator;
       };
 
       Constant.prototype.differentiate = function(variable) {
@@ -3814,6 +3803,10 @@ define("lib/almond", function(){});
 
       Expression.prototype.toMathML = function() {
         return this.expr.toMathML();
+      };
+
+      Expression.prototype.toLaTeX = function() {
+        return this.expr.toLaTeX();
       };
 
       Expression.prototype.solve = function(variable) {

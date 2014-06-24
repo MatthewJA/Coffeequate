@@ -123,7 +123,7 @@ define ->
       return "<mn class=\"constant\">#{@value}</mn>"
 
   class Variable extends DrawingNode
-    constructor: (@label, @class="default") ->
+    constructor: (@label, @classname="variable") ->
 
     bindingStrength: ->
       10
@@ -147,9 +147,9 @@ define ->
       atEnd = "<mrow><mo>" + ("." for i in [0...atCount]).join("") + "</mo></mrow></mover>"
 
       if label.length > 1
-        return atStart + '<msub class="variable"><mi>' + label[0] + '</mi><mi>' + label[1..] + "</mi></msub>" + atEnd
+        return atStart + '<msub class="#{@classname}"><mi>' + label[0] + '</mi><mi>' + label[1..] + "</mi></msub>" + atEnd
       else
-        return '<mi class="variable">' + label + '</mi>'
+        return '<mi class="#{@classname}">' + label + '</mi>'
 
 
   class Fraction extends DrawingNode
