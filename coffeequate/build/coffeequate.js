@@ -590,7 +590,7 @@ define("lib/almond", function(){});
 
     })(Error);
     VARIABLE_REGEX = /^@*[a-zA-Z\u0391-\u03A9\u03B1-\u03C9][a-zA-Z\u0391-\u03A9\u03B1-\u03C9_\-\d]*$/;
-    CONSTANT_REGEX = /^-?\d+(\.\d+)?$/;
+    CONSTANT_REGEX = /^-?\d+(\.\d+)?e-?\d+(\.\d+)?$/;
     RATIO_REGEX = /^-?\d+(\.\d+)?\/\d+(\.\d+)?$/;
     SYMBOLIC_CONSTANT_REGEX = /^\\@*[a-zA-Z\u0391-\u03A9\u03B1-\u03C9][a-zA-Z\u0391-\u03A9\u03B1-\u03C9_\-\d]*$/;
     DIMENSIONS_REGEX = /^[^:]*::\{[^:+]*\}$/;
