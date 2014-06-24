@@ -10,6 +10,7 @@ define ["parse", "nodes"], (parse, nodes) ->
 			else if val.copy?
 				@expr = val.copy()
 			else
+				console.log("Received argument: ", val)
 				throw new Error("Unknown argument: `#{val}'.")
 
 		toString: ->
@@ -23,7 +24,7 @@ define ["parse", "nodes"], (parse, nodes) ->
 
 		solve: (variable) ->
 			# TODO: Equivalencies.
-			new Expression(@expr.solve(variable))
+			(new Expression(solution) for solution in @expr.solve(variable))
 
 		sub: (substitutions) ->
 			# TODO: Uncertainties, equivalencies, options.
