@@ -966,9 +966,9 @@ define("lib/almond", function(){});
     Variable = (function(_super) {
       __extends(Variable, _super);
 
-      function Variable(label, _class) {
+      function Variable(label, classname) {
         this.label = label;
-        this["class"] = _class != null ? _class : "default";
+        this.classname = classname != null ? classname : "variable";
       }
 
       Variable.prototype.bindingStrength = function() {
@@ -1002,9 +1002,9 @@ define("lib/almond", function(){});
           return _results;
         })()).join("") + "</mo></mrow></mover>";
         if (label.length > 1) {
-          return atStart + '<msub class="variable"><mi>' + label[0] + '</mi><mi>' + label.slice(1) + "</mi></msub>" + atEnd;
+          return atStart + '<msub class="' + this.classname + '"><mi>' + label[0] + '</mi><mi>' + label.slice(1) + "</mi></msub>" + atEnd;
         } else {
-          return '<mi class="variable">' + label + '</mi>';
+          return '<mi class="' + this.classname + '">' + label + '</mi>';
         }
       };
 
