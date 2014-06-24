@@ -106,20 +106,6 @@ define ["parse", "generateInfo", "nodes", "prettyRender", "constants"], (parse, 
 		setVariableUnits: (variable, equivalencies, units) ->
 			null
 
-		toMathML2: (equationID, expression=false, equality="0", topLevel=false) ->
-
-			# Return this constant as a MathML string.
-			if topLevel
-				[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
-				closingHTML = "</math></div>"
-			else
-				html = ""
-				closingHTML = ""
-
-			if @denominator == 1
-				return html + "<mn class=\"constant\">#{@numerator}</mn>" + closingHTML
-			return html + "<mfrac class=\"constant\"><mrow><mn>#{@numerator}</mn></mrow><mrow><mn>#{@denominator}</mn></mrow></mfrac>" + closingHTML
-
 		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return this constant as an HTML string.
 			[mathClass, mathID, html] = generateInfo.getHTMLInfo(equationID, expression, equality)
@@ -215,16 +201,6 @@ define ["parse", "generateInfo", "nodes", "prettyRender", "constants"], (parse, 
 				html = ""
 				closingHTML = ""
 			return html + "<span class=\"constant symbolic-constant\">" + @toString() + "</span>" + closingHTML
-
-		toMathML2: (equationID, expression=false, equality="0", topLevel=false) ->
-			if topLevel
-				[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
-				closingHTML = "</math></div>"
-			else
-				html = ""
-				closingHTML = ""
-
-			"#{html}<mn class=\"constant symbolic-constant\">#{@label}</mn>#{closingHTML}"
 
 		toDrawingNode: ->
 			VariableNode = prettyRender.Variable
@@ -325,36 +301,6 @@ define ["parse", "generateInfo", "nodes", "prettyRender", "constants"], (parse, 
 		expandAndSimplify: ->
 			@copy()
 
-		toMathML2: (equationID, expression=false, equality="0", topLevel=false) ->
-			# Return the variable as a MathML string.
-			if topLevel
-				[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
-				closingHTML = "</math></div>"
-			else
-				html = ""
-				closingHTML = ""
-
-			# The ID of the variable will wind up being variable-equation/expression-equationID-@label
-			# E.g. variable-expression-1-p-0
-
-			# Strip the ID off of the variable, if it has one.
-			labelArray = @label.split("-")
-			label = labelArray[0]
-			labelID = if labelArray[1]? then 'id="variable-' + (if expression then "expression" else "equation") + "-#{equationID}-" + @label + '"' else ""
-
-			atCount = 0
-			while label[0] == "@"
-				atCount += 1
-				label = label[1..]
-
-			atStart = "<mover accent=\"true\">"
-			atEnd = "<mrow><mo>" + ("." for i in [0...atCount]).join("") + "</mo></mrow></mover>"
-
-			if label.length > 1
-				return html + atStart + '<msub class="variable"' + labelID + '><mi>' + label[0] + '</mi><mi>' + label[1..] + "</mi></msub>" + atEnd + closingHTML
-			else
-				return html + atStart + '<mi class="variable"' + labelID + '>' + label + '</mi>' + atEnd + closingHTML
-
 		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return an HTML string representing the variable.
 			if topLevel
@@ -452,10 +398,6 @@ define ["parse", "generateInfo", "nodes", "prettyRender", "constants"], (parse, 
 		toHTML: (args...) ->
 			dummyVar = new Variable("σ#{@label}")
 			return dummyVar.toHTML(args...)
-
-		toMathML2: ->
-			dummyVar = new Variable("σ(#{label})")
-			return dummyVar.toMathML2(arguments)
 
 		toDrawingNode: ->
 			UncertaintyNode = prettyRender.Uncertainty

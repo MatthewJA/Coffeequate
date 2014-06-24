@@ -354,45 +354,6 @@ define [
 
 			return results
 
-		toMathML2: (equationID, expression=false, equality="0", topLevel=false) ->
-			Mul = require("operators/Mul")
-			Add = require("operators/Add")
-
-			# Return a MathML string representing this node.
-			# This code was partially lifted from the (delightfully uncommented) predecessor
-			# to Coffeequate, MatthewJA/JS-Algebra.
-			# There's a few peculiarities, but for the most part it seems to work.
-			[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
-
-			unless topLevel
-				html = ""
-				closingHTML = ""
-			else
-				closingHTML = "</math></div>"
-
-			if @children.right.evaluate?() == 1
-				return html + @children.left.toMathML2(equationID, expression) + closingHTML
-			else if @children.right.evaluate?() == 0
-				return html + "<mn>1</mn>" + closingHTML
-			else
-				if @children.right.evaluate?() < 0
-					right = @children.right.copy()
-					right = new Mul("-1", right)
-					right = right.expandAndSimplify()
-				else
-					right = @children.right.copy()
-
-				# Fence if lower precedence, i.e. Add or Mul.
-				if @children.left instanceof Add or @children.left instanceof Mul
-					innerHTML = "<mfenced>#{@children.left.toMathML2(equationID, expression)}</mfenced>"
-				else
-					innerHTML = "#{@children.left.toMathML2(equationID, expression)}"
-				unless right.evaluate?() == 1
-					innerHTML = "<msup>#{innerHTML}#{right.toMathML2(equationID, expression)}</msup>"
-				if @children.right.evaluate?() < 0
-					innerHTML = "<mfrac><mn>1</mn>#{innerHTML}</mfrac>"
-				return html + innerHTML + closingHTML
-
 		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return an HTML string representing this node.
 			[mathClass, mathID, html] = generateInfo.getHTMLInfo(equationID, expression, equality)

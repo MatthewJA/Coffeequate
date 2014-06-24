@@ -638,22 +638,6 @@ define [
 
 			return results
 
-		toMathML2: (equationID, expression=false, equality="0", topLevel=false) ->
-			# Return a MathML string representing this node.
-			[mathClass, mathID, html] = generateInfo.getMathMLInfo(equationID, expression, equality)
-
-			unless topLevel
-				html = ""
-				closingHTML = ""
-			else
-				closingHTML = "</math></div>"
-
-			return html + "<mrow>" + @children.map(
-				(child) ->
-					# Don't fence addition nodes.
-					child.toMathML2(equationID, expression)
-				).join("<mo>+</mo>") + "</mrow>" + closingHTML
-
 		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
 			# Return an HTML string representing this node.
 			[mathClass, mathID, html] = generateInfo.getHTMLInfo(equationID, expression, equality)
