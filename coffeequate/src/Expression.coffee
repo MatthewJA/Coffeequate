@@ -15,9 +15,12 @@ define ["parse", "nodes"], (parse, nodes) ->
 		toString: ->
 			@expr.toString()
 
+		toMathML: ->
+			@expr.toMathML()
+
 		solve: (variable) ->
 			# TODO: Equivalencies.
-			@expr.solve(variable)
+			new Expression(@expr.solve(variable))
 
 		sub: (substitutions) ->
 			# TODO: Uncertainties, equivalencies, options.
@@ -31,12 +34,12 @@ define ["parse", "nodes"], (parse, nodes) ->
 				else
 					newsubs[key] = substitutions[key]
 
-			return @expr.sub(newsubs, null, null).simplify()
+			return new Expression(@expr.sub(newsubs, null, null).simplify())
 
 		copy: ->
 			new Expression(@expr.copy())
 
 		simplify: ->
-			@expr.simplify()
+			new Expression(@expr.simplify())
 
 	return Expression

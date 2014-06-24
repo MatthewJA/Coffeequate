@@ -493,22 +493,8 @@ define("lib/almond", function(){});
         return this.label;
       };
 
-      BasicNode.prototype.toMathML = function(equationID, expression, equality, topLevel) {
-        var closingHTML, mathClass, mathID, openingHTML, _ref;
-        if (equality == null) {
-          equality = "0";
-        }
-        if (topLevel == null) {
-          topLevel = false;
-        }
-        _ref = generateInfo.getMathMLInfo(equationID, expression, equality), mathClass = _ref[0], mathID = _ref[1], openingHTML = _ref[2];
-        if (!topLevel) {
-          openingHTML = "";
-          closingHTML = "";
-        } else {
-          closingHTML = "</math></div>";
-        }
-        return openingHTML + this.toDrawingNode().renderMathML(equationID, expression) + closingHTML;
+      BasicNode.prototype.toMathML = function() {
+        return this.toDrawingNode().renderMathML();
       };
 
       BasicNode.prototype.stringEqual = function(other) {
@@ -815,7 +801,7 @@ define("lib/almond", function(){});
       };
 
       DrawingNode.prototype.bracketIfNeeded = function(child) {
-        if (child.bindingStrength() <= this.bindingStrength()) {
+        if (child.bindingStrength <= this.bindingStrength()) {
           return new Bracket(child);
         }
         return child;
@@ -829,7 +815,7 @@ define("lib/almond", function(){});
       terms = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
       node = new this();
       terms = terms.map(function(x) {
-        if (x.bindingStrength() <= node.bindingStrength()) {
+        if (x.bindingStrength <= node.bindingStrength()) {
           return new Bracket(x);
         } else {
           return x;
@@ -863,9 +849,9 @@ define("lib/almond", function(){});
         }).join(" + ");
       };
 
-      Add.prototype.renderMathML = function(equationID, expression) {
+      Add.prototype.renderMathML = function() {
         return this.terms.map(function(x) {
-          return x.renderMathML(equationID, expression);
+          return x.renderMathML();
         }).join("<mo>+</mo>");
       };
 
@@ -897,9 +883,9 @@ define("lib/almond", function(){});
         }).join("*");
       };
 
-      Mul.prototype.renderMathML = function(equationID, expression) {
+      Mul.prototype.renderMathML = function() {
         return this.terms.map(function(x) {
-          return x.renderMathML(equationID, expression);
+          return x.renderMathML();
         }).join("<mo>&middot;</mo>");
       };
 
@@ -922,8 +908,8 @@ define("lib/almond", function(){});
         return "" + (this.left.renderString()) + "**" + (this.bracketIfNeeded(this.right).renderString());
       };
 
-      Pow.prototype.renderMathML = function(equationID, expression) {
-        return "<msup>" + (this.left.renderMathML(equationID, expression)) + (this.right.renderMathML(equationID, expression)) + "</msup>";
+      Pow.prototype.renderMathML = function() {
+        return "<msup>" + (this.left.renderMathML()) + (this.right.renderMathML()) + "</msup>";
       };
 
       return Pow;
@@ -948,8 +934,8 @@ define("lib/almond", function(){});
         return "(" + (this.contents.renderString()) + ")";
       };
 
-      Bracket.prototype.renderMathML = function(equationID, expression) {
-        return ("<mfenced><mrow>" + (this.contents.renderMathML(equationID, expression))) + "</mrow></mfenced>";
+      Bracket.prototype.renderMathML = function() {
+        return ("<mfenced><mrow>" + (this.contents.renderMathML())) + "</mrow></mfenced>";
       };
 
       return Bracket;
@@ -974,7 +960,7 @@ define("lib/almond", function(){});
         return this.value + "";
       };
 
-      Number.prototype.renderMathML = function(equationID, expression) {
+      Number.prototype.renderMathML = function() {
         return "<mn class=\"constant\">" + this.value + "</mn>";
       };
 
@@ -1001,11 +987,10 @@ define("lib/almond", function(){});
         return this.label;
       };
 
-      Variable.prototype.renderMathML = function(equationID, expression) {
-        var atCount, atEnd, atStart, i, label, labelArray, labelID;
+      Variable.prototype.renderMathML = function() {
+        var atCount, atEnd, atStart, i, label, labelArray;
         labelArray = this.label.split("-");
         label = labelArray[0];
-        labelID = (labelArray[1] != null ? 'id="variable-' + (expression ? "expression" : "equation") + ("-" + equationID + "-") + this.label + '"' : "");
         atCount = 0;
         while (label[0] === "@") {
           atCount += 1;
@@ -1021,9 +1006,9 @@ define("lib/almond", function(){});
           return _results;
         })()).join("") + "</mo></mrow></mover>";
         if (label.length > 1) {
-          return atStart + '<msub class="variable"' + labelID + '><mi>' + label[0] + '</mi><mi>' + label.slice(1) + "</mi></msub>" + atEnd;
+          return atStart + '<msub class="variable"><mi>' + label[0] + '</mi><mi>' + label.slice(1) + "</mi></msub>" + atEnd;
         } else {
-          return '<mi class="variable"' + labelID + '>' + label + '</mi>';
+          return '<mi class="variable">' + label + '</mi>';
         }
       };
 
@@ -4264,8 +4249,12 @@ define("lib/almond", function(){});
         return this.expr.toString();
       };
 
+      Expression.prototype.toMathML = function() {
+        return this.expr.toMathML();
+      };
+
       Expression.prototype.solve = function(variable) {
-        return this.expr.solve(variable);
+        return new Expression(this.expr.solve(variable));
       };
 
       Expression.prototype.sub = function(substitutions) {
@@ -4278,7 +4267,7 @@ define("lib/almond", function(){});
             newsubs[key] = substitutions[key];
           }
         }
-        return this.expr.sub(newsubs, null, null).simplify();
+        return new Expression(this.expr.sub(newsubs, null, null).simplify());
       };
 
       Expression.prototype.copy = function() {
@@ -4286,7 +4275,7 @@ define("lib/almond", function(){});
       };
 
       Expression.prototype.simplify = function() {
-        return this.expr.simplify();
+        return new Expression(this.expr.simplify());
       };
 
       return Expression;

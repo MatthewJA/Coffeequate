@@ -33,14 +33,14 @@ define ->
       8
 
     bracketIfNeeded: (child) ->
-      if child.bindingStrength() <= @bindingStrength()
+      if child.bindingStrength<= @bindingStrength()
         return new Bracket(child)
       return child
 
   DrawingNode.makeWithBrackets = (terms...) ->
     node = new this()
     terms = terms.map((x) ->
-        if x.bindingStrength() <= node.bindingStrength()
+        if x.bindingStrength<= node.bindingStrength()
           return new Bracket(x)
         else
           return x)
@@ -59,8 +59,8 @@ define ->
     renderString: ->
       return @terms.map((x) -> x.renderString()).join(" + ")
 
-    renderMathML: (equationID, expression) ->
-      return @terms.map((x) -> x.renderMathML(equationID, expression))
+    renderMathML: ->
+      return @terms.map((x) -> x.renderMathML())
                    .join("<mo>+</mo>")
 
   class Mul extends DrawingNode
@@ -75,8 +75,8 @@ define ->
     renderString: ->
       return @terms.map((x) -> x.renderString()).join("*")
 
-    renderMathML: (equationID, expression) ->
-      return @terms.map((x) -> x.renderMathML(equationID, expression)).join("<mo>&middot;</mo>")
+    renderMathML: ->
+      return @terms.map((x) -> x.renderMathML()).join("<mo>&middot;</mo>")
 
   class Pow extends DrawingNode
     constructor: (@left, @right) ->
@@ -87,8 +87,8 @@ define ->
     renderString: ->
       "#{@left.renderString()}**#{@bracketIfNeeded(@right).renderString()}"
 
-    renderMathML: (equationID, expression) ->
-      "<msup>#{@left.renderMathML(equationID, expression)}#{@right.renderMathML(equationID, expression)}</msup>"
+    renderMathML: ->
+      "<msup>#{@left.renderMathML()}#{@right.renderMathML()}</msup>"
 
 
   class Bracket extends DrawingNode
@@ -103,8 +103,8 @@ define ->
     renderString: ->
       return "(#{@contents.renderString()})"
 
-    renderMathML: (equationID, expression) ->
-      return "<mfenced><mrow>#{@contents.renderMathML(equationID, expression)}" +
+    renderMathML: ->
+      return "<mfenced><mrow>#{@contents.renderMathML()}" +
                                                                 "</mrow></mfenced>"
 
   class Number extends DrawingNode
@@ -119,7 +119,7 @@ define ->
     renderString: ->
       return @value+""
 
-    renderMathML: (equationID, expression) ->
+    renderMathML: ->
       return "<mn class=\"constant\">#{@value}</mn>"
 
   class Variable extends DrawingNode
@@ -134,12 +134,9 @@ define ->
     renderString: ->
       return @label
 
-    renderMathML: (equationID, expression) ->
+    renderMathML: ->
       labelArray = @label.split("-")
       label = labelArray[0]
-      labelID = (if labelArray[1]? then 'id="variable-' +
-                (if expression then "expression" else "equation") +
-                      "-#{equationID}-" + @label + '"' else "")
 
       atCount = 0
       while label[0] == "@"
@@ -150,9 +147,9 @@ define ->
       atEnd = "<mrow><mo>" + ("." for i in [0...atCount]).join("") + "</mo></mrow></mover>"
 
       if label.length > 1
-        return atStart + '<msub class="variable"' + labelID + '><mi>' + label[0] + '</mi><mi>' + label[1..] + "</mi></msub>" + atEnd
+        return atStart + '<msub class="variable"><mi>' + label[0] + '</mi><mi>' + label[1..] + "</mi></msub>" + atEnd
       else
-        return '<mi class="variable"' + labelID + '>' + label + '</mi>'
+        return '<mi class="variable">' + label + '</mi>'
 
 
   class Fraction extends DrawingNode
