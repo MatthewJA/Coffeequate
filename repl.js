@@ -16,6 +16,8 @@
 	entryArea.appendChild(entry);
 	entryArea.appendChild(entryButton);
 
+	var $entry = $(entry);
+
 	var style = document.createElement("style");
 	style.innerHTML = ".entry {width: 90%; height: 32px; display: inline-block; font-family: monospace; padding: 0; border: 0; font-size: 28px;}";
 	style.innerHTML += ".entry:focus {background-color: #EFEFFF;}";
@@ -28,7 +30,12 @@
 	repl.appendChild(scrollback);
 	repl.appendChild(entryArea);
 
+	var history = [];
+	var positionInHistory = 0
+
 	function submit() {
+		history.push(entry.value);
+		positionInHistory = history.length;
 		try {
 			var ret = eval(entry.value);
 		} catch (err) {
@@ -43,9 +50,17 @@
 		entry.value = "";
 	}
 
-	entry.addEventListener('keypress', function (e) {
+
+
+	$entry.on('keydown', function (e) {
 		if (e.keyCode == 13) {
 			submit();
+		} else if (e.keyCode == 38) {
+			positionInHistory = Math.max(positionInHistory - 1, 0);
+			$entry.val(history[positionInHistory] || "");
+		} else if (e.keyCode == 40) {
+			positionInHistory = Math.min(positionInHistory + 1, history.length);
+			$entry.val(history[positionInHistory] || "");
 		}
 	});
 	entryButton.addEventListener('click', submit);
