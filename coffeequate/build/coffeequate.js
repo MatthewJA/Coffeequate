@@ -1155,8 +1155,7 @@ define("lib/almond", function(){});
 (function() {
   var __hasProp = {}.hasOwnProperty,
     __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; },
-    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; },
-    __slice = [].slice;
+    __indexOf = [].indexOf || function(item) { for (var i = 0, l = this.length; i < l; i++) { if (i in this && this[i] === item) return i; } return -1; };
 
   define('terminals',["parse", "generateInfo", "nodes", "prettyRender", "constants"], function(parse, generateInfo, nodes, prettyRender, constants) {
     var Constant, SymbolicConstant, Terminal, Uncertainty, Variable;
@@ -1285,30 +1284,6 @@ define("lib/almond", function(){});
         return null;
       };
 
-      Constant.prototype.toHTML = function(equationID, expression, equality, topLevel) {
-        var closingHTML, html, mathClass, mathID, _ref;
-        if (expression == null) {
-          expression = false;
-        }
-        if (equality == null) {
-          equality = "0";
-        }
-        if (topLevel == null) {
-          topLevel = false;
-        }
-        _ref = generateInfo.getHTMLInfo(equationID, expression, equality), mathClass = _ref[0], mathID = _ref[1], html = _ref[2];
-        if (!topLevel) {
-          html = "";
-          closingHTML = "";
-        } else {
-          closingHTML = "</div>";
-        }
-        if (this.denominator === 1) {
-          return html + ("" + this.numerator) + closingHTML;
-        }
-        return html + ("(" + this.numerator + "/" + this.denominator + ")") + closingHTML;
-      };
-
       Constant.prototype.toDrawingNode = function() {
         var FractionNode, NumberNode;
         NumberNode = prettyRender.Number;
@@ -1420,27 +1395,6 @@ define("lib/almond", function(){});
 
       SymbolicConstant.prototype.setVariableUnits = function(variable, equivalencies, units) {
         return null;
-      };
-
-      SymbolicConstant.prototype.toHTML = function(equationID, expression, equality, topLevel) {
-        var closingHTML, html, mathClass, mathID, _ref;
-        if (expression == null) {
-          expression = false;
-        }
-        if (equality == null) {
-          equality = "0";
-        }
-        if (topLevel == null) {
-          topLevel = false;
-        }
-        if (topLevel) {
-          _ref = generateInfo.getHTMLInfo(equationID, expression, equality), mathClass = _ref[0], mathID = _ref[1], html = _ref[2];
-          closingHTML = "</div>";
-        } else {
-          html = "";
-          closingHTML = "";
-        }
-        return html + "<span class=\"constant symbolic-constant\">" + this.toString() + "</span>" + closingHTML;
       };
 
       SymbolicConstant.prototype.toDrawingNode = function() {
@@ -1596,30 +1550,6 @@ define("lib/almond", function(){});
         return this.copy();
       };
 
-      Variable.prototype.toHTML = function(equationID, expression, equality, topLevel) {
-        var closingHTML, html, label, labelArray, labelID, mathClass, mathID, _ref;
-        if (expression == null) {
-          expression = false;
-        }
-        if (equality == null) {
-          equality = "0";
-        }
-        if (topLevel == null) {
-          topLevel = false;
-        }
-        if (topLevel) {
-          _ref = generateInfo.getHTMLInfo(equationID, expression, equality), mathClass = _ref[0], mathID = _ref[1], html = _ref[2];
-          closingHTML = "</div>";
-        } else {
-          html = "";
-          closingHTML = "";
-        }
-        labelArray = this.label.split("-");
-        label = labelArray[0];
-        labelID = labelArray[1] != null ? 'id="variable-' + (expression ? "expression" : "equation") + ("-" + equationID + "-") + this.label + '"' : "";
-        return html + '<span class="variable"' + labelID + '>' + label + '</span>' + closingHTML;
-      };
-
       Variable.prototype.toDrawingNode = function() {
         var VariableNode;
         VariableNode = prettyRender.Variable;
@@ -1742,13 +1672,6 @@ define("lib/almond", function(){});
 
       Uncertainty.prototype.expandAndSimplify = function() {
         return this.copy();
-      };
-
-      Uncertainty.prototype.toHTML = function() {
-        var args, dummyVar;
-        args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
-        dummyVar = new Variable("σ" + this.label);
-        return dummyVar.toHTML.apply(dummyVar, args);
       };
 
       Uncertainty.prototype.toDrawingNode = function() {
@@ -2638,29 +2561,6 @@ define("lib/almond", function(){});
         return results;
       };
 
-      Add.prototype.toHTML = function(equationID, expression, equality, topLevel) {
-        var closingHTML, html, mathClass, mathID, _ref;
-        if (expression == null) {
-          expression = false;
-        }
-        if (equality == null) {
-          equality = "0";
-        }
-        if (topLevel == null) {
-          topLevel = false;
-        }
-        _ref = generateInfo.getHTMLInfo(equationID, expression, equality), mathClass = _ref[0], mathID = _ref[1], html = _ref[2];
-        if (!topLevel) {
-          html = "";
-          closingHTML = "";
-        } else {
-          closingHTML = "</div>";
-        }
-        return html + this.children.map(function(child) {
-          return child.toHTML();
-        }).join("+") + closingHTML;
-      };
-
       Add.prototype.toDrawingNode = function() {
         var AddNode;
         AddNode = prettyRender.Add;
@@ -3254,7 +3154,6 @@ define("lib/almond", function(){});
               children.push(child.copy());
             }
           } else if (child.sub != null) {
-            console.log(assumeZeroUncertainty);
             children.push(child.sub(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty, evaluateSymbolicConstants));
           } else {
             children.push(child.copy());
@@ -3320,34 +3219,6 @@ define("lib/almond", function(){});
         }
         console.log(results);
         return results;
-      };
-
-      Mul.prototype.toHTML = function(equationID, expression, equality, topLevel) {
-        var Add, closingHTML, html, mathClass, mathID, _ref;
-        if (expression == null) {
-          expression = false;
-        }
-        if (equality == null) {
-          equality = "0";
-        }
-        if (topLevel == null) {
-          topLevel = false;
-        }
-        Add = require("operators/Add");
-        _ref = generateInfo.getHTMLInfo(equationID, expression, equality), mathClass = _ref[0], mathID = _ref[1], html = _ref[2];
-        if (!topLevel) {
-          html = "";
-          closingHTML = "";
-        } else {
-          closingHTML = "</div>";
-        }
-        return html + this.children.map(function(child) {
-          if (child instanceof Add) {
-            return "(" + child.toHTML() + ")";
-          } else {
-            return child.toHTML();
-          }
-        }).join("&middot;") + closingHTML;
       };
 
       Mul.prototype.toDrawingNode = function() {
@@ -3866,44 +3737,6 @@ define("lib/almond", function(){});
           }
         }
         return results;
-      };
-
-      Pow.prototype.toHTML = function(equationID, expression, equality, topLevel) {
-        var closingHTML, html, innerHTML, leftSide, mathClass, mathID, rightSide, _base, _base1, _ref;
-        if (expression == null) {
-          expression = false;
-        }
-        if (equality == null) {
-          equality = "0";
-        }
-        if (topLevel == null) {
-          topLevel = false;
-        }
-        _ref = generateInfo.getHTMLInfo(equationID, expression, equality), mathClass = _ref[0], mathID = _ref[1], html = _ref[2];
-        if (!topLevel) {
-          html = "";
-          closingHTML = "";
-        } else {
-          closingHTML = "</div>";
-        }
-        if ((typeof (_base = this.children.right).evaluate === "function" ? _base.evaluate() : void 0) === 1) {
-          return html + this.children.left.toHTML() + closingHTML;
-        } else if ((typeof (_base1 = this.children.right).evaluate === "function" ? _base1.evaluate() : void 0) === 0) {
-          return html + "1" + closingHTML;
-        } else {
-          if (this.children.left instanceof terminals.Terminal) {
-            leftSide = this.children.left.toHTML();
-          } else {
-            leftSide = "(" + (this.children.left.toHTML()) + ")";
-          }
-          if (this.children.right instanceof terminals.Terminal) {
-            rightSide = this.children.right.toHTML();
-          } else {
-            rightSide = "(" + (this.children.right.toHTML()) + ")";
-          }
-          innerHTML = "" + leftSide + " ** " + rightSide;
-          return html + innerHTML + closingHTML;
-        }
       };
 
       Pow.prototype.toDrawingNode = function() {

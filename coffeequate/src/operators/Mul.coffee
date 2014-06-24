@@ -423,7 +423,6 @@ define [
 					unless subbed
 						children.push(child.copy())
 				else if child.sub?
-					console.log assumeZeroUncertainty
 					children.push(child.sub(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty, evaluateSymbolicConstants))
 				else
 					children.push(child.copy())
