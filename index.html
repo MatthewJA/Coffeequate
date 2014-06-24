@@ -8,6 +8,7 @@
     <link rel="stylesheet" type="text/css" href="stylesheets/css3reset.css">
     <link rel="stylesheet" type="text/css" href="stylesheets/styles.css">
     <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js"></script>
+     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="coffeequate.min.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/prettify/r298/prettify.min.css"></script>
@@ -28,6 +29,12 @@
       .cb {
         display: block;
         margin: 10pt auto;
+      }
+      #repl {
+        border: 2px solid;
+        border-radius: 5px;
+        padding: 20px;
+        background: lightgrey;
       }
     </style>
   </head>
@@ -114,7 +121,7 @@
         <p>
           Here's a JS REPL with Coffeequate v0.4.1 already loaded. Try it out!
         </p>
-        <div id="repl"></div>
+          <div id="repl"></div>
       </article>
       <article>
         <header><h3>Examples</h3></header>
