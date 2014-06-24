@@ -1,14 +1,21 @@
 ### Compiled Source ###
 *.js
-!coffeequate/src/build.js
-!coffeequate/src/build-min.js
+
+# Disabling the committing of builds.
+#!coffeequate/src/build.js
+#!coffeequate/src/build-min.js
 
 ### Editor Specific ###
 *.sublime-workspace
 .DS_Store/*
+*/**/.DS_Store/*
 
 ### Libraries ###
 !coffeequate/src/lib/**/*.js
+
+### Tests ###
+# This is temporary, while these are outdated.
+coffeequate/tests/*
 
 ### Workspace ###
 progress/*
