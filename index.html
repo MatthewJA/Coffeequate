@@ -139,6 +139,17 @@
             time = freefall.solve("t");<br>
             time.toString(); // -1*sqrt(s)/sqrt(g/2),sqrt(s)/sqrt(g/2)
           </code>
+
+          <h4>Time dilation</h4>
+          <code class="cb prettyprint">
+            dilation = function(v) {<br>
+            &nbsp; var td = CQ("Δt * (1 + -v**2 * c**-2)**(-1/2)");<br>
+            &nbsp; return td.sub({"Δt": 1, "c": 3e8, "v": v});<br>
+            };<br>
+            dilation(10).toString(); // 1<br>
+            dilation(1000000000).toString(); // 0.287348<br>
+            dilation(CQ("v")).toString(); // 1 + 1.11111e-17*v**2**-1/2
+          </code>
         </div>
       </article>
     </section>
