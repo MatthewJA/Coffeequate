@@ -3385,7 +3385,6 @@ define("lib/almond", function(){});
               children.push(child.copy());
             }
           } else if (child.sub != null) {
-            console.log(assumeZeroUncertainty);
             children.push(child.sub(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty, evaluateSymbolicConstants));
           } else {
             children.push(child.copy());
