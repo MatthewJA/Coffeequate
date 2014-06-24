@@ -106,20 +106,6 @@ define ["parse", "generateInfo", "nodes", "prettyRender", "constants"], (parse, 
 		setVariableUnits: (variable, equivalencies, units) ->
 			null
 
-		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
-			# Return this constant as an HTML string.
-			[mathClass, mathID, html] = generateInfo.getHTMLInfo(equationID, expression, equality)
-
-			unless topLevel
-				html = ""
-				closingHTML = ""
-			else
-				closingHTML = "</div>"
-
-			if @denominator == 1
-				return html + "#{@numerator}" + closingHTML
-			return html + "(#{@numerator}/#{@denominator})" + closingHTML
-
 		toDrawingNode: ->
 			NumberNode = prettyRender.Number
 			FractionNode = prettyRender.Fraction
@@ -192,15 +178,6 @@ define ["parse", "generateInfo", "nodes", "prettyRender", "constants"], (parse, 
 
 		setVariableUnits: (variable, equivalencies, units) ->
 			null
-
-		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
-			if topLevel
-				[mathClass, mathID, html] = generateInfo.getHTMLInfo(equationID, expression, equality)
-				closingHTML = "</div>"
-			else
-				html = ""
-				closingHTML = ""
-			return html + "<span class=\"constant symbolic-constant\">" + @toString() + "</span>" + closingHTML
 
 		toDrawingNode: ->
 			VariableNode = prettyRender.Variable
@@ -301,21 +278,6 @@ define ["parse", "generateInfo", "nodes", "prettyRender", "constants"], (parse, 
 		expandAndSimplify: ->
 			@copy()
 
-		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
-			# Return an HTML string representing the variable.
-			if topLevel
-				[mathClass, mathID, html] = generateInfo.getHTMLInfo(equationID, expression, equality)
-				closingHTML = "</div>"
-			else
-				html = ""
-				closingHTML = ""
-
-			# Strip the ID off of the variable, if it has one.
-			labelArray = @label.split("-")
-			label = labelArray[0]
-			labelID = if labelArray[1]? then 'id="variable-' + (if expression then "expression" else "equation") + "-#{equationID}-" + @label + '"' else ""
-			return html + '<span class="variable"' + labelID + '>' + label + '</span>' + closingHTML
-
 		toDrawingNode: ->
 			VariableNode = prettyRender.Variable
 			return new VariableNode(@label)
@@ -394,10 +356,6 @@ define ["parse", "generateInfo", "nodes", "prettyRender", "constants"], (parse, 
 
 		expandAndSimplify: ->
 			@copy()
-
-		toHTML: (args...) ->
-			dummyVar = new Variable("σ#{@label}")
-			return dummyVar.toHTML(args...)
 
 		toDrawingNode: ->
 			UncertaintyNode = prettyRender.Uncertainty

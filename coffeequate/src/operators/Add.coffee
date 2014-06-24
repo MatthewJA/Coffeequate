@@ -638,18 +638,6 @@ define [
 
 			return results
 
-		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
-			# Return an HTML string representing this node.
-			[mathClass, mathID, html] = generateInfo.getHTMLInfo(equationID, expression, equality)
-
-			unless topLevel
-				html = ""
-				closingHTML = ""
-			else
-				closingHTML = "</div>"
-
-			return html + @children.map((child) -> child.toHTML()).join("+") + closingHTML
-
 		toDrawingNode: ->
 			AddNode = prettyRender.Add
 			return AddNode.makeWithBrackets(@children.map((term) -> term.toDrawingNode())...)

@@ -470,26 +470,6 @@ define [
 			console.log results
 			return results
 
-		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
-			Add = require("operators/Add")
-
-			# Return an HTML string representing this node.
-			[mathClass, mathID, html] = generateInfo.getHTMLInfo(equationID, expression, equality)
-
-			unless topLevel
-				html = ""
-				closingHTML = ""
-			else
-				closingHTML = "</div>"
-
-			return html + @children.map(
-				(child) ->
-					if child instanceof Add
-						"(" + child.toHTML() + ")"
-					else
-						child.toHTML()
-				).join("&middot;") + closingHTML
-
 		toDrawingNode: ->
 			# To make a drawing node out of a Mul node, we turn it into either a
 			# fraction or a long product.

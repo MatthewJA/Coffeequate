@@ -1285,30 +1285,6 @@ define("lib/almond", function(){});
         return null;
       };
 
-      Constant.prototype.toMathML2 = function(equationID, expression, equality, topLevel) {
-        var closingHTML, html, mathClass, mathID, _ref;
-        if (expression == null) {
-          expression = false;
-        }
-        if (equality == null) {
-          equality = "0";
-        }
-        if (topLevel == null) {
-          topLevel = false;
-        }
-        if (topLevel) {
-          _ref = generateInfo.getMathMLInfo(equationID, expression, equality), mathClass = _ref[0], mathID = _ref[1], html = _ref[2];
-          closingHTML = "</math></div>";
-        } else {
-          html = "";
-          closingHTML = "";
-        }
-        if (this.denominator === 1) {
-          return html + ("<mn class=\"constant\">" + this.numerator + "</mn>") + closingHTML;
-        }
-        return html + ("<mfrac class=\"constant\"><mrow><mn>" + this.numerator + "</mn></mrow><mrow><mn>" + this.denominator + "</mn></mrow></mfrac>") + closingHTML;
-      };
-
       Constant.prototype.toHTML = function(equationID, expression, equality, topLevel) {
         var closingHTML, html, mathClass, mathID, _ref;
         if (expression == null) {
@@ -1467,27 +1443,6 @@ define("lib/almond", function(){});
         return html + "<span class=\"constant symbolic-constant\">" + this.toString() + "</span>" + closingHTML;
       };
 
-      SymbolicConstant.prototype.toMathML2 = function(equationID, expression, equality, topLevel) {
-        var closingHTML, html, mathClass, mathID, _ref;
-        if (expression == null) {
-          expression = false;
-        }
-        if (equality == null) {
-          equality = "0";
-        }
-        if (topLevel == null) {
-          topLevel = false;
-        }
-        if (topLevel) {
-          _ref = generateInfo.getMathMLInfo(equationID, expression, equality), mathClass = _ref[0], mathID = _ref[1], html = _ref[2];
-          closingHTML = "</math></div>";
-        } else {
-          html = "";
-          closingHTML = "";
-        }
-        return "" + html + "<mn class=\"constant symbolic-constant\">" + this.label + "</mn>" + closingHTML;
-      };
-
       SymbolicConstant.prototype.toDrawingNode = function() {
         var VariableNode;
         VariableNode = prettyRender.Variable;
@@ -1639,48 +1594,6 @@ define("lib/almond", function(){});
 
       Variable.prototype.expandAndSimplify = function() {
         return this.copy();
-      };
-
-      Variable.prototype.toMathML2 = function(equationID, expression, equality, topLevel) {
-        var atCount, atEnd, atStart, closingHTML, html, i, label, labelArray, labelID, mathClass, mathID, _ref;
-        if (expression == null) {
-          expression = false;
-        }
-        if (equality == null) {
-          equality = "0";
-        }
-        if (topLevel == null) {
-          topLevel = false;
-        }
-        if (topLevel) {
-          _ref = generateInfo.getMathMLInfo(equationID, expression, equality), mathClass = _ref[0], mathID = _ref[1], html = _ref[2];
-          closingHTML = "</math></div>";
-        } else {
-          html = "";
-          closingHTML = "";
-        }
-        labelArray = this.label.split("-");
-        label = labelArray[0];
-        labelID = labelArray[1] != null ? 'id="variable-' + (expression ? "expression" : "equation") + ("-" + equationID + "-") + this.label + '"' : "";
-        atCount = 0;
-        while (label[0] === "@") {
-          atCount += 1;
-          label = label.slice(1);
-        }
-        atStart = "<mover accent=\"true\">";
-        atEnd = "<mrow><mo>" + ((function() {
-          var _i, _results;
-          _results = [];
-          for (i = _i = 0; 0 <= atCount ? _i < atCount : _i > atCount; i = 0 <= atCount ? ++_i : --_i) {
-            _results.push(".");
-          }
-          return _results;
-        })()).join("") + "</mo></mrow></mover>";
-        if (label.length > 1) {
-          return html + atStart + '<msub class="variable"' + labelID + '><mi>' + label[0] + '</mi><mi>' + label.slice(1) + "</mi></msub>" + atEnd + closingHTML;
-        } else {
-          return html + atStart + '<mi class="variable"' + labelID + '>' + label + '</mi>' + atEnd + closingHTML;
-        }
       };
 
       Variable.prototype.toHTML = function(equationID, expression, equality, topLevel) {
@@ -1836,12 +1749,6 @@ define("lib/almond", function(){});
         args = 1 <= arguments.length ? __slice.call(arguments, 0) : [];
         dummyVar = new Variable("σ" + this.label);
         return dummyVar.toHTML.apply(dummyVar, args);
-      };
-
-      Uncertainty.prototype.toMathML2 = function() {
-        var dummyVar;
-        dummyVar = new Variable("σ(" + label + ")");
-        return dummyVar.toMathML2(arguments);
       };
 
       Uncertainty.prototype.toDrawingNode = function() {
@@ -2731,29 +2638,6 @@ define("lib/almond", function(){});
         return results;
       };
 
-      Add.prototype.toMathML2 = function(equationID, expression, equality, topLevel) {
-        var closingHTML, html, mathClass, mathID, _ref;
-        if (expression == null) {
-          expression = false;
-        }
-        if (equality == null) {
-          equality = "0";
-        }
-        if (topLevel == null) {
-          topLevel = false;
-        }
-        _ref = generateInfo.getMathMLInfo(equationID, expression, equality), mathClass = _ref[0], mathID = _ref[1], html = _ref[2];
-        if (!topLevel) {
-          html = "";
-          closingHTML = "";
-        } else {
-          closingHTML = "</math></div>";
-        }
-        return html + "<mrow>" + this.children.map(function(child) {
-          return child.toMathML2(equationID, expression);
-        }).join("<mo>+</mo>") + "</mrow>" + closingHTML;
-      };
-
       Add.prototype.toHTML = function(equationID, expression, equality, topLevel) {
         var closingHTML, html, mathClass, mathID, _ref;
         if (expression == null) {
@@ -3438,113 +3322,6 @@ define("lib/almond", function(){});
         return results;
       };
 
-      Mul.prototype.toMathML2 = function(equationID, expression, equality, topLevel) {
-        var Add, Pow, child, closingHTML, denominator, denominatorWithoutNegatives, html, i, mathClass, mathID, negativeCount, numerator, numeratorWithoutNegatives, _ref;
-        if (expression == null) {
-          expression = false;
-        }
-        if (equality == null) {
-          equality = "0";
-        }
-        if (topLevel == null) {
-          topLevel = false;
-        }
-        Add = require("operators/Add");
-        Pow = require("operators/Pow");
-        _ref = generateInfo.getMathMLInfo(equationID, expression, equality), mathClass = _ref[0], mathID = _ref[1], html = _ref[2];
-        if (!topLevel) {
-          html = "";
-          closingHTML = "";
-        } else {
-          closingHTML = "</math></div>";
-        }
-        denominator = (function() {
-          var _i, _len, _ref1, _results;
-          _ref1 = this.children;
-          _results = [];
-          for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-            child = _ref1[_i];
-            if (child instanceof Pow && (child.children.right.evaluate != null) && child.children.right.evaluate() < 0) {
-              _results.push((new Pow(child, "-1")).simplify());
-            }
-          }
-          return _results;
-        }).call(this);
-        numerator = (function() {
-          var _i, _len, _ref1, _results;
-          _ref1 = this.children;
-          _results = [];
-          for (_i = 0, _len = _ref1.length; _i < _len; _i++) {
-            child = _ref1[_i];
-            if (!(child instanceof Pow && (child.children.right.evaluate != null) && child.children.right.evaluate() < 0)) {
-              _results.push(child);
-            }
-          }
-          return _results;
-        }).call(this);
-        numeratorWithoutNegatives = numerator.filter(function(child) {
-          return !(child instanceof terminals.Constant && (typeof child.evaluate === "function" ? child.evaluate() : void 0) === -1);
-        });
-        denominatorWithoutNegatives = denominator.filter(function(child) {
-          return !(child instanceof terminals.Constant && (typeof child.evaluate === "function" ? child.evaluate() : void 0) === -1);
-        });
-        negativeCount = denominator.length - denominatorWithoutNegatives.length + numerator.length - numeratorWithoutNegatives.length;
-        if (denominator.length > 0 && numerator.length > 0) {
-          return html + ((function() {
-            var _i, _results;
-            _results = [];
-            for (i = _i = 0; 0 <= negativeCount ? _i < negativeCount : _i > negativeCount; i = 0 <= negativeCount ? ++_i : --_i) {
-              _results.push("<mo>-</mo>");
-            }
-            return _results;
-          })()).join("") + "<mfrac><mrow>" + numeratorWithoutNegatives.map(function(child) {
-            if (child instanceof Add) {
-              return "<mfenced>" + child.toMathML2(equationID, expression) + "</mfenced>";
-            } else {
-              return child.toMathML2(equationID, expression);
-            }
-          }).join("<mo>&middot;</mo>") + "</mrow><mrow>" + denominatorWithoutNegatives.map(function(child) {
-            if (child instanceof Add) {
-              return "<mfenced>" + child.toMathML2(equationID, expression) + "</mfenced>";
-            } else {
-              return child.toMathML2(equationID, expression);
-            }
-          }).join("<mo>&middot;</mo>") + "</mrow></mfrac>" + closingHTML;
-        } else if (denominator.length > 0) {
-          return html + ((function() {
-            var _i, _results;
-            _results = [];
-            for (i = _i = 0; 0 <= negativeCount ? _i < negativeCount : _i > negativeCount; i = 0 <= negativeCount ? ++_i : --_i) {
-              _results.push("<mo>-</mo>");
-            }
-            return _results;
-          })()).join("") + "<mfrac><mn>1</mn><mrow>" + denominatorWithoutNegatives.map(function(child) {
-            if (child instanceof Add) {
-              return "<mfenced>" + child.toMathML2(equationID, expression) + "</mfenced>";
-            } else {
-              return child.toMathML2(equationID, expression);
-            }
-          }).join("<mo>&middot;</mo>") + "</mrow></mfrac>" + closingHTML;
-        } else if (numerator.length > 0) {
-          return html + ((function() {
-            var _i, _results;
-            _results = [];
-            for (i = _i = 0; 0 <= negativeCount ? _i < negativeCount : _i > negativeCount; i = 0 <= negativeCount ? ++_i : --_i) {
-              _results.push("<mo>-</mo>");
-            }
-            return _results;
-          })()).join("") + "<mrow>" + numeratorWithoutNegatives.map(function(child) {
-            if (child instanceof Add) {
-              return "<mfenced>" + child.toMathML2(equationID, expression) + "</mfenced>";
-            } else {
-              return child.toMathML2(equationID, expression);
-            }
-          }).join("<mo>&middot;</mo>") + "</mrow>" + closingHTML;
-        } else {
-          throw new Error("No terms in Mul node.");
-        }
-      };
-
       Mul.prototype.toHTML = function(equationID, expression, equality, topLevel) {
         var Add, closingHTML, html, mathClass, mathID, _ref;
         if (expression == null) {
@@ -4089,53 +3866,6 @@ define("lib/almond", function(){});
           }
         }
         return results;
-      };
-
-      Pow.prototype.toMathML2 = function(equationID, expression, equality, topLevel) {
-        var Add, Mul, closingHTML, html, innerHTML, mathClass, mathID, right, _base, _base1, _base2, _base3, _ref;
-        if (expression == null) {
-          expression = false;
-        }
-        if (equality == null) {
-          equality = "0";
-        }
-        if (topLevel == null) {
-          topLevel = false;
-        }
-        Mul = require("operators/Mul");
-        Add = require("operators/Add");
-        _ref = generateInfo.getMathMLInfo(equationID, expression, equality), mathClass = _ref[0], mathID = _ref[1], html = _ref[2];
-        if (!topLevel) {
-          html = "";
-          closingHTML = "";
-        } else {
-          closingHTML = "</math></div>";
-        }
-        if ((typeof (_base = this.children.right).evaluate === "function" ? _base.evaluate() : void 0) === 1) {
-          return html + this.children.left.toMathML2(equationID, expression) + closingHTML;
-        } else if ((typeof (_base1 = this.children.right).evaluate === "function" ? _base1.evaluate() : void 0) === 0) {
-          return html + "<mn>1</mn>" + closingHTML;
-        } else {
-          if ((typeof (_base2 = this.children.right).evaluate === "function" ? _base2.evaluate() : void 0) < 0) {
-            right = this.children.right.copy();
-            right = new Mul("-1", right);
-            right = right.expandAndSimplify();
-          } else {
-            right = this.children.right.copy();
-          }
-          if (this.children.left instanceof Add || this.children.left instanceof Mul) {
-            innerHTML = "<mfenced>" + (this.children.left.toMathML2(equationID, expression)) + "</mfenced>";
-          } else {
-            innerHTML = "" + (this.children.left.toMathML2(equationID, expression));
-          }
-          if ((typeof right.evaluate === "function" ? right.evaluate() : void 0) !== 1) {
-            innerHTML = "<msup>" + innerHTML + (right.toMathML2(equationID, expression)) + "</msup>";
-          }
-          if ((typeof (_base3 = this.children.right).evaluate === "function" ? _base3.evaluate() : void 0) < 0) {
-            innerHTML = "<mfrac><mn>1</mn>" + innerHTML + "</mfrac>";
-          }
-          return html + innerHTML + closingHTML;
-        }
       };
 
       Pow.prototype.toHTML = function(equationID, expression, equality, topLevel) {

@@ -354,34 +354,6 @@ define [
 
 			return results
 
-		toHTML: (equationID, expression=false, equality="0", topLevel=false) ->
-			# Return an HTML string representing this node.
-			[mathClass, mathID, html] = generateInfo.getHTMLInfo(equationID, expression, equality)
-
-			unless topLevel
-				html = ""
-				closingHTML = ""
-			else
-				closingHTML = "</div>"
-
-			if @children.right.evaluate?() == 1
-				return html + @children.left.toHTML() + closingHTML
-			else if @children.right.evaluate?() == 0
-				return html + "1" + closingHTML
-			else
-				# Fence if terminals.
-				if @children.left instanceof terminals.Terminal
-					leftSide = @children.left.toHTML()
-				else
-					leftSide = "(#{@children.left.toHTML()})"
-				if @children.right instanceof terminals.Terminal
-					rightSide = @children.right.toHTML()
-				else
-					rightSide = "(#{@children.right.toHTML()})"
-
-				innerHTML = "#{leftSide} ** #{rightSide}"
-				return html + innerHTML + closingHTML
-
 		toDrawingNode: ->
 			SurdNode = prettyRender?.Surd
 			PowNode = prettyRender.Pow
