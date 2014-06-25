@@ -1,5 +1,6 @@
 (function() {
-	var repl = document.getElementById("repl");
+	var repl = $($(".repl")[0]);
+
 
 	var scrollback = document.createElement("ul");
 	scrollback.className = "scrollback";
@@ -18,17 +19,8 @@
 
 	var $entry = $(entry);
 
-	var style = document.createElement("style");
-	style.innerHTML = ".entry {width: 90%; height: 32px; display: inline-block; font-family: monospace; padding: 0; border: 0; font-size: 16px;}";
-	style.innerHTML += ".entry:focus {background-color: #EFEFFF;}";
-	style.innerHTML += ".entry-area {width: 100%; height: 32px; border: 1px solid #EAEAEA; padding: 0;}";
-	style.innerHTML += ".entry-button {width: 10%; height: 32px; padding: 0; border: 0; margin: 0; vertical-align: top;}";
-	style.innerHTML += ".scrollback {font-family: monospace; list-style-type: none; overflow: auto;}";
-	style.innerHTML += "#repl {width: 500px; margin: 0 auto;}";
-	repl.appendChild(style);
-
-	repl.appendChild(scrollback);
-	repl.appendChild(entryArea);
+	repl.append(scrollback);
+	repl.append(entryArea);
 
 	var history = [];
 	var positionInHistory = 0
@@ -72,4 +64,6 @@
 	submit("1 + 2");
 	submit("CQ(\"(x+y)**2\").simplify()");
 	submit('CQ("(x+y)**2").simplify().toLaTeX()')
+	submit('CQ("(x+y)**2").solve("x")')
+
 }).call()
