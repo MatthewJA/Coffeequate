@@ -1,25 +1,33 @@
-// grammar for PEG.js, which is at http://pegjs.majda.cz/online
+{
+// These dummy definitions make it easier to test
+
+stringToTerminal = function(x) { return x; };
+operators = {
+  Add: function(l,r) { return ["+",l,r] },
+  Mul: function(l,r) { return ["*",l,r] }
+};
+}
 
 start
   = expr
 
 expr
-  = left:term "+" right:term { return ["+",left,right]; }
-  / left:term "-" right:term { return ["+",left,right]; }
+  = left:term "+" right:expr { return new operators.Add(left, right); }
+  / left:term "-" right:expr { return new operators.Add(left, new operators.Mul(right, "-1")); }
   / x:term { return x; }
 
 term
-  = l:powerTerm "*" r:powerTerm { return ["*",l, r]; }
-  / l:powerTerm "/" r:powerTerm { return ["/",l, r]; }
+  = l:powerTerm "*" r:term { return new operators.Mul(l, r); }
+  / l:powerTerm "/" r:term { return new operators.Mul(l, new operators.Pow(r, "-1")); }
   / f:powerTerm { return f; }
 
 powerTerm
-  = l:factor "**" r:factor { return ["**", l, r]; }
+  = l:factor "**" r:factor { return new operators.Pow(l, r); }
   / f:factor { return f; }
 
 
 factor
-  = digits:[0-9]+ { return parseInt(digits.join(""), 10); }
-  / variable:[a-zA-Z]+ { return variable.join(""); }
+  = terminal:[^()+\-*/{}:]+ "::{" u:[^{}]+ "}" { return stringToTerminal(terminal.join("") + "::{" + u.join("") + "}"); }
+  / terminal:[^()+\-*/{}:]+ { return stringToTerminal(terminal.join("")); }
   / "(" x:expr ")" { return x; }
-  / "-" x:factor { return ["-", 0, x] }
+  / "-" x:factor { return new operators.Mul(x, "-1") }
