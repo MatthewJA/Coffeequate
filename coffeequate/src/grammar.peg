@@ -1,7 +1,6 @@
 // grammar for PEG.js, which is at http://pegjs.majda.cz/online
 
 {
-  var require = function() {};
   var operators = require("operators");
 }
 
@@ -24,6 +23,7 @@ powerTerm
 
 
 factor
-  = terminal:[^()+\-*/]+ { return stringToTerminal(terminal.join("")); }
+  = terminal:[^()+\-*/{}:]+ "::{" u:[^{}]+ "}" { return stringToTerminal(terminal.join("") + "::{" + u.join("") + "}"); }
+  / terminal:[^()+\-*/{}:]+ { return stringToTerminal(terminal.join("")); }
   / "(" x:expr ")" { return x; }
   / "-" x:factor { return new operators.Mul(x, "-1") }
