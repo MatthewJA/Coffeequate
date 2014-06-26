@@ -45,5 +45,6 @@ define ["parse", "nodes"], (parse, nodes) ->
 
 		simplify: ->
 			new Expression(@expr.simplify())
-
+		expand: ->
+			new Expression(@expr.expand())
 	return Expression
