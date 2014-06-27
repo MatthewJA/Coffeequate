@@ -126,7 +126,7 @@ define [
 						newMul = new Mul(children...)
 						newMul = newMul.expand()
 						left = newMul
-					else
+					else # FIXME: Should expand denominators too!
 						left = new Pow(left, right)
 
 				return left
@@ -163,7 +163,7 @@ define [
 				return new terminals.Constant("1")
 			else
 				if right instanceof terminals.Constant and left instanceof terminals.Constant
-					return new terminals.Constant(Math.pow(left.evaluate(), right.evaluate()))
+					return left.pow(right)
 				else if left instanceof Pow
 					power = new Mul(left.children.right, right)
 					newPow = new Pow(left.children.left, power)
@@ -208,7 +208,7 @@ define [
 
 					# This will lose some solutions, if we have something like x ** x, but we can't solve
 					# a ** x anyway with this program, so losing a solution to x ** x doesn't bother me.
-					if expr.children.right.evaluate? and expr.children.right.evaluate() % 2 == 0
+					if expr.children.right.evaluate? and expr.children.right.evaluate() % 2 == 0 # % 2 checks for two real solutions.
 						returnables = []
 						for solution in solutions
 							negative = (new Mul(-1, solution)).simplify(equivalencies)

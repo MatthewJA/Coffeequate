@@ -2,8 +2,8 @@
 *.js
 
 # Disabling the committing of builds.
-!coffeequate/build/coffeequate.js
-!coffeequate/build/coffeequate.min.js
+#!coffeequate/build/coffeequate.js
+#!coffeequate/build/coffeequate.min.js
 
 ### Editor Specific ###
 *.sublime-workspace

@@ -14,28 +14,33 @@ define ["parse", "generateInfo", "nodes", "prettyRender", "constants"], (parse, 
 			return new Terminal(@label)
 
 	class Constant extends Terminal
-		# Constants in the equation tree, e.g. 1/2
-		constructor: (value, @denominator=null) ->
+		# Constants in the equation tree, e.g. 0.5 or 1/2.
+		# Can be represented as a RATIONAL (1/2) or a FLOAT (0.5).
+		# If a constant is produced by a negative exponentiation (or division, but CQ doesn't use that)
+		# then it becomes a rational. If it is entered as an integer then it will also be a rational.
+		# If it is entered as a float, then it remains a float.
+		# Rational * Rational -> Rational
+		# Rational * Float -> Float
+		# Float * Float -> Float
+		constructor: (@numerator, @denominator=1, @mode="rational") ->
 			@cmp = -6
 
-			if @denominator?
-				[@numerator, denominator] = parse.constant(value)
-				@denominator *= denominator
-			else
-				[@numerator, @denominator] = parse.constant(value)
-
-			if @denominator < 0
-				@denominator *= -1
-				@numerator *= -1
-
-			# @simplifyInPlace()
-			@numerator = parseFloat((@numerator).toPrecision(6)) # Temporary, until we have better numerical output.
+			switch @mode
+				when "rational"
+					@numerator = parseInt(@numerator)
+					@denominator = parseInt(@denominator)
+					@simplifyInPlace()
+				when "float"
+					@numerator = parseFloat(@numerator)
+					@denominator = parseFloat(@denominator)
+					@numerator /= @denominator
+					@denominator = 1
 
 		evaluate: ->
-			parseFloat((@numerator/@denominator).toPrecision(6)) # Temporary, until we have better numerical output.
+			parseFloat(@numerator/@denominator)
 
 		copy: ->
-			return new Constant(@numerator, @denominator)
+			return new Constant(@numerator, @denominator, @mode)
 
 		compareSameType: (b) ->
 			# Compare this object with another of the same type.
@@ -46,13 +51,65 @@ define ["parse", "generateInfo", "nodes", "prettyRender", "constants"], (parse, 
 			else
 				return 1
 
-		multiply: (b) ->
+		mul: (b) ->
 			# Multiply by another constant and return the result.
-			return new Constant(@numerator * b.numerator, @denominator * b.denominator)
+			if @mode == b.mode
+				newMode = @mode
+			else
+				newMode = "float"
+
+			return new Constant(@numerator * b.numerator, @denominator * b.denominator, newMode)
 
 		add: (b) ->
 			# Add another constant and return the result.
-			return new Constant(b.denominator * @numerator + @denominator * b.numerator, @denominator * b.denominator)
+			if @mode == b.mode
+				newMode = @mode
+			else
+				newMode = "float"
+
+			return new Constant(b.denominator * @numerator + @denominator * b.numerator, @denominator * b.denominator, newMode)
+
+		pow: (b) ->
+			# Put this constant to the power of another constant and return the result.
+			if @mode == "rational"
+				if b.mode == "rational"
+					flip = false # Whether to invert the fraction (for negative powers).
+					# Sort out the power so there's no negative numbers in it.
+					if b.numerator < 0 and b.denominator < 0
+						b = new Constant(-b.numerator, -b.denominator)
+					else if b.numerator > 0 and b.denominator < 0
+						flip = true
+						b = new Constant(b.numerator, -b.denominator)
+					else if b.numerator < 0 and b.denominator > 0
+						flip = true
+						b = new Constant(-b.numerator, b.denominator)
+
+					# No matter what, we're going to be raising everything to a power.
+					num = Math.pow(@numerator, b.numerator)
+					den = Math.pow(@denominator, b.numerator)
+
+					if flip
+						con = new Constant(den, num, "rational")
+					else
+						con = new Constant(num, den, "rational")
+
+					# Depending on whether or not the exponent is an integer, we might also need to root this.
+					if b.denominator == 1
+						# Integer. Just put the numerator and denominator of this constant to this power.
+						return con
+					else
+						# Fraction. Put everything to the power and then root the whole thing using another pow.
+						# This is a bit weird if you think about it - the pow method is actually returning a Pow -
+						# but you can think about this as an "irreducible" power.
+						operators = require("operators")
+						return new operators.Pow(con, new Constant(1, b.denominator, "rational"))
+
+				else
+					# We're returning a float here, so this is very easy!
+					return new Constant(Math.pow(@evaluate(), b.evaluate()), 1, "float")
+			else
+				# Also returning a float.
+				return new Constant(Math.pow(@evaluate(), b.evaluate()), 1, "float")
 
 		equals: (b) ->
 			# Test equality between this object and another.
@@ -85,7 +142,7 @@ define ["parse", "generateInfo", "nodes", "prettyRender", "constants"], (parse, 
 
 		simplify: ->
 			constant = @copy()
-			# constant.simplifyInPlace()
+			constant.simplifyInPlace()
 			return constant
 
 		expand: ->

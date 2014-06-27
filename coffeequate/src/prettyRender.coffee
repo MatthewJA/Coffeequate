@@ -245,7 +245,7 @@ define ->
 
     renderString: ->
       if @power and @power != 2
-        return "#{@bracketIfNeeded(@contents).renderString()} ** #{@power}}"
+        return "#{@bracketIfNeeded(@contents).renderString()} ** (1/#{@power})"
       else
         return "sqrt(#{@contents.renderString()})"
 

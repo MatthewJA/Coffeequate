@@ -9,17 +9,18 @@ define ["require"], (require) ->
 			"Could not parse '#{@input}' as #{@type}"
 
 	VARIABLE_REGEX = /^@*[a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ][a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ_\-\d]*$/
-	CONSTANT_REGEX = /^-?\d+(\.\d+)?(e-?\d+(\.\d+)?)?$/
-	RATIO_REGEX = /^-?\d+(\.\d+)?\/\d+(\.\d+)?$/
+	CONSTANT_INTEGER_REGEX = /^-?\d+(e\d+)?$/
+	CONSTANT_FLOAT_REGEX = /^-?\d+(\.\d+)?(e-?\d+(\.\d+)?)?$/ # Note that this matches integers too, so we'll need to match this after integers.
 	SYMBOLIC_CONSTANT_REGEX = /^\\@*[a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ][a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ_\-\d]*$/
 	DIMENSIONS_REGEX = /^[^:]*::\{[^:+]*\}$/
 
 	stringToTerminal = (string) ->
 		# Take a string and return a Terminal that that string represents.
-		# E.g. "2" -> Constant(2)
+		# E.g. "2" -> Constant(2, 1, "rational")
+		# E.g. "2.0" -> Constant(2, 1, "float")
 		# E.g. "v" -> Variable(2)
 		if /\^/.test(string)
-			throw new Error("Unexpected carat (^). Coffeequate uses ** for exponentiation")
+			throw new Error("Unexpected carat (^). Coffeequate uses ** for exponentiation.")
 		if DIMENSIONS_REGEX.test(string)
 			segments = string.split("::")
 			terminal = stringToTerminal(segments[0])
@@ -27,8 +28,10 @@ define ["require"], (require) ->
 			return terminal
 		string = string.trim()
 		terminals = require("terminals")
-		if CONSTANT_REGEX.test(string) or RATIO_REGEX.test(string)
-			return new terminals.Constant(string)
+		if CONSTANT_INTEGER_REGEX.test(string)
+			return new terminals.Constant(string, 1, "rational")
+		else if CONSTANT_FLOAT_REGEX.test(string)
+			return new terminals.Constant(string, 1, "float")
 		else if VARIABLE_REGEX.test(string)
 			if string[0] == "σ"
 				return new terminals.Uncertainty(string[1..])
@@ -686,28 +689,6 @@ define ["require"], (require) ->
 			if simplify
 				return expr.simplify()
 			return expr
-
-		constant: (value) ->
-			# Take a string and return [numerator, denominator].
-
-			if typeof(value) == "string" or value instanceof String
-				## TODO: Use regex here!
-				if value == "" then throw new ParseError("", "constant")
-
-				value = value.split("/")
-				if value.length == 1
-					return [parseFloat(value[0]), 1]
-				else if value.length == 2
-					return [parseFloat(value[0]), parseFloat(value[1])]
-				else
-					throw new ParseError(value.join("/"), "constant")
-
-			else if typeof(value) == "number" or value instanceof Number
-				## TODO: Convert the number into a fraction if necessary.
-				return [value, 1]
-
-			else
-				throw new ParseError(value, "constant")
 
 		stringToTerminal: stringToTerminal
 
