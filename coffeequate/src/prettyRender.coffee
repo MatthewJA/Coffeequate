@@ -73,25 +73,44 @@ greekLatexDictionary =
   "ϑ": "\\vartheta "
 
 define ->
+
+  # Generic drawing node, parent of all other drawing nodes.
   class DrawingNode
+
+    # Draw the node as a string.
+    #
+    # @throw [Error] Not implemented.
     toString: ->
       throw new Error("not implemented")
 
+    # Draw the node as a LaTeX string.
+    #
+    # @throw [Error] Not implemented.
     renderLaTeX: ->
       throw new Error("not implemented")
 
     # This tells us how strongly bound together the node is.
-    # As in, because x+y*z is parsed as x+(y*z), * binds more closely than + does.
-    # When we want to express (x+y)*z, we put the x+y Add node inside a Bracket
+    # As in, because `x+y*z` is parsed as `x+(y*z)`, `*` binds more closely than `+` does.
+    # When we want to express `(x+y)*z`, we put the `x+y` Add node inside a Bracket
     # node, which binds very tightly.
+    #
+    # @return [Number] Binding strength.
     bindingStrength: ->
       8
 
+    # Wraps the node in brackets if a node has lower precedence than this node.
+    #
+    # @param child [DrawingNode] The node to (potentially) bracket.
+    # @return [DrawingNode] The bracketed child, or the original child.
     bracketIfNeeded: (child) ->
       if child.bindingStrength<= @bindingStrength()
         return new Bracket(child)
       return child
 
+  # Make a new drawing node from terms.
+  #
+  # @param terms... [Array<DrawingNode>] An array of terms to make into a drawing node.
+  # @return [DrawingNode] A new drawing node from the terms provided.
   DrawingNode.makeWithBrackets = (terms...) ->
     node = new this()
     terms = terms.map((x) ->

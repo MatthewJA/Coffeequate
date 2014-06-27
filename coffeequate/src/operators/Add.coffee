@@ -1,13 +1,12 @@
 define [
 	"nodes"
 	"terminals"
-	"generateInfo"
 	"AlgebraError"
 	"parseArgs"
 	"require"
 	"compare"
 	"prettyRender"
-], (nodes, terminals, generateInfo, AlgebraError, parseArgs, require, compare, prettyRender) ->
+], (nodes, terminals, AlgebraError, parseArgs, require, compare, prettyRender) ->
 
 
 	combinations = (list) ->

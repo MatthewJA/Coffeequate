@@ -67,11 +67,22 @@ define ["parse", "nodes"], (parse, nodes) ->
 
 			return new Expression(@expr.sub(newsubs, null, null).simplify())
 
+		# Deep-copy this Expression.
+		#
+		# @return [Expression] A copy of this Expression.
 		copy: ->
 			new Expression(@expr.copy())
 
+		# Simplify this Expression.
+		#
+		# @return [Expression] A simplified Expression.
 		simplify: ->
 			new Expression(@expr.simplify())
+
+		# Expand this Expression.
+		#
+		# @return [Expression] An expanded Expression.
 		expand: ->
 			new Expression(@expr.expand())
+
 	return Expression

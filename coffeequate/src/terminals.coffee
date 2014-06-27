@@ -1,4 +1,4 @@
-define ["parse", "generateInfo", "nodes", "prettyRender", "constants"], (parse, generateInfo, nodes, prettyRender, constants) ->
+define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRender, constants) ->
 
 	# Terminals for the equation tree.
 

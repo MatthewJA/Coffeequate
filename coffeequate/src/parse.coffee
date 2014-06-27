@@ -2,23 +2,43 @@ define ["require"], (require) ->
 
 	# Functions to parse strings into various Coffeequate objects.
 
+	# Exception thrown if a terminal cannot be parsed.
+	#
 	class ParseError extends Error
+
+		# Make a new ParseError.
+		#
+		# @param input [Object] Input that was attempted to parse.
+		# @param type [String] The type of object that the input was being parsed as.
+		# @return [ParseError] A new ParseError.
 		constructor: (@input, @type) ->
 
+		# The string displayed when this error is thrown.
+		#
+		# @return [String] The string displayed when this error is thrown.
 		toString: ->
 			"Could not parse '#{@input}' as #{@type}"
 
+	# Regular expressions that match the various types of terminal recognised by Coffeequate.
 	VARIABLE_REGEX = /^@*[a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ][a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ_\-\d]*$/
 	CONSTANT_INTEGER_REGEX = /^-?\d+(e\d+)?$/
 	CONSTANT_FLOAT_REGEX = /^-?\d+(\.\d+)?(e-?\d+(\.\d+)?)?$/ # Note that this matches integers too, so we'll need to match this after integers.
 	SYMBOLIC_CONSTANT_REGEX = /^\\@*[a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ][a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ_\-\d]*$/
 	DIMENSIONS_REGEX = /^[^:]*::\{[^:+]*\}$/
 
+	# Take a string and return a Terminal that that string represents.
+	#
+	# @param string [String] A string to parse as a terminal.
+	# @return [Terminal] Terminal that the input string represented.
+	# @throw [ParseError] If the string cannot be parsed as a terminal.
+	#
+	# @example Integer parsing.
+	# 	"2" -> Constant(2, 1, "rational")
+	# @example Float parsing.
+	# 	"2.0" -> Constant(2, 1, "float")
+	# @example Variable parsing.
+	# 	"v" -> Variable(2)
 	stringToTerminal = (string) ->
-		# Take a string and return a Terminal that that string represents.
-		# E.g. "2" -> Constant(2, 1, "rational")
-		# E.g. "2.0" -> Constant(2, 1, "float")
-		# E.g. "v" -> Variable(2)
 		if /\^/.test(string)
 			throw new Error("Unexpected carat (^). Coffeequate uses ** for exponentiation.")
 		if DIMENSIONS_REGEX.test(string)
@@ -684,6 +704,11 @@ define ["require"], (require) ->
 		ParseError: ParseError
 		SyntaxError: parser.SyntaxError
 
+		# Parse a string and return an Expression.
+		#
+		# @param string [String] The string to parse.
+		# @param simplify [Boolean] Optional. Whether to simplify the parsed result.
+		# @return [Expression] The parsed Expression.
 		stringToExpression: (string, simplify=true) ->
 			expr = parser.parse(string)
 			if simplify
