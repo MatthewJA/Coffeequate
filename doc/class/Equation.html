@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset='UTF-8'>
+  <title>CoffeeScript API Documentation</title>
+  <script src='../javascript/application.js'></script>
+  <script src='../javascript/search.js'></script>
+  <link rel='stylesheet' href='../stylesheets/application.css' type='text/css'>
+</head>
+  <body>
+    <div id='base' data-path='../'></div>
+<div id='header'>
+  <div id='menu'>
+    <a href='../extra/README.md.html' title='Coffeequate'>
+      Coffeequate
+    </a>
+    &raquo;
+    <a href='../alphabetical_index.html' title='Index'>
+      Index
+    </a>
+    &raquo;
+    <span class='title'>Equation</span>
+  </div>
+</div>
+    <div id='content'>
+      <h1>
+        Class:
+        Equation
+      </h1>
+      <table class='box'>
+        <tr>
+          <td>Defined in:</td>
+          <td>coffeequate&#47;src&#47;Equation.coffee</td>
+        </tr>
+      </table>
+      <h2>Instance Method Summary</h2>
+      <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#solve-dynamic'>
+        #
+(void)
+<b>solve</b><span>(variable, equivalencies = null)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#replaceVariables-dynamic'>
+        #
+(void)
+<b>replaceVariables</b><span>(replacements)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getAllVariables-dynamic'>
+        #
+(void)
+<b>getAllVariables</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#sub-dynamic'>
+        #
+(void)
+<b>sub</b><span>(substitutions, uncertainties, equivalencies, assumeZeroUncertainty = false, evaluate = false)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#substituteExpression-dynamic'>
+        #
+(void)
+<b>substituteExpression</b><span>(source, variable, equivalencies, eliminate = false)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#expandAndSimplify-dynamic'>
+        #
+(void)
+<b>expandAndSimplify</b><span>(equivalencies)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#simplify-dynamic'>
+        #
+(void)
+<b>simplify</b><span>(equivalencies)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#expand-dynamic'>
+        #
+(void)
+<b>expand</b><span>(equivalencies)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getVariableUnits-dynamic'>
+        #
+(void)
+<b>getVariableUnits</b><span>(variable, equivalencies)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setVariableUnits-dynamic'>
+        #
+(void)
+<b>setVariableUnits</b><span>(variable, equivalencies, units)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#copy-dynamic'>
+        #
+(void)
+<b>copy</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#equals-dynamic'>
+        #
+(void)
+<b>equals</b><span>(b)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#toMathML-dynamic'>
+        #
+(void)
+<b>toMathML</b><span>(equationID, expression = false, equality = null, topLevel = false)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#toHTML-dynamic'>
+        #
+(void)
+<b>toHTML</b><span>(equationID, expression = false, equality = null, topLevel = false)</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#toLaTeX-dynamic'>
+        #
+(void)
+<b>toLaTeX</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#toString-dynamic'>
+        #
+(void)
+<b>toString</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+    </span>
+  </li>
+</ul>
+      <h2>Constructor Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='constructor-dynamic'>
+      #
+(void)
+<b>constructor</b><span>(args...)</span>
+      <br>
+    </p>
+    
+  </div>
+</div>
+      <h2>Instance Method Details</h2>
+      <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='solve-dynamic'>
+      #
+(void)
+<b>solve</b><span>(variable, equivalencies = null)</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='replaceVariables-dynamic'>
+      #
+(void)
+<b>replaceVariables</b><span>(replacements)</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getAllVariables-dynamic'>
+      #
+(void)
+<b>getAllVariables</b><span>()</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='sub-dynamic'>
+      #
+(void)
+<b>sub</b><span>(substitutions, uncertainties, equivalencies, assumeZeroUncertainty = false, evaluate = false)</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='substituteExpression-dynamic'>
+      #
+(void)
+<b>substituteExpression</b><span>(source, variable, equivalencies, eliminate = false)</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='expandAndSimplify-dynamic'>
+      #
+(void)
+<b>expandAndSimplify</b><span>(equivalencies)</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='simplify-dynamic'>
+      #
+(void)
+<b>simplify</b><span>(equivalencies)</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='expand-dynamic'>
+      #
+(void)
+<b>expand</b><span>(equivalencies)</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getVariableUnits-dynamic'>
+      #
+(void)
+<b>getVariableUnits</b><span>(variable, equivalencies)</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setVariableUnits-dynamic'>
+      #
+(void)
+<b>setVariableUnits</b><span>(variable, equivalencies, units)</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='copy-dynamic'>
+      #
+(void)
+<b>copy</b><span>()</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='equals-dynamic'>
+      #
+(void)
+<b>equals</b><span>(b)</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='toMathML-dynamic'>
+      #
+(void)
+<b>toMathML</b><span>(equationID, expression = false, equality = null, topLevel = false)</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='toHTML-dynamic'>
+      #
+(void)
+<b>toHTML</b><span>(equationID, expression = false, equality = null, topLevel = false)</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='toLaTeX-dynamic'>
+      #
+(void)
+<b>toLaTeX</b><span>()</span>
+      <br>
+    </p>
+    
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='toString-dynamic'>
+      #
+(void)
+<b>toString</b><span>()</span>
+      <br>
+    </p>
+    
+  </div>
+</div>
+    </div>
+    <div id='footer'>
+  June 27, 14 13:43:13 by
+  <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
+    Codo
+  </a>
+  2.0.9
+  &#10034;
+  Press H to see the keyboard shortcuts
+  &#10034;
+  <a href='http://twitter.com/netzpirat' target='_parent'>@netzpirat</a>
+  &#10034;
+  <a href='http://twitter.com/_inossidabile' target='_parent'>@_inossidabile</a>
+</div>
+<iframe id='search_frame'></iframe>
+<div id='fuzzySearch'>
+  <input type='text'>
+  <ol></ol>
+</div>
+<div id='help'>
+  <p>
+    Quickly fuzzy find classes, mixins, methods, file:
+  </p>
+  <ul>
+    <li>
+      <span>T</span>
+      Open fuzzy finder dialog
+    </li>
+  </ul>
+  <p>
+    Control the navigation frame:
+  </p>
+  <ul>
+    <li>
+      <span>L</span>
+      Toggle list view
+    </li>
+    <li>
+      <span>C</span>
+      Show class list
+    </li>
+    <li>
+      <span>I</span>
+      Show mixin list
+    </li>
+    <li>
+      <span>F</span>
+      Show file list
+    </li>
+    <li>
+      <span>M</span>
+      Show method list
+    </li>
+    <li>
+      <span>E</span>
+      Show extras list
+    </li>
+  </ul>
+  <p>
+    You can focus and blur the search input:
+  </p>
+  <ul>
+    <li>
+      <span>S</span>
+      Focus search input
+    </li>
+    <li>
+      <span>Esc</span>
+      Blur search input
+    </li>
+  </ul>
+</div>
+  </body>
+</html>
