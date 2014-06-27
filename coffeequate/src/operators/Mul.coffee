@@ -42,7 +42,7 @@ define [
 
 			for child in @children
 				if child instanceof terminals.Constant
-					constantterm = constantterm.multiply(child)
+					constantterm = constantterm.mul(child)
 				else
 					if variableterm?
 						variableterm.children.push(child)
@@ -234,7 +234,7 @@ define [
 					i -= 1 # Rewind the loop slightly.
 				else if term instanceof terminals.Constant
 					if constantterm?
-						constantterm = constantterm.multiply(term)
+						constantterm = constantterm.mul(term)
 					else
 						constantterm = term.copy()
 				else if term instanceof Pow # Might need to expand Pow nodes.
