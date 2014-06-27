@@ -5,6 +5,9 @@
 #!coffeequate/build/coffeequate.js
 #!coffeequate/build/coffeequate.min.js
 
+### Compiled Docs ###
+doc/*
+
 ### Editor Specific ###
 *.sublime-workspace
 .DS_Store/*
