@@ -5,7 +5,10 @@ define [
 	"require"
 ], (nodes, terminals, operators, require) ->
 
-	nodes.BasicNode.prototype.getUncertainty = () ->
+	# Get the uncertainty of a node.
+	#
+	# @return [BasicNode] The propagated uncertainty of this node.
+	nodes.BasicNode.prototype.getUncertainty = ->
 		Mul = operators.Mul
 		Pow = operators.Pow
 		Add = operators.Add

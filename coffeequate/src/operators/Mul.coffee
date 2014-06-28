@@ -8,8 +8,10 @@ define [
 	"prettyRender"
 ], (nodes, terminals, AlgebraError, parseArgs, require, compare, prettyRender) ->
 
-	# Represent multiplication as a node.
-
+	# Get all combinations of a list of items.
+	#
+	# @param list [Array<Object>] A list of items.
+	# @return [Array<Array<Object>>] A list of combinations of items.
 	combinations = (list) ->
 		if list.length == 1
 			return (i for i in list[0])
@@ -20,8 +22,14 @@ define [
 					results.push([i].concat(ii))
 			return results
 
-	return class Mul extends nodes.RoseNode
+	# Node in the expression tree representing multiplication.
+	class Mul extends nodes.RoseNode
 
+		# Make a new multiplication node.
+		# Arguments passed as children will be parsed as children from whatever type they are.
+		#
+		# @param args... [Array<Object>] A list of children for this node.
+		# @return [Mul] A new multiplication node.
 		constructor: (args...) ->
 			if args.length < 1
 				throw new Error("Mul nodes must have at least one child.")
@@ -31,10 +39,16 @@ define [
 			args = parseArgs(args...)
 			super("*", args)
 
+		# Deep-copy this node.
+		#
+		# @return [Mul] A copy of this node.
 		copy: ->
 			args = ((if i.copy? then i.copy() else i) for i in @children)
 			return new Mul(args...)
 
+		# Collect constants into one term.
+		#
+		# @return [Mul] This node with constants collected into one term.
 		simplifyConstants: ->
 			constantterm = new terminals.Constant("1")
 			variableterm = null
@@ -55,8 +69,11 @@ define [
 
 			return new Mul(constantterm, variableterm)
 
+		# Compare this object with another of the same type.
+		#
+		# @param b [Mul] An addition node to compare to.
+		# @return [Number] The comparison: 1 if this node is greater than the other, -1 if vice versa, and 0 if they are equal.
 		compareSameType: (b) ->
-			# Compare this object with another of the same type.
 			if @children.length == b.children.length
 				lengthComparison = 0
 			else if @children.length < b.children.length
@@ -540,3 +557,4 @@ define [
 				g = new Mul(@children.slice(1)...)
 				return new Add(new Mul(f, g.differentiate(variable)),
 											 new Mul(g, f.differentiate(variable))).expandAndSimplify()
+	return Mul

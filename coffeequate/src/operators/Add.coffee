@@ -8,7 +8,10 @@ define [
 	"prettyRender"
 ], (nodes, terminals, AlgebraError, parseArgs, require, compare, prettyRender) ->
 
-
+	# Get all combinations of a list of items.
+	#
+	# @param list [Array<Object>] A list of items.
+	# @return [Array<Array<Object>>] A list of combinations of items.
 	combinations = (list) ->
 		if list.length == 1
 			return (i for i in list[0])
@@ -19,7 +22,14 @@ define [
 					results.push([i].concat(ii))
 			return results
 
-	return class Add extends nodes.RoseNode
+	# Node in the expression tree representing addition.
+	class Add extends nodes.RoseNode
+
+		# Make a new addition node.
+		# Arguments passed as children will be parsed as children from whatever type they are.
+		#
+		# @param args... [Array<Object>] A list of children for this node.
+		# @return [Add] A new addition node.
 		constructor: (args...) ->
 			# Check validity of arguments.
 			if args.length < 1
@@ -30,12 +40,18 @@ define [
 			args = parseArgs(args...)
 			super("+", args)
 
+		# Deep-copy this node.
+		#
+		# @return [Add] A copy of this node.
 		copy: ->
 			args = ((if i.copy? then i.copy() else i) for i in @children)
 			return new Add(args...)
 
+		# Compare this object with another of the same type.
+		#
+		# @param b [Add] An addition node to compare to.
+		# @return [Number] The comparison: 1 if this node is greater than the other, -1 if vice versa, and 0 if they are equal.
 		compareSameType: (b) ->
-			# Compare this object with another of the same type.
 			if @children.length == b.children.length
 				lengthComparison = 0
 			else if @children.length < b.children.length
@@ -51,6 +67,12 @@ define [
 
 			return lengthComparison
 
+		# Get the dimensions/units of a variable in this node.
+		#
+		# @param variable [String] The label of the variable to get dimensions of.
+		# @param equivalencies [Object] An object of equivalencies.
+		# @return [BasicNode] The units of the variable, or null if the variable wasn't found.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		getVariableUnits: (variable, equivalencies) ->
 			variableEquivalencies = if equivalencies? then equivalencies.get(variable) else [variable]
 			for child in @children
@@ -62,11 +84,20 @@ define [
 						return childVariableUnits
 			return null
 
+		# Set the dimensions/units of a variable in this node.
+		#
+		# @param variable [String] The label of the variable to set dimensions of.
+		# @param equivalencies [Object] An object of equivalencies.
+		# @param units [BasicNode] The units to give the variable.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		setVariableUnits: (variable, equivalencies, units) ->
 			variableEquivalencies = if equivalencies? then equivalencies.get(variable) else {get: (z) -> [z]}
 			for child in @children
 				child.setVariableUnits(variable, equivalencies, units)
 
+		# Expand this node.
+		#
+		# @return [Add] This node, expanded.
 		expand: ->
 			# Addition is associative, so expand (+ (+ a b) c) into (+ a b c).
 			children = []
@@ -88,14 +119,19 @@ define [
 
 			return add
 
+		# Sort this node in-place.
 		sort: ->
-			# Sort this node.
 			for child in @children
 				child.sort?()
 			@children.sort(compare)
 
+		# Check equality between this and another object.
+		#
+		# @param b [Object] An object to check equality with.
+		# @param equivalencies [Object] An object of equivalencies.
+		# @return [Boolean] Whether the objects are equal.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		equals: (b, equivalencies) ->
-			# Check equality between this and another object.
 			unless b instanceof Add
 				return false
 			unless b.children.length == @children.length
@@ -109,6 +145,11 @@ define [
 						return false
 			return true
 
+		# Simplify this node.
+		#
+		# @param equivalencies [Object] An object of equivalencies.
+		# @return [BasicNode, Terminal] This node, simplified.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		simplify: (equivalencies) ->
 			Mul = require("operators/Mul")
 
@@ -228,12 +269,24 @@ define [
 			return newAdd unless newAdd.children.length == 1
 			return newAdd.children[0]
 
+		# Expand and then simplify this node.
+		#
+		# @param equivalencies [Object] An object of equivalencies.
+		# @return [BasicNode, Terminal] This node, expanded and simplified.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		expandAndSimplify: (equivalencies) ->
 			expr = @expand()
 			if expr.simplify?
 				return expr.simplify(equivalencies)
 			return expr
 
+		# Solve this node for a variable.
+		#
+		# @param variable [String] The label of the variable to solve for.
+		# @param equivalencies [Object] Optional. An object of equivalencies.
+		# @return [Array<BasicNode>, Array<Terminal>] The solutions for the given variable.
+		# @throw [AlgebraError] If the node cannot be solved.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		solve: (variable, equivalencies=null) ->
 			Mul = require("operators/Mul")
 			Pow = require("operators/Pow")
@@ -538,6 +591,9 @@ define [
 					newMul = newMul.simplify(equivalencies)
 					return [0, newMul]
 
+		# Get all variable labels used in children of this node.
+		#
+		# @return [Array<String>] A list of all labels of variables in children of this node.
 		getAllVariables: ->
 			variables = {}
 			for child in @children
@@ -554,6 +610,10 @@ define [
 
 			return outVariables
 
+		# Replace variable labels.
+		#
+		# @param replacements [Object] A map of variable labels to their replacement labels.
+		# @return [Add] This node with variable labels replaced.
 		replaceVariables: (replacements) ->
 			children = []
 			for child, index in @children
@@ -567,6 +627,15 @@ define [
 
 			return new Add(children...)
 
+		# Substitute values into variables.
+		#
+		# @param substitutions [Object] A map of variable labels to their values. Values can be any node, terminal, or something interpretable as a terminal.
+		# @param uncertaintySubstitutions [Object] A map of variable labels to the values of their uncertainties.
+		# @param equivalencies [Object] Optional. An object of equivalencies.
+		# @param assumeZeroUncertainty [Boolean] Optional. Whether to assume uncertainties are zero if unknown (default false).
+		# @param evaluateSymbolicConstants [Boolean] Optional. Whether to evaluate symbolic constants (default false).
+		# @return [BasicNode, Terminal] This node with all substitutions substituted.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		sub: (substitutions, uncertaintySubstitutions, equivalencies=null, assumeZeroUncertainty=false, evaluateSymbolicConstants=false) ->
 			# substitutions: {variable: value}
 			# variable is a label, value is any object - if it is a node,
@@ -602,6 +671,9 @@ define [
 			newAdd = newAdd.expandAndSimplify(equivalencies)
 			return newAdd
 
+		# Substitute an expression into this node.
+		#
+		# @deprecated (Not sure why this exists)
 		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
 			# Replace all instances of a variable with an expression.
 			# Eliminate the target variable if set to do so.
@@ -637,13 +709,22 @@ define [
 
 			return results
 
+		# Convert this node into a drawing node.
+		#
+		# @return [DrawingNode] A drawing node representing this node.
 		toDrawingNode: ->
 			AddNode = prettyRender.Add
 			return AddNode.makeWithBrackets(@children.map((term) -> term.toDrawingNode())...)
 
+		# Differentiate this node with respect to a variable.
+		#
+		# @param variable [String] The label of the variable to differentiate with respect to.
+		# @todo Add equivalencies. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		differentiate: (variable) ->
 			newChildren = @children.map (x) -> x.differentiate(variable)
 
 			derivative = new Add(newChildren...)
 
 			return derivative.expandAndSimplify()
+
+	return Add
