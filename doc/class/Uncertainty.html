@@ -39,63 +39,72 @@
           </td>
         </tr>
       </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <p>Represents an uncertainty.</p>
+</div>
+<div class='tags'>
+</div>
       <h2>Instance Method Summary</h2>
       <ul class='summary'>
   <li>
     <span class='signature'>
       <a href='#copy-dynamic'>
         #
-(void)
+(Uncertainty)
 <b>copy</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Deep-copy the Uncertainty. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#compareSameType-dynamic'>
         #
-(void)
+(Number)
 <b>compareSameType</b><span>(b)</span>
       </a>
     </span>
     <span class='desc'>
+      Compares this Uncertainty with another Uncertainty. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#equals-dynamic'>
         #
-(void)
+(Boolean)
 <b>equals</b><span>(b, equivalencies = null)</span>
       </a>
     </span>
     <span class='desc'>
-      Before commit: think about this more before asking Matt Matt: should we do this?
-
+      Check equality of this and another object. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#replaceVariables-dynamic'>
         #
-(void)
+(Uncertainty)
 <b>replaceVariables</b><span>(replacements)</span>
       </a>
     </span>
     <span class='desc'>
+      Replace variable labels. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#getAllVariables-dynamic'>
         #
-(void)
+(Array&lt;String&gt;)
 <b>getAllVariables</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Get variable labels. 
     </span>
   </li>
   <li>
@@ -107,6 +116,7 @@
       </a>
     </span>
     <span class='desc'>
+      Substitute values. 
     </span>
   </li>
   <li>
@@ -118,6 +128,7 @@
       </a>
     </span>
     <span class='desc'>
+      Substitute an expression. 
     </span>
   </li>
   <li>
@@ -129,6 +140,7 @@
       </a>
     </span>
     <span class='desc'>
+      Get uncertainty. 
     </span>
   </li>
   <li>
@@ -140,6 +152,7 @@
       </a>
     </span>
     <span class='desc'>
+      Get variable units. 
     </span>
   </li>
   <li>
@@ -151,50 +164,55 @@
       </a>
     </span>
     <span class='desc'>
+      Set variable units. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#simplify-dynamic'>
         #
-(void)
+(Uncertainty)
 <b>simplify</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Simplify this node. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#expand-dynamic'>
         #
-(void)
+(Uncertainty)
 <b>expand</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Expand this node. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#expandAndSimplify-dynamic'>
         #
-(void)
+(Uncertainty)
 <b>expandAndSimplify</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Expand and then simplify this node. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#toDrawingNode-dynamic'>
         #
-(void)
+(DrawingNode)
 <b>toDrawingNode</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Make a new drawing node representing this uncertainty. 
     </span>
   </li>
   <li>
@@ -206,6 +224,7 @@
       </a>
     </span>
     <span class='desc'>
+      Differentiate. 
     </span>
   </li>
 </ul>
@@ -230,9 +249,22 @@
       <br>
     </p>
     <div class='docstring'>
-  <p>Uncertainty in the equation tree, e.g. sigma_m</p>
+  <p>Make an Uncertainty.</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>label</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Label of the variable this Uncertainty is for. </span>
+    </li>
+  </ul>
 </div>
   </div>
 </div>
@@ -241,52 +273,175 @@
   <div class='method_details'>
     <p class='signature' id='copy-dynamic'>
       #
-(void)
+(Uncertainty)
 <b>copy</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Deep-copy the Uncertainty.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Uncertainty.html'>Uncertainty</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A copy of the Uncertainty. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='compareSameType-dynamic'>
       #
-(void)
+(Number)
 <b>compareSameType</b><span>(b)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Compares this Uncertainty with another Uncertainty.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>b</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Uncertainty.html'>Uncertainty</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Uncertainty to compare with. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Number.html'>Number</a></tt>
+      )
+      &mdash;
+      <span class='desc'>1 if this is greater, 0 if equal, -1 if this is lesser. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='equals-dynamic'>
       #
-(void)
+(Boolean)
 <b>equals</b><span>(b, equivalencies = null)</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>Before commit: think about this more before asking Matt
-Matt: should we do this?</p>
+  <div class='note todo'>
+    <strong>TODO:</strong>
+    Change the way equivalencies are handled. <a href="https://github.com/MatthewJA/Coffeequate/issues/62">#62</a> 
+  </div>
+  <p>Check equality of this and another object.</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>b</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Object to compare with. </span>
+    </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Equivalencies object. Optional (default is null). </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Boolean</tt>
+      )
+      &mdash;
+      <span class='desc'>Whether the objects are equal. </span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='replaceVariables-dynamic'>
       #
-(void)
+(Uncertainty)
 <b>replaceVariables</b><span>(replacements)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Replace variable labels.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>replacements</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Map of variable labels to new labels. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Uncertainty.html'>Uncertainty</a></tt>
+      )
+      &mdash;
+      <span class='desc'>This node with its label possibly replaced. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='getAllVariables-dynamic'>
       #
-(void)
+(Array&lt;String&gt;)
 <b>getAllVariables</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Get variable labels.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Array&lt;String&gt;</tt>
+      )
+      &mdash;
+      <span class='desc'>An array containing just this label. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='sub-dynamic'>
@@ -295,7 +450,54 @@ Matt: should we do this?</p>
 <b>sub</b><span>(substitutions, uncertaintySubstitutions, equivalencies = null, assumeZero = false)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Substitute values.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>substitutions</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Substitutions map. Irrelevant; included for API parity. </span>
+    </li>
+    <li>
+      <span class='name'>uncertaintySubstitutions</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Map of uncertainty labels to uncertainty values. </span>
+    </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Equivalencies object. Optional (default is null). </span>
+    </li>
+    <li>
+      <span class='name'>assumeZero</span>
+      <span class='type'>
+        (
+          <tt>Boolean</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Whether to assume this uncertainty is zero if its value is not defined. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='substituteExpression-dynamic'>
@@ -304,7 +506,15 @@ Matt: should we do this?</p>
 <b>substituteExpression</b><span>(sourceExpression, variable, equivalencies = null, eliminate = false)</span>
       <br>
     </p>
+    <div class='docstring'>
+  <div class='deprecated note'>
+    <strong>Deprecated.</strong>
     
+  </div>
+  <p>Substitute an expression.</p>
+</div>
+<div class='tags'>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='getUncertainty-dynamic'>
@@ -313,7 +523,22 @@ Matt: should we do this?</p>
 <b>getUncertainty</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Get uncertainty.</p>
+</div>
+<div class='tags'>
+  <h3>Throws:</h3>
+  <ul class='throw'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Error</tt>
+      )
+      &mdash;
+      <span class='desc'>Not implemented for uncertainties. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='getVariableUnits-dynamic'>
@@ -322,7 +547,22 @@ Matt: should we do this?</p>
 <b>getVariableUnits</b><span>(variable, equivalencies)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Get variable units.</p>
+</div>
+<div class='tags'>
+  <h3>Throws:</h3>
+  <ul class='throw'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Error</tt>
+      )
+      &mdash;
+      <span class='desc'>Not implemented for uncertainties. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='setVariableUnits-dynamic'>
@@ -331,43 +571,118 @@ Matt: should we do this?</p>
 <b>setVariableUnits</b><span>(variable, equivalencies, units)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Set variable units.</p>
+</div>
+<div class='tags'>
+  <h3>Throws:</h3>
+  <ul class='throw'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Error</tt>
+      )
+      &mdash;
+      <span class='desc'>Not implemented for uncertainties. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='simplify-dynamic'>
       #
-(void)
+(Uncertainty)
 <b>simplify</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Simplify this node.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Uncertainty.html'>Uncertainty</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A copy of this uncertainty. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='expand-dynamic'>
       #
-(void)
+(Uncertainty)
 <b>expand</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Expand this node.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Uncertainty.html'>Uncertainty</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A copy of this uncertainty. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='expandAndSimplify-dynamic'>
       #
-(void)
+(Uncertainty)
 <b>expandAndSimplify</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Expand and then simplify this node.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Uncertainty.html'>Uncertainty</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A copy of this uncertainty. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='toDrawingNode-dynamic'>
       #
-(void)
+(DrawingNode)
 <b>toDrawingNode</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Make a new drawing node representing this uncertainty.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/DrawingNode.html'>DrawingNode</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A drawing node representing this uncertainty. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='differentiate-dynamic'>
@@ -376,12 +691,28 @@ Matt: should we do this?</p>
 <b>differentiate</b><span>(variable)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Differentiate.
+Don&#39;t differentiate uncertainties. It won&#39;t work.</p>
+</div>
+<div class='tags'>
+  <h3>Throws:</h3>
+  <ul class='throw'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Error</tt>
+      )
+      &mdash;
+      <span class='desc'>Not implemented for uncertainties. </span>
+    </li>
+  </ul>
+</div>
   </div>
 </div>
     </div>
     <div id='footer'>
-  June 27, 14 14:08:50 by
+  June 30, 14 00:34:37 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

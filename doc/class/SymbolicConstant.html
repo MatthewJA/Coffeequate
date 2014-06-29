@@ -39,116 +39,132 @@
           </td>
         </tr>
       </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <p>Represents symbolic constants in the equation tree, such as π.</p>
+</div>
+<div class='tags'>
+</div>
       <h2>Instance Method Summary</h2>
       <ul class='summary'>
   <li>
     <span class='signature'>
       <a href='#copy-dynamic'>
         #
-(void)
+(SymbolicConstant)
 <b>copy</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Deep-copy the symbolic constant. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#compareSameType-dynamic'>
         #
-(void)
+(Number)
 <b>compareSameType</b><span>(b)</span>
       </a>
     </span>
     <span class='desc'>
+      Compare this symbolic constant with another symbolic constant. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#evaluate-dynamic'>
         #
-(void)
+(Number)
 <b>evaluate</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Evaluate the symbolic constant. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#equals-dynamic'>
         #
-(void)
+(Boolean)
 <b>equals</b><span>(b)</span>
       </a>
     </span>
     <span class='desc'>
+      Check equality of this and another object. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#replaceVariables-dynamic'>
         #
-(void)
+(SymbolicConstant)
 <b>replaceVariables</b><span>(replacements)</span>
       </a>
     </span>
     <span class='desc'>
+      Replace variables - does nothing. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#getAllVariables-dynamic'>
         #
-(void)
+(Array&lt;Object&gt;)
 <b>getAllVariables</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Get all variables in this node. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#sub-dynamic'>
         #
-(void)
+(SymbolicConstant, Constant)
 <b>sub</b><span>(substitutions, uncertaintySubstitutions, equivalencies = null, assumeZeroUncertainty = false, evaluateSymbolicConstants = false)</span>
       </a>
     </span>
     <span class='desc'>
+      Substitute values - side effect of evaluation if evaluateSymbolicConstants is true. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#simplify-dynamic'>
         #
-(void)
+(SymbolicConstant)
 <b>simplify</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Simplify this constant. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#expand-dynamic'>
         #
-(void)
+(SymbolicConstant)
 <b>expand</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Expand this constant. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#expandAndSimplify-dynamic'>
         #
-(void)
+(SymbolicConstant)
 <b>expandAndSimplify</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Expand and simplify this constant. 
     </span>
   </li>
   <li>
@@ -160,28 +176,31 @@
       </a>
     </span>
     <span class='desc'>
+      Substitutes an expression into this constant. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#getUncertainty-dynamic'>
         #
-(void)
+(Constant)
 <b>getUncertainty</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Get uncertainty of this constant. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#getVariableUnits-dynamic'>
         #
-(void)
-<b>getVariableUnits</b><span>()</span>
+(Object)
+<b>getVariableUnits</b><span>(variable)</span>
       </a>
     </span>
     <span class='desc'>
+      Get units of variable children of this constant. 
     </span>
   </li>
   <li>
@@ -193,28 +212,31 @@
       </a>
     </span>
     <span class='desc'>
+      Set units of variable children. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#toDrawingNode-dynamic'>
         #
-(void)
+(DrawingNode)
 <b>toDrawingNode</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Make a drawing node representing this constant. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#differentiate-dynamic'>
         #
-(void)
+(Constant)
 <b>differentiate</b><span>(variable)</span>
       </a>
     </span>
     <span class='desc'>
+      Differentiate this constant. 
     </span>
   </li>
 </ul>
@@ -239,9 +261,42 @@
       <br>
     </p>
     <div class='docstring'>
-  <p>Symbolic constants in the equation tree, e.g. Ï€</p>
+  <p>Make a new symbolic constant.</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>label</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The label of this constant (such as π). </span>
+    </li>
+    <li>
+      <span class='name'>value</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Number.html'>Number</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. Value of the symbolic constant (default is null). </span>
+    </li>
+    <li>
+      <span class='name'>units</span>
+      <span class='type'>
+        (
+          <tt>BasicNode, Terminal</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. Units of the constant (default is null). </span>
+    </li>
+  </ul>
 </div>
   </div>
 </div>
@@ -250,92 +305,326 @@
   <div class='method_details'>
     <p class='signature' id='copy-dynamic'>
       #
-(void)
+(SymbolicConstant)
 <b>copy</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Deep-copy the symbolic constant.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/SymbolicConstant.html'>SymbolicConstant</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A new copy of the Symbolic Constant. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='compareSameType-dynamic'>
       #
-(void)
+(Number)
 <b>compareSameType</b><span>(b)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Compare this symbolic constant with another symbolic constant.
+Note that this compares labels, not values - this is a lexiographic sort.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>b</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/SymbolicConstant.html'>SymbolicConstant</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The constant to compare with. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Number.html'>Number</a></tt>
+      )
+      &mdash;
+      <span class='desc'>1 if this constant is greater, -1 if vice-versa, and 0 if equal. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='evaluate-dynamic'>
       #
-(void)
+(Number)
 <b>evaluate</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Evaluate the symbolic constant.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Number.html'>Number</a></tt>
+      )
+      &mdash;
+      <span class='desc'>The value of the symbolic constant, if it has one, or the value in the lookup table. Null otherwise. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='equals-dynamic'>
       #
-(void)
+(Boolean)
 <b>equals</b><span>(b)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Check equality of this and another object.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>b</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The object to compare with. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Boolean</tt>
+      )
+      &mdash;
+      <span class='desc'>Whether the objects are equal. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='replaceVariables-dynamic'>
       #
-(void)
+(SymbolicConstant)
 <b>replaceVariables</b><span>(replacements)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Replace variables - does nothing. Included for API parity.</p><p>@params replacements [Object] Map of replacements. Irrelevant.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/SymbolicConstant.html'>SymbolicConstant</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A copy of this constant. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='getAllVariables-dynamic'>
       #
-(void)
+(Array&lt;Object&gt;)
 <b>getAllVariables</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Get all variables in this node. Included for API parity.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Array&lt;Object&gt;</tt>
+      )
+      &mdash;
+      <span class='desc'>[] </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='sub-dynamic'>
       #
-(void)
+(SymbolicConstant, Constant)
 <b>sub</b><span>(substitutions, uncertaintySubstitutions, equivalencies = null, assumeZeroUncertainty = false, evaluateSymbolicConstants = false)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <div class='note todo'>
+    <strong>TODO:</strong>
+    Change the way equivalencies are handled. <a href="https://github.com/MatthewJA/Coffeequate/issues/62">#62</a> 
+  </div>
+  <p>Substitute values - side effect of evaluation if evaluateSymbolicConstants is true.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>substitutions</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Substitutions map. Irrelevant, included for API parity. </span>
+    </li>
+    <li>
+      <span class='name'>uncertaintySubstitutions</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Uncertainty substitutions map. Irrelevant. </span>
+    </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. Equivalencies object. Irrelevant. </span>
+    </li>
+    <li>
+      <span class='name'>assumeZeroUncertainty</span>
+      <span class='type'>
+        (
+          <tt>Boolean</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. Whether to assume unknown uncertainties are zero. Irrelevant. </span>
+    </li>
+    <li>
+      <span class='name'>evaluateSymbolicConstants</span>
+      <span class='type'>
+        (
+          <tt>Boolean</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. Whether to evaluate this constant (default is false). </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>SymbolicConstant, Constant</tt>
+      )
+      &mdash;
+      <span class='desc'>A copy of this constant if not evaluating symbolic constants, or an evaluated constant otherwise. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='simplify-dynamic'>
       #
-(void)
+(SymbolicConstant)
 <b>simplify</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Simplify this constant.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/SymbolicConstant.html'>SymbolicConstant</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A copy of the constant. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='expand-dynamic'>
       #
-(void)
+(SymbolicConstant)
 <b>expand</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Expand this constant.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/SymbolicConstant.html'>SymbolicConstant</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A copy of the constant. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='expandAndSimplify-dynamic'>
       #
-(void)
+(SymbolicConstant)
 <b>expandAndSimplify</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Expand and simplify this constant.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/SymbolicConstant.html'>SymbolicConstant</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A copy of the constant. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='substituteExpression-dynamic'>
@@ -344,25 +633,76 @@
 <b>substituteExpression</b><span>(sourceExpression, variable, equivalencies)</span>
       <br>
     </p>
+    <div class='docstring'>
+  <div class='deprecated note'>
+    <strong>Deprecated.</strong>
     
+  </div>
+  <p>Substitutes an expression into this constant.</p>
+</div>
+<div class='tags'>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='getUncertainty-dynamic'>
       #
-(void)
+(Constant)
 <b>getUncertainty</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Get uncertainty of this constant.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Constant.html'>Constant</a></tt>
+      )
+      &mdash;
+      <span class='desc'>0, as we assume no uncertainty in a symbolic constant. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='getVariableUnits-dynamic'>
       #
-(void)
-<b>getVariableUnits</b><span>()</span>
+(Object)
+<b>getVariableUnits</b><span>(variable)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Get units of variable children of this constant. Included for API parity.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>variable</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The variable to check for. Irrelevant. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Object</tt>
+      )
+      &mdash;
+      <span class='desc'>null - no children. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='setVariableUnits-dynamic'>
@@ -371,30 +711,114 @@
 <b>setVariableUnits</b><span>(variable, equivalencies, units)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <div class='note todo'>
+    <strong>TODO:</strong>
+    Change the way equivalencies are handled. <a href="https://github.com/MatthewJA/Coffeequate/issues/62">#62</a> 
+  </div>
+  <p>Set units of variable children. Included for API parity.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>variable</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The variable to set for. Irrelevant. </span>
+    </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Equivalencies object. Irrelevant. </span>
+    </li>
+    <li>
+      <span class='name'>units</span>
+      <span class='type'>
+        (
+          <tt>BasicNode, Terminal</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The units to set. Irrelevant. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='toDrawingNode-dynamic'>
       #
-(void)
+(DrawingNode)
 <b>toDrawingNode</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Make a drawing node representing this constant.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/DrawingNode.html'>DrawingNode</a></tt>
+      )
+      &mdash;
+      <span class='desc'>Renderable drawing node representing this constant. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='differentiate-dynamic'>
       #
-(void)
+(Constant)
 <b>differentiate</b><span>(variable)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Differentiate this constant.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>variable</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Variable to differentiate with respect to. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Constant.html'>Constant</a></tt>
+      )
+      &mdash;
+      <span class='desc'>0, as constants are constant. </span>
+    </li>
+  </ul>
+</div>
   </div>
 </div>
     </div>
     <div id='footer'>
-  June 27, 14 14:08:50 by
+  June 30, 14 00:34:37 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

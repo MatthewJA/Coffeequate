@@ -39,39 +39,56 @@
           </td>
         </tr>
       </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <p>A constant in the equation tree, e.g. 0.5 or 1/2.
+Can be represented as a rational (1/2) or a float (0.5).
+If a constant is produced by negative exponentiation
+it becomes a rational; if it is entered as an integer then it
+is a rational; if it is entered as a float, then it remains
+a float.
+Rational <code>*</code> Rational -&gt; Rational
+Rational <code>*</code> Float -&gt; Float
+Float <code>*</code> Float -&gt; Float</p>
+</div>
+<div class='tags'>
+</div>
       <h2>Instance Method Summary</h2>
       <ul class='summary'>
   <li>
     <span class='signature'>
       <a href='#evaluate-dynamic'>
         #
-(void)
+(Number)
 <b>evaluate</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Evaluate the constant. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#copy-dynamic'>
         #
-(void)
+(Constant)
 <b>copy</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Deep-copy this constant. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#compareSameType-dynamic'>
         #
-(void)
+(Number)
 <b>compareSameType</b><span>(b)</span>
       </a>
     </span>
     <span class='desc'>
+      Compare this constant with another constant. 
     </span>
   </li>
   <li>
@@ -83,39 +100,43 @@
       </a>
     </span>
     <span class='desc'>
+      Multiply by another constant. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#add-dynamic'>
         #
-(void)
+(Constant)
 <b>add</b><span>(b)</span>
       </a>
     </span>
     <span class='desc'>
+      Add another constant to this one. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#pow-dynamic'>
         #
-(void)
+(Constant, Pow)
 <b>pow</b><span>(b)</span>
       </a>
     </span>
     <span class='desc'>
+      Raise this constant to the power of another. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#equals-dynamic'>
         #
-(void)
+(Boolean)
 <b>equals</b><span>(b)</span>
       </a>
     </span>
     <span class='desc'>
+      Test the equality between this constant and another object. 
     </span>
   </li>
   <li>
@@ -127,17 +148,19 @@
       </a>
     </span>
     <span class='desc'>
+      Alias of copy. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#getAllVariables-dynamic'>
         #
-(void)
+(Array&lt;Object&gt;)
 <b>getAllVariables</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Get all variables in this terminal. 
     </span>
   </li>
   <li>
@@ -149,6 +172,7 @@
       </a>
     </span>
     <span class='desc'>
+      Alias of copy. 
     </span>
   </li>
   <li>
@@ -160,39 +184,43 @@
       </a>
     </span>
     <span class='desc'>
+      Simplify this fraction in-place using Euclid&#39;s method. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#simplify-dynamic'>
         #
-(void)
+(Constant)
 <b>simplify</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Simplify this constant. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#expand-dynamic'>
         #
-(void)
+(Constant)
 <b>expand</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Expand this constant. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#expandAndSimplify-dynamic'>
         #
-(void)
+(Constant)
 <b>expandAndSimplify</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Expand and simplify. 
     </span>
   </li>
   <li>
@@ -204,28 +232,31 @@
       </a>
     </span>
     <span class='desc'>
+      Substitute an expression into this. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#getUncertainty-dynamic'>
         #
-(void)
+(Constant)
 <b>getUncertainty</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Get uncertainty of this constant. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#getVariableUnits-dynamic'>
         #
-(void)
+(Object)
 <b>getVariableUnits</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Get the units of variables. 
     </span>
   </li>
   <li>
@@ -237,17 +268,19 @@
       </a>
     </span>
     <span class='desc'>
+      Set the units of variables. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#toDrawingNode-dynamic'>
         #
-(void)
+(DrawingNode)
 <b>toDrawingNode</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Create a drawing node representing this constant 
     </span>
   </li>
   <li>
@@ -259,6 +292,7 @@
       </a>
     </span>
     <span class='desc'>
+      Differentiate this constant. 
     </span>
   </li>
 </ul>
@@ -283,16 +317,42 @@
       <br>
     </p>
     <div class='docstring'>
-  <p>Constants in the equation tree, e.g. 0.5 or 1/2.
-Can be represented as a RATIONAL (1/2) or a FLOAT (0.5).
-If a constant is produced by a negative exponentiation (or division, but CQ doesn&#39;t use that)
-then it becomes a rational. If it is entered as an integer then it will also be a rational.
-If it is entered as a float, then it remains a float.
-Rational <em> Rational -&gt; Rational
-Rational </em> Float -&gt; Float
-Float * Float -&gt; Float</p>
+  <p>Make a new constant.</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>numerator</span>
+      <span class='type'>
+        (
+          <tt>String, Number</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The numerator of the rational. If the number is a float, this is just the whole value. </span>
+    </li>
+    <li>
+      <span class='name'>denominator</span>
+      <span class='type'>
+        (
+          <tt>String, Number</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The denominator of the rational. </span>
+    </li>
+    <li>
+      <span class='name'>mode</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. Can be &quot;rational&quot; or &quot;float&quot; (default &quot;rational&quot;). </span>
+    </li>
+  </ul>
 </div>
   </div>
 </div>
@@ -301,29 +361,87 @@ Float * Float -&gt; Float</p>
   <div class='method_details'>
     <p class='signature' id='evaluate-dynamic'>
       #
-(void)
+(Number)
 <b>evaluate</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Evaluate the constant.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Number.html'>Number</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A float representation of this constant. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='copy-dynamic'>
       #
-(void)
+(Constant)
 <b>copy</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Deep-copy this constant.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Constant.html'>Constant</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A copy of this Constant </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='compareSameType-dynamic'>
       #
-(void)
+(Number)
 <b>compareSameType</b><span>(b)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Compare this constant with another constant.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>b</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Constant.html'>Constant</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The constant to compare with. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Number.html'>Number</a></tt>
+      )
+      &mdash;
+      <span class='desc'>An integer based on the comparison result. 1 if this is greater, -1 if vice versa, and 0 if equal. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='mul-dynamic'>
@@ -332,34 +450,135 @@ Float * Float -&gt; Float</p>
 <b>mul</b><span>(b)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Multiply by another constant.</p><p>return [Constant] The multiple of the two constants.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>b</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Constant.html'>Constant</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The constant to multiply by. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='add-dynamic'>
       #
-(void)
+(Constant)
 <b>add</b><span>(b)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Add another constant to this one.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>b</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Constant.html'>Constant</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The constant to add. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Constant.html'>Constant</a></tt>
+      )
+      &mdash;
+      <span class='desc'>The sum of the two constants. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='pow-dynamic'>
       #
-(void)
+(Constant, Pow)
 <b>pow</b><span>(b)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Raise this constant to the power of another.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>b</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Constant.html'>Constant</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The exponent. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Constant, Pow</tt>
+      )
+      &mdash;
+      <span class='desc'>A constant of this to the given exponent, or a power node if this is non-simplifiable. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='equals-dynamic'>
       #
-(void)
+(Boolean)
 <b>equals</b><span>(b)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Test the equality between this constant and another object.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>b</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The object to check. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Boolean</tt>
+      )
+      &mdash;
+      <span class='desc'>Whether or not the two objects are equal. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='replaceVariables-dynamic'>
@@ -368,16 +587,48 @@ Float * Float -&gt; Float</p>
 <b>replaceVariables</b><span>(replacements)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Alias of copy. Included for API parity.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>replacements</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>A map of replacements. Irrelevant. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='getAllVariables-dynamic'>
       #
-(void)
+(Array&lt;Object&gt;)
 <b>getAllVariables</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Get all variables in this terminal. Included for API parity.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Array&lt;Object&gt;</tt>
+      )
+      &mdash;
+      <span class='desc'>Returns <code>[]</code>. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='sub-dynamic'>
@@ -386,7 +637,34 @@ Float * Float -&gt; Float</p>
 <b>sub</b><span>(substitutions, uncertaintySubstitutions)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Alias of copy. Included for API parity.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>substitutions</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Map of substitutions. Irrelevant. </span>
+    </li>
+    <li>
+      <span class='name'>uncertaintySubstitutions</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Map of uncertainty substitutions. Irrelevant. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='simplifyInPlace-dynamic'>
@@ -395,34 +673,83 @@ Float * Float -&gt; Float</p>
 <b>simplifyInPlace</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Simplify this fraction in-place using Euclid&#39;s method.</p>
+</div>
+<div class='tags'>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='simplify-dynamic'>
       #
-(void)
+(Constant)
 <b>simplify</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Simplify this constant.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Constant.html'>Constant</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A simplified version of this constant. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='expand-dynamic'>
       #
-(void)
+(Constant)
 <b>expand</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Expand this constant. Included for API parity.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Constant.html'>Constant</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A copy of this constant. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='expandAndSimplify-dynamic'>
       #
-(void)
+(Constant)
 <b>expandAndSimplify</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Expand and simplify. Included for API parity.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Constant.html'>Constant</a></tt>
+      )
+      &mdash;
+      <span class='desc'>Simplified constant. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='substituteExpression-dynamic'>
@@ -431,25 +758,63 @@ Float * Float -&gt; Float</p>
 <b>substituteExpression</b><span>(sourceExpression, variable, equivalencies)</span>
       <br>
     </p>
+    <div class='docstring'>
+  <div class='deprecated note'>
+    <strong>Deprecated.</strong>
     
+  </div>
+  <p>Substitute an expression into this. Included for API parity.</p>
+</div>
+<div class='tags'>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='getUncertainty-dynamic'>
       #
-(void)
+(Constant)
 <b>getUncertainty</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Get uncertainty of this constant.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Constant.html'>Constant</a></tt>
+      )
+      &mdash;
+      <span class='desc'>0, as there is no uncertainty in a constant. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='getVariableUnits-dynamic'>
       #
-(void)
+(Object)
 <b>getVariableUnits</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Get the units of variables. Included for API parity.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Object</tt>
+      )
+      &mdash;
+      <span class='desc'>null - Constants don&#39;t have units. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='setVariableUnits-dynamic'>
@@ -458,16 +823,68 @@ Float * Float -&gt; Float</p>
 <b>setVariableUnits</b><span>(variable, equivalencies, units)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Set the units of variables. Does nothing. Included for API parity.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>variable</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Variable label. Irrelevant. </span>
+    </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Equivalencies map. Irrelevant. </span>
+    </li>
+    <li>
+      <span class='name'>units</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/BasicNode.html'>BasicNode</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Units for the variable. Irrelevant. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='toDrawingNode-dynamic'>
       #
-(void)
+(DrawingNode)
 <b>toDrawingNode</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Create a drawing node representing this constant</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/DrawingNode.html'>DrawingNode</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A drawing node representing this constant. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='differentiate-dynamic'>
@@ -476,12 +893,16 @@ Float * Float -&gt; Float</p>
 <b>differentiate</b><span>(variable)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Differentiate this constant.</p><p>return [Constant] 0, because constants are constant.</p>
+</div>
+<div class='tags'>
+</div>
   </div>
 </div>
     </div>
     <div id='footer'>
-  June 27, 14 14:08:50 by
+  June 30, 14 00:34:37 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

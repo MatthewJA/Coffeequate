@@ -19,29 +19,29 @@
       Index
     </a>
     &raquo;
-    <span class='title'>Pow</span>
+    <span class='title'>RoseNode</span>
   </div>
 </div>
     <div id='content'>
       <h1>
         Class:
-        Pow
+        RoseNode
       </h1>
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>coffeequate&#47;src&#47;prettyRender.coffee</td>
+          <td>coffeequate&#47;src&#47;nodes.coffee</td>
         </tr>
         <tr>
           <td>Inherits:</td>
           <td>
-            <a href='../class/DrawingNode.html'>DrawingNode</a>
+            <a href='../class/BasicNode.html'>BasicNode</a>
           </td>
         </tr>
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>Drawing node representing exponentiation.</p>
+  <p>A node with any number of children.</p>
 </div>
 <div class='tags'>
 </div>
@@ -49,38 +49,14 @@
       <ul class='summary'>
   <li>
     <span class='signature'>
-      <a href='#renderLaTeX-dynamic'>
+      <a href='#getChildren-dynamic'>
         #
-(String)
-<b>renderLaTeX</b><span>()</span>
+(Array&lt;BasicNode&gt;, Array&lt;Terminal&gt;)
+<b>getChildren</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
-      Draw the node as a LaTeX string. 
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#renderString-dynamic'>
-        #
-(String)
-<b>renderString</b><span>()</span>
-      </a>
-    </span>
-    <span class='desc'>
-      Draw the node as a string. 
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#renderMathML-dynamic'>
-        #
-(String)
-<b>renderMathML</b><span>()</span>
-      </a>
-    </span>
-    <span class='desc'>
-      Draw the node as a MathML string. 
+      Return an array of all children of this node. 
     </span>
   </li>
 </ul>
@@ -88,12 +64,15 @@
         <small>Inherited Method Summary</small>
         <h3 class='inherited'>
           Methods inherited from
-          <a href='../class/DrawingNode.html'>DrawingNode</a>
+          <a href='../class/BasicNode.html'>BasicNode</a>
         </h3>
         <p class='inherited'>
-          <a href='../class/DrawingNode.html#renderLaTeX-dynamic'>#renderLaTeX</a>
-          <a href='../class/DrawingNode.html#bindingStrength-dynamic'>#bindingStrength</a>
-          <a href='../class/DrawingNode.html#bracketIfNeeded-dynamic'>#bracketIfNeeded</a>
+          <a href='../class/BasicNode.html#getChildren-dynamic'>#getChildren</a>
+          <a href='../class/BasicNode.html#getAllVariables-dynamic'>#getAllVariables</a>
+          <a href='../class/BasicNode.html#toDrawingNode-dynamic'>#toDrawingNode</a>
+          <a href='../class/BasicNode.html#toLaTeX-dynamic'>#toLaTeX</a>
+          <a href='../class/BasicNode.html#toMathML-dynamic'>#toMathML</a>
+          <a href='../class/BasicNode.html#stringEqual-dynamic'>#stringEqual</a>
         </p>
       </h2>
       <h2>Constructor Details</h2>
@@ -101,35 +80,35 @@
   <div class='method_details'>
     <p class='signature' id='constructor-dynamic'>
       #
-(Pow)
-<b>constructor</b><span>(left, right)</span>
+(RoseNode)
+<b>constructor</b><span>(label, children = null)</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>Make a new exponentiation drawing node.</p>
+  <p>Make a new RoseNode.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>left</span>
+      <span class='name'>label</span>
       <span class='type'>
         (
-          <tt><a href='../class/DrawingNode.html'>DrawingNode</a></tt>
+          <tt>String</tt>
         )
       </span>
       &mdash;
-      <span class='desc'>The base of the power node. </span>
+      <span class='desc'>The label of this node. </span>
     </li>
     <li>
-      <span class='name'>right</span>
+      <span class='name'>children</span>
       <span class='type'>
         (
-          <tt><a href='../class/DrawingNode.html'>DrawingNode</a></tt>
+          <tt>Array&lt;BasicNode&gt;, Array&lt;Terminal&gt;</tt>
         )
       </span>
       &mdash;
-      <span class='desc'>The exponent of the power node. </span>
+      <span class='desc'>Optional. Children to add to this node. </span>
     </li>
   </ul>
   <h3>Returns:</h3>
@@ -137,10 +116,10 @@
     <li>
       <span class='type'></span>
       (
-        <tt><a href='../class/Pow.html'>Pow</a></tt>
+        <tt><a href='../class/RoseNode.html'>RoseNode</a></tt>
       )
       &mdash;
-      <span class='desc'>A new exponentiation drawing node. </span>
+      <span class='desc'>A new RoseNode. </span>
     </li>
   </ul>
 </div>
@@ -149,14 +128,14 @@
       <h2>Instance Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
-    <p class='signature' id='renderLaTeX-dynamic'>
+    <p class='signature' id='getChildren-dynamic'>
       #
-(String)
-<b>renderLaTeX</b><span>()</span>
+(Array&lt;BasicNode&gt;, Array&lt;Terminal&gt;)
+<b>getChildren</b><span>()</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>Draw the node as a LaTeX string.</p>
+  <p>Return an array of all children of this node.</p>
 </div>
 <div class='tags'>
   <h3>Returns:</h3>
@@ -164,58 +143,10 @@
     <li>
       <span class='type'></span>
       (
-        <tt>String</tt>
+        <tt>Array&lt;BasicNode&gt;, Array&lt;Terminal&gt;</tt>
       )
       &mdash;
-      <span class='desc'>This node drawn as LaTeX. </span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='renderString-dynamic'>
-      #
-(String)
-<b>renderString</b><span>()</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Draw the node as a string.</p>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (
-        <tt>String</tt>
-      )
-      &mdash;
-      <span class='desc'>This node drawn as a string. </span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='renderMathML-dynamic'>
-      #
-(String)
-<b>renderMathML</b><span>()</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Draw the node as a MathML string.</p>
-</div>
-<div class='tags'>
-  <h3>Returns:</h3>
-  <ul class='return'>
-    <li>
-      <span class='type'></span>
-      (
-        <tt>String</tt>
-      )
-      &mdash;
-      <span class='desc'>This node drawn as MathML. </span>
+      <span class='desc'>An array of all children of this node. </span>
     </li>
   </ul>
 </div>

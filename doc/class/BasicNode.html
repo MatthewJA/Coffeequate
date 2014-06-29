@@ -33,28 +33,41 @@
           <td>coffeequate&#47;src&#47;nodes.coffee</td>
         </tr>
       </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <p>Template for nodes in the expression tree. All non-terminal nodes inherit from this.</p>
+</div>
+<div class='tags'>
+</div>
+      <h2>Direct Known Subclasses</h2>
+      <p class='children'>
+        <a href='../class/RoseNode.html'>RoseNode</a>
+        <a href='../class/BinaryNode.html'>BinaryNode</a>
+      </p>
       <h2>Instance Method Summary</h2>
       <ul class='summary'>
   <li>
     <span class='signature'>
       <a href='#getChildren-dynamic'>
         #
-(void)
+(Array&lt;BasicNode&gt;, Array&lt;Terminal&gt;)
 <b>getChildren</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Return an array of children. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#getAllVariables-dynamic'>
         #
-(void)
+(Array&lt;String&gt;)
 <b>getAllVariables</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Get the labels of all variables involved in this node. 
     </span>
   </li>
   <li>
@@ -66,50 +79,55 @@
       </a>
     </span>
     <span class='desc'>
+      Convert this node into a drawing node for output. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#toLaTeX-dynamic'>
         #
-(void)
+(String)
 <b>toLaTeX</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Convert this node into a LaTeX string. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#toString-dynamic'>
         #
-(void)
+(String)
 <b>toString</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Convert this node into a string. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#toMathML-dynamic'>
         #
-(void)
+(String)
 <b>toMathML</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Convert this node into a MathML string. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#stringEqual-dynamic'>
         #
-(void)
+(Boolean)
 <b>stringEqual</b><span>(other)</span>
       </a>
     </span>
     <span class='desc'>
+      Check if this node has the same string representation as another. 
     </span>
   </li>
 </ul>
@@ -118,15 +136,38 @@
   <div class='method_details'>
     <p class='signature' id='constructor-dynamic'>
       #
-(void)
+(BasicNode)
 <b>constructor</b><span>(label)</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>A basic node for the expression tree.
-All nodes inherit from this.</p>
+  <p>Make a new node.</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>label</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The label of this node. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/BasicNode.html'>BasicNode</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A new BasicNode. </span>
+    </li>
+  </ul>
 </div>
   </div>
 </div>
@@ -135,20 +176,46 @@ All nodes inherit from this.</p>
   <div class='method_details'>
     <p class='signature' id='getChildren-dynamic'>
       #
-(void)
+(Array&lt;BasicNode&gt;, Array&lt;Terminal&gt;)
 <b>getChildren</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Return an array of children.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Array&lt;BasicNode&gt;, Array&lt;Terminal&gt;</tt>
+      )
+      &mdash;
+      <span class='desc'>An array of children of this node. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='getAllVariables-dynamic'>
       #
-(void)
+(Array&lt;String&gt;)
 <b>getAllVariables</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Get the labels of all variables involved in this node.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      <tt>Array&lt;String&gt;</tt>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='toDrawingNode-dynamic'>
@@ -157,48 +224,136 @@ All nodes inherit from this.</p>
 <b>toDrawingNode</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Convert this node into a drawing node for output.</p>
+</div>
+<div class='tags'>
+  <h3>Throws:</h3>
+  <ul class='throw'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Error</tt>
+      )
+      &mdash;
+      <span class='desc'>Not implemented. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='toLaTeX-dynamic'>
       #
-(void)
+(String)
 <b>toLaTeX</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Convert this node into a LaTeX string.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>String</tt>
+      )
+      &mdash;
+      <span class='desc'>A LaTeX representation of this node. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='toString-dynamic'>
       #
-(void)
+(String)
 <b>toString</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Convert this node into a string.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>String</tt>
+      )
+      &mdash;
+      <span class='desc'>A string representation of this node. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='toMathML-dynamic'>
       #
-(void)
+(String)
 <b>toMathML</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Convert this node into a MathML string.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>String</tt>
+      )
+      &mdash;
+      <span class='desc'>A MathML representation of this node. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='stringEqual-dynamic'>
       #
-(void)
+(Boolean)
 <b>stringEqual</b><span>(other)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Check if this node has the same string representation as another.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>other</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/BasicNode.html'>BasicNode</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>A node to compare this node to. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Boolean</tt>
+      )
+      &mdash;
+      <span class='desc'>Whether the two nodes have the same string representation. </span>
+    </li>
+  </ul>
+</div>
   </div>
 </div>
     </div>
     <div id='footer'>
-  June 27, 14 14:08:50 by
+  June 30, 14 00:34:37 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

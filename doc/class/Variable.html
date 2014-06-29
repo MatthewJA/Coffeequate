@@ -39,72 +39,84 @@
           </td>
         </tr>
       </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <p>Represents variables in the equation tree.</p>
+</div>
+<div class='tags'>
+</div>
       <h2>Instance Method Summary</h2>
       <ul class='summary'>
   <li>
     <span class='signature'>
       <a href='#copy-dynamic'>
         #
-(void)
+(Variable)
 <b>copy</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Deep-copy this Variable. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#compareSameType-dynamic'>
         #
-(void)
+(Number)
 <b>compareSameType</b><span>(b)</span>
       </a>
     </span>
     <span class='desc'>
+      Compare this Variable with another Variable. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#equals-dynamic'>
         #
-(void)
+(Boolean)
 <b>equals</b><span>(b, equivalencies = null)</span>
       </a>
     </span>
     <span class='desc'>
+      Check equality of this Variable and another object. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#replaceVariables-dynamic'>
         #
-(void)
+(Variable)
 <b>replaceVariables</b><span>(replacements)</span>
       </a>
     </span>
     <span class='desc'>
+      Replace variable labels. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#getAllVariables-dynamic'>
         #
-(void)
+(Array&lt;String&gt;)
 <b>getAllVariables</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Get a list of children variable labels. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#sub-dynamic'>
         #
-(void)
+(Variable, Constant)
 <b>sub</b><span>(substitutions, uncertaintySubstitutions)</span>
       </a>
     </span>
     <span class='desc'>
+      Substitute values into the Variable. 
     </span>
   </li>
   <li>
@@ -116,28 +128,31 @@
       </a>
     </span>
     <span class='desc'>
+      Substitute an expression into the Variable. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#getUncertainty-dynamic'>
         #
-(void)
+(Uncertainty)
 <b>getUncertainty</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Get uncertainty of this Variable. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#getVariableUnits-dynamic'>
         #
-(void)
+(BasicNode, Terminal)
 <b>getVariableUnits</b><span>(variable, equivalencies)</span>
       </a>
     </span>
     <span class='desc'>
+      Get the units of a given Variable. 
     </span>
   </li>
   <li>
@@ -149,61 +164,67 @@
       </a>
     </span>
     <span class='desc'>
+      Set units for a given Variable. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#simplify-dynamic'>
         #
-(void)
+(Variable)
 <b>simplify</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Simplify the Variable. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#expand-dynamic'>
         #
-(void)
+(Variable)
 <b>expand</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Expand the Variable. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#expandAndSimplify-dynamic'>
         #
-(void)
+(Variable)
 <b>expandAndSimplify</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Expand and simplify the Variable. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#toDrawingNode-dynamic'>
         #
-(void)
+(DrawingNode)
 <b>toDrawingNode</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Make a drawing node representing this Variable. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#differentiate-dynamic'>
         #
-(void)
+(Constant)
 <b>differentiate</b><span>(variable)</span>
       </a>
     </span>
     <span class='desc'>
+      Differentiate the variable. 
     </span>
   </li>
 </ul>
@@ -228,9 +249,32 @@
       <br>
     </p>
     <div class='docstring'>
-  <p>Variables in the equation tree, e.g. m</p>
+  <p>Make a new Variable.</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>label</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The label of this variable. </span>
+    </li>
+    <li>
+      <span class='name'>units</span>
+      <span class='type'>
+        (
+          <tt>BasicNode, Terminal</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. Units of this variable (default is null). </span>
+    </li>
+  </ul>
 </div>
   </div>
 </div>
@@ -239,56 +283,222 @@
   <div class='method_details'>
     <p class='signature' id='copy-dynamic'>
       #
-(void)
+(Variable)
 <b>copy</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Deep-copy this Variable.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Variable.html'>Variable</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A copy of this Variable. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='compareSameType-dynamic'>
       #
-(void)
+(Number)
 <b>compareSameType</b><span>(b)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Compare this Variable with another Variable.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>b</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Variable.html'>Variable</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The variable to compare with. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Number.html'>Number</a></tt>
+      )
+      &mdash;
+      <span class='desc'>1 if this is greater, 0 if equal, and -1 if this is lesser. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='equals-dynamic'>
       #
-(void)
+(Boolean)
 <b>equals</b><span>(b, equivalencies = null)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <div class='note todo'>
+    <strong>TODO:</strong>
+    Change the way equivalencies are handled. <a href="https://github.com/MatthewJA/Coffeequate/issues/62">#62</a> 
+  </div>
+  <p>Check equality of this Variable and another object.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>b</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The other object to compare with. </span>
+    </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Equivalencies object. Optional (default is null). </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Boolean</tt>
+      )
+      &mdash;
+      <span class='desc'>Whether the objects are equal. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='replaceVariables-dynamic'>
       #
-(void)
+(Variable)
 <b>replaceVariables</b><span>(replacements)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Replace variable labels.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>replacements</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>A map of variable labels to replacement labels. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Variable.html'>Variable</a></tt>
+      )
+      &mdash;
+      <span class='desc'>This variable, possibly with its name replaced. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='getAllVariables-dynamic'>
       #
-(void)
+(Array&lt;String&gt;)
 <b>getAllVariables</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Get a list of children variable labels.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Array&lt;String&gt;</tt>
+      )
+      &mdash;
+      <span class='desc'>An array containing just this label. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='sub-dynamic'>
       #
-(void)
+(Variable, Constant)
 <b>sub</b><span>(substitutions, uncertaintySubstitutions)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Substitute values into the Variable.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>substitutions</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>A map of variable labels to their values. </span>
+    </li>
+    <li>
+      <span class='name'>uncertaintySubstitutions</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>A map of uncertainty labels to their values. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Variable, Constant</tt>
+      )
+      &mdash;
+      <span class='desc'>This variable, possibly substituted. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='substituteExpression-dynamic'>
@@ -297,25 +507,90 @@
 <b>substituteExpression</b><span>(sourceExpression, variable, equivalencies = null, eliminate = false)</span>
       <br>
     </p>
+    <div class='docstring'>
+  <div class='deprecated note'>
+    <strong>Deprecated.</strong>
     
+  </div>
+  <p>Substitute an expression into the Variable.</p>
+</div>
+<div class='tags'>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='getUncertainty-dynamic'>
       #
-(void)
+(Uncertainty)
 <b>getUncertainty</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Get uncertainty of this Variable.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Uncertainty.html'>Uncertainty</a></tt>
+      )
+      &mdash;
+      <span class='desc'>Symbolic uncertainty of this Variable. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='getVariableUnits-dynamic'>
       #
-(void)
+(BasicNode, Terminal)
 <b>getVariableUnits</b><span>(variable, equivalencies)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <div class='note todo'>
+    <strong>TODO:</strong>
+    Change the way equivalencies are handled. <a href="https://github.com/MatthewJA/Coffeequate/issues/62">#62</a> 
+  </div>
+  <p>Get the units of a given Variable.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>variable</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Label of the variable to get units for. </span>
+    </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Equivalencies object. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>BasicNode, Terminal</tt>
+      )
+      &mdash;
+      <span class='desc'>Units if this is the Variable being looked for. null otherwise. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='setVariableUnits-dynamic'>
@@ -324,57 +599,186 @@
 <b>setVariableUnits</b><span>(variable, equivalencies, units)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <div class='note todo'>
+    <strong>TODO:</strong>
+    Change the way equivalencies are handled. <a href="https://github.com/MatthewJA/Coffeequate/issues/62">#62</a> 
+  </div>
+  <p>Set units for a given Variable.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>variable</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The variable to set units for. </span>
+    </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Equivalencies object. </span>
+    </li>
+    <li>
+      <span class='name'>units</span>
+      <span class='type'>
+        (
+          <tt>BasicNode, Terminal</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The units to set. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='simplify-dynamic'>
       #
-(void)
+(Variable)
 <b>simplify</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Simplify the Variable.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Variable.html'>Variable</a></tt>
+      )
+      &mdash;
+      <span class='desc'>Copy of the Variable. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='expand-dynamic'>
       #
-(void)
+(Variable)
 <b>expand</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Expand the Variable.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Variable.html'>Variable</a></tt>
+      )
+      &mdash;
+      <span class='desc'>Copy of the Variable. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='expandAndSimplify-dynamic'>
       #
-(void)
+(Variable)
 <b>expandAndSimplify</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Expand and simplify the Variable.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Variable.html'>Variable</a></tt>
+      )
+      &mdash;
+      <span class='desc'>Copy of the Variable. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='toDrawingNode-dynamic'>
       #
-(void)
+(DrawingNode)
 <b>toDrawingNode</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Make a drawing node representing this Variable.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/DrawingNode.html'>DrawingNode</a></tt>
+      )
+      &mdash;
+      <span class='desc'>Drawing node representing this variable. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='differentiate-dynamic'>
       #
-(void)
+(Constant)
 <b>differentiate</b><span>(variable)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Differentiate the variable.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>variable</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The label of the variable to differentiate with respect to. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Constant.html'>Constant</a></tt>
+      )
+      &mdash;
+      <span class='desc'>The differentiated variable. </span>
+    </li>
+  </ul>
+</div>
   </div>
 </div>
     </div>
     <div id='footer'>
-  June 27, 14 14:08:50 by
+  June 30, 14 00:34:37 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

@@ -33,6 +33,12 @@
           <td>coffeequate&#47;src&#47;prettyRender.coffee</td>
         </tr>
       </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <p>Generic drawing node, parent of all other drawing nodes.</p>
+</div>
+<div class='tags'>
+</div>
       <h2>Direct Known Subclasses</h2>
       <p class='children'>
         <a href='../class/Add.html'>Add</a>
@@ -56,6 +62,7 @@
       </a>
     </span>
     <span class='desc'>
+      Draw the node as a string. 
     </span>
   </li>
   <li>
@@ -67,13 +74,14 @@
       </a>
     </span>
     <span class='desc'>
+      Draw the node as a LaTeX string. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#bindingStrength-dynamic'>
         #
-(void)
+(Number)
 <b>bindingStrength</b><span>()</span>
       </a>
     </span>
@@ -85,11 +93,12 @@
     <span class='signature'>
       <a href='#bracketIfNeeded-dynamic'>
         #
-(void)
+(DrawingNode)
 <b>bracketIfNeeded</b><span>(child)</span>
       </a>
     </span>
     <span class='desc'>
+      Wraps the node in brackets if a node has lower precedence than this node. 
     </span>
   </li>
 </ul>
@@ -102,7 +111,22 @@
 <b>toString</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Draw the node as a string.</p>
+</div>
+<div class='tags'>
+  <h3>Throws:</h3>
+  <ul class='throw'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Error</tt>
+      )
+      &mdash;
+      <span class='desc'>Not implemented. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='renderLaTeX-dynamic'>
@@ -111,37 +135,91 @@
 <b>renderLaTeX</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Draw the node as a LaTeX string.</p>
+</div>
+<div class='tags'>
+  <h3>Throws:</h3>
+  <ul class='throw'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Error</tt>
+      )
+      &mdash;
+      <span class='desc'>Not implemented. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='bindingStrength-dynamic'>
       #
-(void)
+(Number)
 <b>bindingStrength</b><span>()</span>
       <br>
     </p>
     <div class='docstring'>
   <p>This tells us how strongly bound together the node is.
-As in, because x+y<em>z is parsed as x+(y</em>z), <em> binds more closely than + does.
-When we want to express (x+y)</em>z, we put the x+y Add node inside a Bracket
+As in, because <code>x+y*z</code> is parsed as <code>x+(y*z)</code>, <code>*</code> binds more closely than <code>+</code> does.
+When we want to express <code>(x+y)*z</code>, we put the <code>x+y</code> Add node inside a Bracket
 node, which binds very tightly.</p>
 </div>
 <div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Number.html'>Number</a></tt>
+      )
+      &mdash;
+      <span class='desc'>Binding strength. </span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
     <p class='signature' id='bracketIfNeeded-dynamic'>
       #
-(void)
+(DrawingNode)
 <b>bracketIfNeeded</b><span>(child)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Wraps the node in brackets if a node has lower precedence than this node.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>child</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/DrawingNode.html'>DrawingNode</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The node to (potentially) bracket. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/DrawingNode.html'>DrawingNode</a></tt>
+      )
+      &mdash;
+      <span class='desc'>The bracketed child, or the original child. </span>
+    </li>
+  </ul>
+</div>
   </div>
 </div>
     </div>
     <div id='footer'>
-  June 27, 14 14:08:50 by
+  June 30, 14 00:34:37 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

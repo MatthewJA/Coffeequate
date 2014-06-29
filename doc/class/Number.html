@@ -39,50 +39,60 @@
           </td>
         </tr>
       </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <p>Drawing node representing a number.</p>
+</div>
+<div class='tags'>
+</div>
       <h2>Instance Method Summary</h2>
       <ul class='summary'>
   <li>
     <span class='signature'>
       <a href='#bindingStrength-dynamic'>
         #
-(void)
+(Number)
 <b>bindingStrength</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      How strongly this node is bound. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#renderLaTeX-dynamic'>
         #
-(void)
+(String)
 <b>renderLaTeX</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Draw the node as a LaTeX string. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#renderString-dynamic'>
         #
-(void)
+(String)
 <b>renderString</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Draw the node as a string. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#renderMathML-dynamic'>
         #
-(void)
+(String)
 <b>renderMathML</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Draw the node as MathML. 
     </span>
   </li>
 </ul>
@@ -103,11 +113,49 @@
   <div class='method_details'>
     <p class='signature' id='constructor-dynamic'>
       #
-(void)
-<b>constructor</b><span>(value)</span>
+(Number)
+<b>constructor</b><span>(value, classname = &quot;constant&quot;)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Make a new number drawing node.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>value</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Number.html'>Number</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The value of the number. </span>
+    </li>
+    <li>
+      <span class='name'>classname</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. The name that should be set as the class for this node if drawn as MathML or similar. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Number.html'>Number</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A new drawing node representing this number. </span>
+    </li>
+  </ul>
+</div>
   </div>
 </div>
       <h2>Instance Method Details</h2>
@@ -115,43 +163,103 @@
   <div class='method_details'>
     <p class='signature' id='bindingStrength-dynamic'>
       #
-(void)
+(Number)
 <b>bindingStrength</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>How strongly this node is bound.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Number.html'>Number</a></tt>
+      )
+      &mdash;
+      <span class='desc'>Binding strength. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='renderLaTeX-dynamic'>
       #
-(void)
+(String)
 <b>renderLaTeX</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Draw the node as a LaTeX string.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>String</tt>
+      )
+      &mdash;
+      <span class='desc'>This node drawn as LaTeX. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='renderString-dynamic'>
       #
-(void)
+(String)
 <b>renderString</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Draw the node as a string.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>String</tt>
+      )
+      &mdash;
+      <span class='desc'>This node drawn as a string. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='renderMathML-dynamic'>
       #
-(void)
+(String)
 <b>renderMathML</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Draw the node as MathML.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>String</tt>
+      )
+      &mdash;
+      <span class='desc'>This node drawn as MathML. </span>
+    </li>
+  </ul>
+</div>
   </div>
 </div>
     </div>
     <div id='footer'>
-  June 27, 14 14:08:50 by
+  June 30, 14 00:34:37 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

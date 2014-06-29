@@ -39,6 +39,12 @@
           </td>
         </tr>
       </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <p>Base class for terminals.</p>
+</div>
+<div class='tags'>
+</div>
       <h2>Direct Known Subclasses</h2>
       <p class='children'>
         <a href='../class/Constant.html'>Constant</a>
@@ -57,8 +63,7 @@
       </a>
     </span>
     <span class='desc'>
-      Question for Matt: why do the next two functions exist? I would have thought they should raise a NotImplementedError
-
+      Evaluate this node. 
     </span>
   </li>
   <li>
@@ -70,25 +75,10 @@
       </a>
     </span>
     <span class='desc'>
+      Deep-copy this node. 
     </span>
   </li>
 </ul>
-      <h2>Constructor Details</h2>
-      <div class='methods'>
-  <div class='method_details'>
-    <p class='signature' id='constructor-dynamic'>
-      #
-(void)
-<b>constructor</b><span>(label)</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Base class for terminals.</p>
-</div>
-<div class='tags'>
-</div>
-  </div>
-</div>
       <h2>Instance Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
@@ -99,10 +89,20 @@
       <br>
     </p>
     <div class='docstring'>
-  <p>Question for Matt: why do the next two functions exist?
-I would have thought they should raise a NotImplementedError</p>
+  <p>Evaluate this node.</p>
 </div>
 <div class='tags'>
+  <h3>Throws:</h3>
+  <ul class='throw'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Error</tt>
+      )
+      &mdash;
+      <span class='desc'>Not implemented. </span>
+    </li>
+  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -112,12 +112,27 @@ I would have thought they should raise a NotImplementedError</p>
 <b>copy</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Deep-copy this node.</p>
+</div>
+<div class='tags'>
+  <h3>Throws:</h3>
+  <ul class='throw'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Error</tt>
+      )
+      &mdash;
+      <span class='desc'>Not implemented. </span>
+    </li>
+  </ul>
+</div>
   </div>
 </div>
     </div>
     <div id='footer'>
-  June 27, 14 14:08:50 by
+  June 30, 14 00:34:37 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

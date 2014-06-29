@@ -39,17 +39,24 @@
           </td>
         </tr>
       </table>
+      <h2>Overview</h2>
+      <div class='docstring'>
+  <p>Exception thrown if a terminal cannot be parsed.</p>
+</div>
+<div class='tags'>
+</div>
       <h2>Instance Method Summary</h2>
       <ul class='summary'>
   <li>
     <span class='signature'>
       <a href='#toString-dynamic'>
         #
-(void)
+(String)
 <b>toString</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      The string displayed when this error is thrown. 
     </span>
   </li>
 </ul>
@@ -58,11 +65,49 @@
   <div class='method_details'>
     <p class='signature' id='constructor-dynamic'>
       #
-(void)
+(ParseError)
 <b>constructor</b><span>(input, type)</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Make a new ParseError.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>input</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Input that was attempted to parse. </span>
+    </li>
+    <li>
+      <span class='name'>type</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The type of object that the input was being parsed as. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/ParseError.html'>ParseError</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A new ParseError. </span>
+    </li>
+  </ul>
+</div>
   </div>
 </div>
       <h2>Instance Method Details</h2>
@@ -70,16 +115,31 @@
   <div class='method_details'>
     <p class='signature' id='toString-dynamic'>
       #
-(void)
+(String)
 <b>toString</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>The string displayed when this error is thrown.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>String</tt>
+      )
+      &mdash;
+      <span class='desc'>The string displayed when this error is thrown. </span>
+    </li>
+  </ul>
+</div>
   </div>
 </div>
     </div>
     <div id='footer'>
-  June 27, 14 14:08:50 by
+  June 30, 14 00:34:37 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

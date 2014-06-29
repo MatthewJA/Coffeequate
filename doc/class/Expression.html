@@ -107,33 +107,36 @@ It wraps underlying nodes and terminals in a neat interface.</p>
     <span class='signature'>
       <a href='#copy-dynamic'>
         #
-(void)
+(Expression)
 <b>copy</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Deep-copy this Expression. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#simplify-dynamic'>
         #
-(void)
+(Expression)
 <b>simplify</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Simplify this Expression. 
     </span>
   </li>
   <li>
     <span class='signature'>
       <a href='#expand-dynamic'>
         #
-(void)
+(Expression)
 <b>expand</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
+      Expand this Expression. 
     </span>
   </li>
 </ul>
@@ -340,34 +343,79 @@ It wraps underlying nodes and terminals in a neat interface.</p>
   <div class='method_details'>
     <p class='signature' id='copy-dynamic'>
       #
-(void)
+(Expression)
 <b>copy</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Deep-copy this Expression.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Expression.html'>Expression</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A copy of this Expression. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='simplify-dynamic'>
       #
-(void)
+(Expression)
 <b>simplify</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Simplify this Expression.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Expression.html'>Expression</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A simplified Expression. </span>
+    </li>
+  </ul>
+</div>
   </div>
   <div class='method_details'>
     <p class='signature' id='expand-dynamic'>
       #
-(void)
+(Expression)
 <b>expand</b><span>()</span>
       <br>
     </p>
-    
+    <div class='docstring'>
+  <p>Expand this Expression.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Expression.html'>Expression</a></tt>
+      )
+      &mdash;
+      <span class='desc'>An expanded Expression. </span>
+    </li>
+  </ul>
+</div>
   </div>
 </div>
     </div>
     <div id='footer'>
-  June 27, 14 14:08:50 by
+  June 30, 14 00:34:37 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

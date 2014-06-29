@@ -2,7 +2,7 @@
 <html>
   <head>
   <meta charset='UTF-8'>
-  <title>CoffeeScript API Documentation</title>
+  <title>Coffeequate Documentation</title>
   <script src='../../../javascript/application.js'></script>
   <script src='../../../javascript/search.js'></script>
   <link rel='stylesheet' href='../../../stylesheets/application.css' type='text/css'>
@@ -23,23 +23,26 @@
     &raquo;
     <span class='title'>src</span>
     &raquo;
-    <span class='title'>Equation.coffee</span>
+    <span class='title'>grammar.peg</span>
   </div>
 </div>
     <div id='content'>
-      <h1>
-        File:
-        Equation.coffee
-      </h1>
-      <table class='box'>
-        <tr>
-          <td>Defined in:</td>
-          <td>coffeequate&#47;src</td>
-        </tr>
-      </table>
+      <nav class='toc'>
+        <p class='title'>
+          <a class='hide_toc' href='#'>
+            <strong>Table of Contents</strong>
+          </a>
+          <small>
+            (<a class='float_toc' href='#'>left</a>)
+          </small>
+        </p>
+      </nav>
+      <div id='filecontents'>
+        <p>{<br/>// These dummy definitions make it easier to test<br/><br/>stringToTerminal = function(x) { return x; };<br/>operators = {<br/>  Add: function(l,r) { return ["+",l,r] },<br/>  Mul: function(l,r) { return ["*",l,r] }<br/>};<br/>}<br/><br/>start<br/>  = expr<br/><br/>expr<br/>  = left:term "+" right:expr { return new operators.Add(left, right); }<br/>  / left:term "-" right:expr { return new operators.Add(left, new operators.Mul(right, "-1")); }<br/>  / x:term { return x; }<br/><br/>term<br/>  = l:powerTerm "*" r:term { return new operators.Mul(l, r); }<br/>  / l:powerTerm "/" r:term { return new operators.Mul(l, new operators.Pow(r, "-1")); }<br/>  / f:powerTerm { return f; }<br/><br/>powerTerm<br/>  = l:factor "**" r:factor { return new operators.Pow(l, r); }<br/>  / f:factor { return f; }<br/><br/><br/>factor<br/>  = terminal:[^()+\-*/{}:]+ "::{" u:[^{}]+ "}" { return stringToTerminal(terminal.join("") + "::{" + u.join("") + "}"); }<br/>  / terminal:[^()+\-*/{}:]+ { return stringToTerminal(terminal.join("")); }<br/>  / "(" x:expr ")" { return x; }<br/>  / "-" x:factor { return new operators.Mul(x, "-1") }</p>
+      </div>
     </div>
     <div id='footer'>
-  June 27, 14 13:43:14 by
+  June 30, 14 00:34:37 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>
