@@ -392,18 +392,18 @@ define ->
       else
         return "\\sqrt{#{@contents.renderLaTeX()}}"
 
-      # Draw the node as a string.
-      #
-      # @return [String] This node drawn as a string.
+    # Draw the node as a string.
+    #
+    # @return [String] This node drawn as a string.
     renderString: ->
       if @power and @power != 2
         return "#{@bracketIfNeeded(@contents).renderString()} ** (1/#{@power})"
       else
         return "sqrt(#{@contents.renderString()})"
 
-      # Draw the node as MathML.
-      #
-      # @return [String] This node drawn as MathML.
+    # Draw the node as MathML.
+    #
+    # @return [String] This node drawn as MathML.
     renderMathML: (x...) ->
       if @power and @power != 2
         return "<mroot>

@@ -71,7 +71,7 @@ define [
 
 		# Compare this object with another of the same type.
 		#
-		# @param b [Mul] An addition node to compare to.
+		# @param b [Mul] A multiplication node to compare to.
 		# @return [Number] The comparison: 1 if this node is greater than the other, -1 if vice versa, and 0 if they are equal.
 		compareSameType: (b) ->
 			if @children.length == b.children.length
@@ -89,6 +89,12 @@ define [
 
 			return lengthComparison
 
+		# Get the dimensions/units of a variable in this node.
+		#
+		# @param variable [String] The label of the variable to get dimensions of.
+		# @param equivalencies [Object] An object of equivalencies.
+		# @return [BasicNode] The units of the variable, or null if the variable wasn't found.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		getVariableUnits: (variable, equivalencies) ->
 			variableEquivalencies = if equivalencies? then equivalencies.get(variable) else [variable]
 			for child in @children
@@ -100,11 +106,22 @@ define [
 						return childVariableUnits
 			return null
 
+		# Set the dimensions/units of a variable in this node.
+		#
+		# @param variable [String] The label of the variable to set dimensions of.
+		# @param equivalencies [Object] An object of equivalencies.
+		# @param units [BasicNode] The units to give the variable.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		setVariableUnits: (variable, equivalencies, units) ->
 			variableEquivalencies = if equivalencies? then equivalencies.get(variable) else {get: (z) -> [z]}
 			for child in @children
 				child.setVariableUnits(variable, equivalencies, units)
 
+		# Expanding helper method for expanding a multiplication node multiplied by an addition node.
+		#
+		# @param mul [Mul] A multiplication node.
+		# @param add [Add] An addition node.
+		# @return [Add] The product of these nodes.
 		@expandMulAdd: (mul, add) ->
 			Add = require("operators/Add")
 			# Multiply out.
@@ -133,6 +150,12 @@ define [
 			newAdd = newAdd.expand()
 			return newAdd
 
+		# Check equality between this and another object.
+		#
+		# @param b [Object] An object to check equality with.
+		# @param equivalencies [Object] An object of equivalencies.
+		# @return [Boolean] Whether the objects are equal.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		equals: (b, equivalencies) ->
 			# Check equality between this and another object.
 			unless b instanceof Mul
@@ -148,6 +171,9 @@ define [
 						return false
 			return true
 
+		# Expand this node.
+		#
+		# @return [Mul] This node, expanded.
 		expand: ->
 			Add = require("operators/Add")
 			# Multiplication is distributive over addition, as well as associative, so
@@ -218,6 +244,11 @@ define [
 
 			return term[0]
 
+		# Simplify this node.
+		#
+		# @param equivalencies [Object] An object of equivalencies.
+		# @return [BasicNode, Terminal] This node, simplified.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		simplify: (equivalencies) ->
 
 			Add = require("operators/Add")
@@ -335,18 +366,30 @@ define [
 			return newMul unless newMul.children.length == 1
 			return newMul.children[0]
 
+		# Sort this node in-place.
 		sort: ->
-			# Sort this node.
 			for child in @children
 				child.sort?()
 			@children.sort(compare)
 
+		# Expand and then simplify this node.
+		#
+		# @param equivalencies [Object] An object of equivalencies.
+		# @return [BasicNode, Terminal] This node, expanded and simplified.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		expandAndSimplify: (equivalencies) ->
 			expr = @expand()
 			if expr.simplify?
 				return expr.simplify(equivalencies)
 			return expr
 
+		# Solve this node for a variable.
+		#
+		# @param variable [String] The label of the variable to solve for.
+		# @param equivalencies [Object] Optional. An object of equivalencies.
+		# @return [Array<BasicNode>, Array<Terminal>] The solutions for the given variable.
+		# @throw [AlgebraError] If the node cannot be solved.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		solve: (variable, equivalencies=null) ->
 			Pow = require("operators/Pow")
 
@@ -383,6 +426,9 @@ define [
 							throw error
 			throw new AlgebraError(expr.toString(), variable)
 
+		# Get all variable labels used in children of this node.
+		#
+		# @return [Array<String>] A list of all labels of variables in children of this node.
 		getAllVariables: ->
 			variables = {}
 			for child in @children
@@ -399,6 +445,10 @@ define [
 
 			return outVariables
 
+		# Replace variable labels.
+		#
+		# @param replacements [Object] A map of variable labels to their replacement labels.
+		# @return [Mul] This node with variable labels replaced.
 		replaceVariables: (replacements) ->
 			children = []
 			for child, index in @children
@@ -412,6 +462,15 @@ define [
 
 			return new Mul(children...)
 
+		# Substitute values into variables.
+		#
+		# @param substitutions [Object] A map of variable labels to their values. Values can be any node, terminal, or something interpretable as a terminal.
+		# @param uncertaintySubstitutions [Object] A map of variable labels to the values of their uncertainties.
+		# @param equivalencies [Object] Optional. An object of equivalencies.
+		# @param assumeZeroUncertainty [Boolean] Optional. Whether to assume uncertainties are zero if unknown (default false).
+		# @param evaluateSymbolicConstants [Boolean] Optional. Whether to evaluate symbolic constants (default false).
+		# @return [BasicNode, Terminal] This node with all substitutions substituted.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		sub: (substitutions, uncertaintySubstitutions, equivalencies=null, assumeZeroUncertainty=false, evaluateSymbolicConstants=false) ->
 			# subtitutions: {variable: value}
 			# variable is a label, value is any object - if it is a node,
@@ -447,8 +506,11 @@ define [
 			newMul = newMul.expandAndSimplify(equivalencies)
 			return newMul
 
+		# Substitute an expression into this node.
+		#
+		# @deprecated (Not sure why this exists)
 		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
-			 # Replace all instances of a variable with an expression.
+			# Replace all instances of a variable with an expression.
 			# Eliminate the target variable if set to do so.
 			if eliminate
 				sourceExpressions = sourceExpression.solve(variable, equivalencies)
@@ -485,6 +547,9 @@ define [
 			console.log results
 			return results
 
+		# Convert this node into a drawing node.
+		#
+		# @return [DrawingNode] A drawing node representing this node.
 		toDrawingNode: ->
 			# To make a drawing node out of a Mul node, we turn it into either a
 			# fraction or a long product.
@@ -546,6 +611,10 @@ define [
 			else
 				return new prettyRender.Fraction(top, newBottom)
 
+		# Differentiate this node with respect to a variable.
+		#
+		# @param variable [String] The label of the variable to differentiate with respect to.
+		# @todo Add equivalencies. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		differentiate: (variable) ->
 			Add = require("operators/Add")
 			if @children.length == 0

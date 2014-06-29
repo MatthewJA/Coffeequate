@@ -2,6 +2,7 @@ define ->
 
 	# Template for nodes in the expression tree. All non-terminal nodes inherit from this.
 	class BasicNode
+
 		# Make a new node.
 		#
 		# @param label [String] The label of this node.
