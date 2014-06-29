@@ -2,32 +2,37 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 
 	# Terminals for the equation tree.
 
+	# Base class for terminals.
 	class Terminal extends nodes.BasicNode
-		# Base class for terminals.
-		constructor: (@label) ->
 
-		# Question for Matt: why do the next two functions exist?
-		# I would have thought they should raise a NotImplementedError
-		evaluate: ->
-
-		copy: ->
-			return new Terminal(@label)
-
-	class Constant extends Terminal
-		# Constants in the equation tree, e.g. 0.5 or 1/2.
-		# Can be represented as a RATIONAL (1/2) or a FLOAT (0.5).
-		# If a constant is produced by a negative exponentiation (or division, but CQ doesn't use that)
-		# then it becomes a rational. If it is entered as an integer then it will also be a rational.
-		# If it is entered as a float, then it remains a float.
-		# Rational * Rational -> Rational
-		# Rational * Float -> Float
-		# Float * Float -> Float
-
-		# Make a new Constant
+		# Evaluate this node.
 		#
-		# @param numerator [String]
-		# @param denominator [String]
-		# @param mode [String] Optional. Can be rational or float. 
+		# @throw [Error] Not implemented.
+		evaluate: ->
+			throw new Error("Not implemented.")
+
+		# Deep-copy this node.
+		#
+		# @throw [Error] Not implemented.
+		copy: ->
+			throw new Error("Not implemented.")
+
+	# A constant in the equation tree, e.g. 0.5 or 1/2.
+	# Can be represented as a rational (1/2) or a float (0.5).
+	# If a constant is produced by negative exponentiation
+	# it becomes a rational; if it is entered as an integer then it
+	# is a rational; if it is entered as a float, then it remains
+	# a float.
+	# Rational `*` Rational -> Rational
+	# Rational `*` Float -> Float
+	# Float `*` Float -> Float
+	class Constant extends Terminal
+
+		# Make a new constant.
+		#
+		# @param numerator [String, Number] The numerator of the rational. If the number is a float, this is just the whole value.
+		# @param denominator [String, Number] The denominator of the rational.
+		# @param mode [String] Optional. Can be "rational" or "float" (default "rational").
 		constructor: (@numerator, @denominator=1, @mode="rational") ->
 			@cmp = -6
 
@@ -42,22 +47,22 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 					@numerator /= @denominator
 					@denominator = 1
 
-		# Evaluate the constant to be a float
+		# Evaluate the constant.
 		#
-		# @return [Float] A float representation of this Constant
+		# @return [Number] A float representation of this constant.
 		evaluate: ->
 			parseFloat(@numerator/@denominator)
 
-		#Deep copy this Constant
+		# Deep-copy this constant.
 		#
-		#@return [Constant] A copy of this Constant
+		# @return [Constant] A copy of this Constant
 		copy: ->
 			return new Constant(@numerator, @denominator, @mode)
 
-		#Compares this constant with another constant
+		# Compare this constant with another constant.
 		#
-		#@param b [Constant]
-		#@return [Integer] returns an integer based on the comparison result (negative, neutral or positive)
+		# @param b [Constant] The constant to compare with.
+		# @return [Number] An integer based on the comparison result. 1 if this is greater, -1 if vice versa, and 0 if equal.
 		compareSameType: (b) ->
 			if @evaluate() < b.evaluate()
 				return -1
@@ -66,10 +71,10 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 			else
 				return 1
 
-		# Multiplies by another constant and returns the resulting Constant
+		# Multiply by another constant.
 		#
-		# @param b [Constant]
-		# return [Constant] The multiple of this and b
+		# @param b [Constant] The constant to multiply by.
+		# return [Constant] The multiple of the two constants.
 		mul: (b) ->
 			if @mode == b.mode
 				newMode = @mode
@@ -78,9 +83,10 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 
 			return new Constant(@numerator * b.numerator, @denominator * b.denominator, newMode)
 
-		# Adds to another constant and returns the resulting Constant.
-		# @param b [Constant]
-		# @return [Constant] The addition of this and b
+		# Add another constant to this one.
+		#
+		# @param b [Constant] The constant to add.
+		# @return [Constant] The sum of the two constants.
 		add: (b) ->
 			if @mode == b.mode
 				newMode = @mode
@@ -88,9 +94,11 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 				newMode = "float"
 
 			return new Constant(b.denominator * @numerator + @denominator * b.numerator, @denominator * b.denominator, newMode)
-		# This constant to the power of another constant
-		# @param b [Constant]
-		# @return [Constant] Returns a constant of base this to power b
+
+		# Raise this constant to the power of another.
+		#
+		# @param b [Constant] The exponent.
+		# @return [Constant, Pow] A constant of this to the given exponent, or a power node if this is non-simplifiable.
 		pow: (b) ->
 			if @mode == "rational"
 				if b.mode == "rational"
@@ -132,32 +140,34 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 				# Also returning a float.
 				return new Constant(Math.pow(@evaluate(), b.evaluate()), 1, "float")
 
-		# Tests the equality between this Constant and another Constant.
-		# @param b [Constant]
-		# @return [Boolean] Whether or not the two Constants are equal
+		# Test the equality between this constant and another object.
+		# @param b [Object] The object to check.
+		# @return [Boolean] Whether or not the two objects are equal.
 		equals: (b) ->
 			unless b instanceof Constant
 				return false
 			return @evaluate() == b.evaluate()
 
-		# Does nothing - included for API parity
-		# @param replacements [???]
+		# Alias of copy. Included for API parity.
+		#
+		# @param replacements [Object] A map of replacements. Irrelevant.
 		replaceVariables: (replacements) ->
 			@copy() # Does nothing - this is a constant.
 
+		# Get all variables in this terminal. Included for API parity.
+		#
+		# @return [Array<Object>] Returns `[]`.
 		getAllVariables: ->
 			[]
 
-		# Substitute values into the constant - does nothing as this is a constant;
-		# Included for API parity
+		# Alias of copy. Included for API parity.
 		# 
-		#@param substitutions [Object] A map of variable labels to their values. Values can be integers, Expressions, Terminals or BasicNodes
-		#@param uncertaintySubstitutions [???] I don't know how this works
+		# @param substitutions [Object] Map of substitutions. Irrelevant.
+		# @param uncertaintySubstitutions [Object] Map of uncertainty substitutions. Irrelevant.
 		sub: (substitutions, uncertaintySubstitutions) ->
 			@copy()
 
-		# Gets greatest common divisor and divides out to simplify Constant
-		#
+		# Simplify this fraction in-place using Euclid's method.
 		simplifyInPlace: ->
 			# Get the greatest common divisor.
 			a = @numerator
@@ -172,52 +182,52 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 			@denominator /= gcd
 			@denominator = Math.round(@denominator*10)/10
 
-		# Simplify this constant
+		# Simplify this constant.
 		#
-		# @return [Constant] A simplified copy of the current Constant
+		# @return [Constant] A simplified version of this constant.
 		simplify: ->
 			constant = @copy()
 			constant.simplifyInPlace()
 			return constant
 
-		# Expands the constant
-		# @return [Constant] A simplified constant
+		# Expand this constant. Included for API parity.
+		# @return [Constant] A copy of this constant.
 		expand: ->
 			@copy()
 
-		# Expands and simplifies 
-		# @return [Constant] A simplified and expanded constant
+		# Expand and simplify. Included for API parity.
+		# @return [Constant] Simplified constant.
 		expandAndSimplify: ->
 			@simplify()
 
-		# Substitutes 
+		# Substitute an expression into this. Included for API parity.
+		#
+		# @deprecated
 		substituteExpression: (sourceExpression, variable, equivalencies) ->
 			[@copy()]
 
-		# Gets uncertainty of the Constant
+		# Get uncertainty of this constant.
 		#
-		# @return [Constant] A constant of 0
+		# @return [Constant] 0, as there is no uncertainty in a constant.
 		getUncertainty: ->
 			new Constant(0)
 
-		# Gets the units of the Constant (does nothing since Constant)
+		# Get the units of variables. Included for API parity.
 		#
-		# @return [null] null
+		# @return [Object] null - Constants don't have units.
 		getVariableUnits: ->
 			null
 
-		#Sets units of the Constant (does nothing)
+		# Set the units of variables. Does nothing. Included for API parity.
 		#
-		# @param variable [???]
-		# @param equivalencies [???]
-		# @param units [String]
-		# @return null
+		# @param variable [String] Variable label. Irrelevant.
+		# @param equivalencies [Object] Equivalencies map. Irrelevant.
+		# @param units [BasicNode] Units for the variable. Irrelevant.
 		setVariableUnits: (variable, equivalencies, units) ->
-			null
 
-		# Creates a drawing node to export Constant for viewing.
+		# Create a drawing node representing this constant
 		#
-		# @return [FractionNode, NumberNode] A drawing node for viewing.
+		# @return [DrawingNode] A drawing node representing this constant.
 		toDrawingNode: ->
 			NumberNode = prettyRender.Number
 			FractionNode = prettyRender.Fraction
@@ -225,34 +235,36 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 				return new NumberNode(@numerator)
 			return new FractionNode(new NumberNode(@numerator), new NumberNode(@denominator))
 
+		# Differentiate this constant.
+		#
+		# return [Constant] 0, because constants are constant.
 		differentiate: (variable) ->
 			return new Constant(0)
 
 
-	# A class to represent symbolic constants in the equation tree; for e.g. Ï€
-	#
+	# Represents symbolic constants in the equation tree, such as π.
 	class SymbolicConstant extends Terminal
 
-		# Symbolic constants in the equation tree, e.g. Ï€
-		# Creates a new SymbolicConstant.
-		# @param label [String]
-		# @param value [Integer, Float] Optional. Default is null.
-		# @param units [String] Optional. Default is null.
+		# Make a new symbolic constant.
+		#
+		# @param label [String] The label of this constant (such as π).
+		# @param value [Number] Optional. Value of the symbolic constant (default is null).
+		# @param units [BasicNode, Terminal] Optional. Units of the constant (default is null).
 		constructor: (@label, @value=null, @units=null) ->
 			@cmp = -5
 
-		# Returns a deep copy of the SymbolicConstant
+		# Deep-copy the symbolic constant.
 		#
-		# @return [SymbolicConstant] Returns a new copy of the Symbolic Constant
+		# @return [SymbolicConstant] A new copy of the Symbolic Constant.
 		copy: ->
 			return new SymbolicConstant(@label, @value, @units)
 
-		# Compares this SymbolicConstant with another SymbolicConstant. 
+		# Compare this symbolic constant with another symbolic constant.
+		# Note that this compares labels, not values - this is a lexiographic sort.
 		#
-		# @param b [SymbolicConstant]
-		# @return [Integer 0,1,2] Returns the difference 'discriminator' of the two SymbolicConstants
+		# @param b [SymbolicConstant] The constant to compare with.
+		# @return [Number] 1 if this constant is greater, -1 if vice-versa, and 0 if equal.
 		compareSameType: (b) ->
-			# Compare this object with another of the same type.
 			if @label < b.label
 				return -1
 			else if @label == b.label
@@ -260,123 +272,138 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 			else
 				return 1
 
-		# Evaluates the SymbolicConstant
-		# @return [Integer, Float] Returns the current value of the SymbolicConstant
+		# Evaluate the symbolic constant.
+		#
+		# @return [Number] The value of the symbolic constant, if it has one, or the value in the lookup table. Null otherwise.
 		evaluate: ->
-			@value
+			if @value?
+				return @value
+			if @label of constants
+				return constants[@label]
+			return null
 
-		# Checks equality of this and another SymbolicConstant
+		# Check equality of this and another object.
 		# 
-		# @param b [SymbolicConstant]
-		# @return [Boolean] Whether or not the two SymbolicConstants are equal
+		# @param b [Object] The object to compare with.
+		# @return [Boolean] Whether the objects are equal.
 		equals: (b) ->
 			unless b instanceof SymbolicConstant
 				return false
 			return @label == b.label and @value == b.value
 
-		# Does nothing - included for API parity
+		# Replace variables - does nothing. Included for API parity.
 		#
-		# @params replacements [???]
-		# @return [SymbolicConstant]
+		# @params replacements [Object] Map of replacements. Irrelevant.
+		# @return [SymbolicConstant] A copy of this constant.
 		replaceVariables: (replacements) ->
 			@copy() # Does nothing - this is a constant.
 
-		#Does nothing??? Matt, please check
+		# Get all variables in this node. Included for API parity.
+		#
+		# @return [Array<Object>] []
 		getAllVariables: ->
 			[]
 
 
-		# Substitute values into the SymbolicConstant - does nothing as this is a SymbolicConstant;
-		# Included for API parity
+		# Substitute values - side effect of evaluation if evaluateSymbolicConstants is true.
 		# 
-		#@param substitutions [Object] A map of variable labels to their values. Values can be integers, Expressions, Terminals or BasicNodes
-		#@param uncertaintySubstitutions [???] I don't know how this works
+		# @param substitutions [Object] Substitutions map. Irrelevant, included for API parity.
+		# @param uncertaintySubstitutions [Object] Uncertainty substitutions map. Irrelevant.
+		# @param equivalencies [Object] Optional. Equivalencies object. Irrelevant.
+		# @param assumeZeroUncertainty [Boolean] Optional. Whether to assume unknown uncertainties are zero. Irrelevant.
+		# @param evaluateSymbolicConstants [Boolean] Optional. Whether to evaluate this constant (default is false).
+		# @return [SymbolicConstant, Constant] A copy of this constant if not evaluating symbolic constants, or an evaluated constant otherwise.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		sub: (substitutions, uncertaintySubstitutions, equivalencies=null, assumeZeroUncertainty=false, evaluateSymbolicConstants=false) ->
 			unless evaluateSymbolicConstants
 				return @copy()
+			if @value?
+				return new Constant(@value)
 			if @label of constants
 				return new Constant(constants[@label])
+			return @copy()
 
-		# Simplify the SymbolicConstant
+		# Simplify this constant.
 		#
-		# @return [SymbolicConstant] Returns a deep copy of the SymbolicConstant
+		# @return [SymbolicConstant] A copy of the constant.
 		simplify: ->
 			@copy()
 
-		# Expand the SymbolicConstant
+		# Expand this constant.
 		#
-		# @return [SymbolicConstant] Returns a deep copy of the SymbolicConstant
+		# @return [SymbolicConstant] A copy of the constant.
 		expand: ->
 			@copy()
 
-		# Expand and simplify the SymbolicConstant
+		# Expand and simplify this constant.
 		#
-		# @return [SymbolicConstant] Returns a deep copy of the SymbolicConstant
+		# @return [SymbolicConstant] A copy of the constant.
 		expandAndSimplify: ->
 			@copy()
 
-		# Substitutes an expression into the SymbolicConstant
+		# Substitutes an expression into this constant.
 		#
-		# @param sourceExpression [Expression]
-		# @param variable [???]
-		# @param equivalencies []
+		# @deprecated
 		substituteExpression: (sourceExpression, variable, equivalencies) ->
 			[@copy()]
 
-		# Gets the uncertainty of the SymbolicConstant
+		# Get uncertainty of this constant.
 		#
-		# @return [Constant] Returns a Constant of 0
+		# @return [Constant] 0, as we assume no uncertainty in a symbolic constant.
 		getUncertainty: ->
 			new Constant(0)
 
-		# Gets the units of the SymbolicConstant i.e. null
-		# @return null
-		getVariableUnits: ->
+		# Get units of variable children of this constant. Included for API parity.
+		#
+		# @param variable [String] The variable to check for. Irrelevant.
+		# @return [Object] null - no children.
+		getVariableUnits: (variable) ->
 			null
 
-		# Sets the units of the SymbolicConstant
-		# @param variable
-		# @param equivalencies
-		# @param units
+		# Set units of variable children. Included for API parity.
+		#
+		# @param variable [String] The variable to set for. Irrelevant.
+		# @param equivalencies [Object] Equivalencies object. Irrelevant.
+		# @param units [BasicNode, Terminal] The units to set. Irrelevant.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		setVariableUnits: (variable, equivalencies, units) ->
 			null
 
-		# Creates a DrawingNode of the SymbolicConstant to be viewed
+		# Make a drawing node representing this constant.
 		#
-		# @return [VariableNode] Returns a prettyRendered DrawingNode of the SymbolicConstant
+		# @return [DrawingNode] Renderable drawing node representing this constant.
 		toDrawingNode: ->
 			VariableNode = prettyRender.Variable
 			return new VariableNode(@label, "constant symbolic-constant")
 
-		# Differentiates the SymbolicConstant
-		# @param variable [???]
-		# @return [Constant] Returns a Constant of 0
+		# Differentiate this constant.
+		#
+		# @param variable [String] Variable to differentiate with respect to.
+		# @return [Constant] 0, as constants are constant.
 		differentiate: (variable) ->
 			return new Constant(0)
 
-	# A class to represent Variables in the Equation tree; e.g. 'm'
+	# Represents variables in the equation tree.
 	class Variable extends Terminal
-		# Variables in the equation tree, e.g. m
 
-		# Make a new Variable
+		# Make a new Variable.
 		# 
-		# @param label [String]
-		# @param units [???] Optional. Defaults to null.
+		# @param label [String] The label of this variable.
+		# @param units [BasicNode, Terminal] Optional. Units of this variable (default is null).
 		constructor: (@label, @units=null) ->
 			@cmp = -4
 
-		# Creates a deep copy of the current Variable
+		# Deep-copy this Variable.
 		#
-		# @return [Variable] Returns a deep copy of the current Variable
+		# @return [Variable] A copy of this Variable.
 		copy: ->
 			return new Variable(@label, @units)
 
-		# Compares this Variable with another Variable
+		# Compare this Variable with another Variable.
 		#
-		# @param b [Variable] The other Variable
-		# @return [Integer -1, 0, 1] Returns an integer to indicate less than, equal to or greater than the other Variable
+		# @param b [Variable] The variable to compare with.
+		# @return [Number] 1 if this is greater, 0 if equal, and -1 if this is lesser.
 		compareSameType: (b) ->
-			# Compare this object with another of the same type.
 			if @label < b.label
 				return -1
 			else if @label == b.label
@@ -384,10 +411,12 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 			else
 				return 1
 
-		# Checks equality of this Variable and another Variable
+		# Check equality of this Variable and another object.
 		#
-		# @param b [Variable] The other variable
-		# @param equivalencies [???] Optional. 
+		# @param b [Object] The other object to compare with.
+		# @param equivalencies [Object] Equivalencies object. Optional (default is null).
+		# @return [Boolean] Whether the objects are equal.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		equals: (b, equivalencies=null) ->
 			# Check equality between this and some other object.
 			unless b instanceof Variable
@@ -398,22 +427,27 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 			else
 				return b.label == @label
 
-		# Replaces the variables with new variables (MATT I DON'T GET THIS ONE)
+		# Replace variable labels.
+		#
+		# @param replacements [Object] A map of variable labels to replacement labels.
+		# @return [Variable] This variable, possibly with its name replaced.
 		replaceVariables: (replacements) ->
 			copy = @copy()
 			if @label of replacements
 				copy.label = replacements[@label]
 			return copy
 
-		# Gets all variables
-		# @return [List of Strings] Returns the variable label
+		# Get a list of children variable labels.
+		#
+		# @return [Array<String>] An array containing just this label.
 		getAllVariables: ->
 			[@label]
 
-		# Substitutes values into the Variable
+		# Substitute values into the Variable.
 		#
-		# @param [???] substitutions
-		# @param [???] uncertaintySubstitutions
+		# @param substitutions [Object] A map of variable labels to their values.
+		# @param uncertaintySubstitutions [Object] A map of uncertainty labels to their values.
+		# @return [Variable, Constant] This variable, possibly substituted.
 		sub: (substitutions, uncertaintySubstitutions) ->
 			if @label of substitutions
 				substitute = substitutions[@label]
@@ -424,13 +458,9 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 			else
 				return @copy()
 
-		# Substitutes an Expression into the Variable
+		# Substitute an expression into the Variable.
 		#
-		# @param sourceExpression [sourceExpression] The source expression to be used.
-		# @param variable [???]
-		# @param equivalencies [???] Optional.
-		# @param eliminate [???] Optional.
-		# @return [Variable] Returns the resulting Variable from the substitution
+		# @deprecated
 		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
 			# Replace all instances of a variable with an expression.
 
@@ -450,17 +480,18 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 			else
 				return [@copy()]
 
-		# Gets the uncertainty of the Variable
+		# Get uncertainty of this Variable.
 		#
-		# @return [???] IDK how this one works either TBH
+		# @return [Uncertainty] Symbolic uncertainty of this Variable.
 		getUncertainty: ->
 			new Uncertainty(@label)
 
-		# Gets the units of the Variable 
+		# Get the units of a given Variable.
 		#
-		# @param variable [???]
-		# @param equivalencies [???]
-		# @return [units] The current units of the Variable
+		# @param variable [String] Label of the variable to get units for.
+		# @param equivalencies [Object] Equivalencies object.
+		# @return [BasicNode, Terminal] Units if this is the Variable being looked for. null otherwise.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		getVariableUnits: (variable, equivalencies) ->
 			if equivalencies?
 				if @label in equivalencies.get(variable)
@@ -469,11 +500,12 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 				return @units
 			return null
 
-		# Sets the units for the Variable
+		# Set units for a given Variable.
 		#
-		# @param variable [???]
-		# @param equivalencies [???]
-		# @param units [???]
+		# @param variable [String] The variable to set units for.
+		# @param equivalencies [Object] Equivalencies object.
+		# @param units [BasicNode, Terminal] The units to set.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		setVariableUnits: (variable, equivalencies, units) ->
 			if equivalencies?
 				if @label in equivalencies.get(variable)
@@ -481,58 +513,59 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 			else if @label == variable
 				@units = units
 
-		# Simplifies the Variable
+		# Simplify the Variable.
 		#
-		# @return [Variable] A deep copy of the Variable
- 		simplify: ->
+		# @return [Variable] Copy of the Variable.
+		simplify: ->
 			@copy()
 
-		# Expand the Variable
+		# Expand the Variable.
 		#
-		# @return [Variable] A deep copy of the Variable
+		# @return [Variable] Copy of the Variable.
 		expand: ->
 			@copy()
 
-		# Expands and simplifies the Variable
+		# Expand and simplify the Variable.
 		#
-		#@return [Variable] A deep copy of the Variable
+		# @return [Variable] Copy of the Variable.
 		expandAndSimplify: ->
 			@copy()
 
-		# Returns a DrawingNode of the Variable to be viewed
+		# Make a drawing node representing this Variable.
 		#
-		# @return [VariableNode] A DrawingNode version of the variable
+		# @return [DrawingNode] Drawing node representing this variable.
 		toDrawingNode: ->
 			VariableNode = prettyRender.Variable
 			return new VariableNode(@label)
 
-		# Differentiates the variable
+		# Differentiate the variable.
 		#
-		# @param variable [Variable]
-		# @return [Constant] Returns a constant of value either 1 or 0 (Mitchell: not sure how this actually works)
+		# @param variable [String] The label of the variable to differentiate with respect to.
+		# @return [Constant] The differentiated variable.
 		differentiate: (variable) ->
 			if variable == @label
 				return new Constant(1)
 			return new Constant(0)
 
-	# Defines an Uncertainty object in the equation tree; for e.g. sigma_m
-	# ??? I know nothing about this object really, it's going to be very poorly documented and needs to be edited
+	# Represents an uncertainty.
 	class Uncertainty extends Terminal
 
-		#Creates an Uncertainty (that sounds really beautiful doesn't it?)
+		# Make an Uncertainty.
 		#
-		# @param label [String] Label of the Uncertainty object
+		# @param label [String] Label of the variable this Uncertainty is for.
 		constructor: (@label) ->
-			# Matt: what do I do here?
 			@cmp = -4.5
 
+		# Deep-copy the Uncertainty.
+		#
+		# @return [Uncertainty] A copy of the Uncertainty.
 		copy: ->
 			return new Uncertainty(@label)
 
-		#Compares the value of this Uncertainty and another Uncertainty
+		# Compares this Uncertainty with another Uncertainty.
 		#
-		# @param b [Uncertainty]
-		# @return [Integer -1, 0, 1]
+		# @param b [Uncertainty] Uncertainty to compare with.
+		# @return [Number] 1 if this is greater, 0 if equal, -1 if this is lesser.
 		compareSameType: (b) ->
 			if @label < b.label
 				return -1
@@ -541,8 +574,12 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 			else
 				return 1
 
-		# Before commit: think about this more before asking Matt
-		# Matt: should we do this?
+		# Check equality of this and another object.
+		#
+		# @param b [Object] Object to compare with.
+		# @param equivalencies [Object] Equivalencies object. Optional (default is null).
+		# @return [Boolean] Whether the objects are equal.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		equals: (b, equivalencies=null) ->
 			# Check equality between this and some other object.
 			unless b instanceof Uncertainty
@@ -553,15 +590,28 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 			else
 				return b.label == @label
 
+		# Replace variable labels.
+		#
+		# @param replacements [Object] Map of variable labels to new labels.
+		# @return [Uncertainty] This node with its label possibly replaced.
 		replaceVariables: (replacements) ->
 			copy = @copy()
 			if @label of replacements
 				copy.label = replacements[@label]
 			return copy
 
+		# Get variable labels.
+		#
+		# @return [Array<String>] An array containing just this label.
 		getAllVariables: ->
 			[@label]
 
+		# Substitute values.
+		#
+		# @param substitutions [Object] Substitutions map. Irrelevant; included for API parity.
+		# @param uncertaintySubstitutions [Object] Map of uncertainty labels to uncertainty values.
+		# @param equivalencies [Object] Equivalencies object. Optional (default is null).
+		# @param assumeZero [Boolean] Whether to assume this uncertainty is zero if its value is not defined.
 		sub: (substitutions, uncertaintySubstitutions, equivalencies=null, assumeZero=false) ->
 			if @label of uncertaintySubstitutions and uncertaintySubstitutions[@label]?
 				substitute = uncertaintySubstitutions[@label]
@@ -572,31 +622,59 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 			else
 				return if not assumeZero then @copy() else new Constant("0")
 
+		# Substitute an expression.
+		#
+		# @deprecated
 		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
 			throw new Error("Can't sub uncertainties")
 
+		# Get uncertainty.
+		#
+		# @throw [Error] Not implemented for uncertainties.
 		getUncertainty: ->
 			throw new Error("Can't take uncertainty of an uncertainty")
 
+		# Get variable units.
+		#
+		# @throw [Error] Not implemented for uncertainties.
 		getVariableUnits: (variable, equivalencies) ->
 			throw new Error("Can't do that with uncertainties")
 
+		# Set variable units.
+		#
+		# @throw [Error] Not implemented for uncertainties.
 		setVariableUnits: (variable, equivalencies, units) ->
 			throw new Error("Can't do that with uncertainties")
 
+		# Simplify this node.
+		#
+		# @return [Uncertainty] A copy of this uncertainty.
 		simplify: ->
 			@copy()
 
+		# Expand this node.
+		#
+		# @return [Uncertainty] A copy of this uncertainty.
 		expand: ->
 			@copy()
 
+		# Expand and then simplify this node.
+		#
+		# @return [Uncertainty] A copy of this uncertainty.
 		expandAndSimplify: ->
 			@copy()
 
+		# Make a new drawing node representing this uncertainty.
+		#
+		# @return [DrawingNode] A drawing node representing this uncertainty.
 		toDrawingNode: ->
 			UncertaintyNode = prettyRender.Uncertainty
 			return new UncertaintyNode(@label)
-		# Don't differentiate uncertainties. It won't work. (Throws error 'Can't differentiate uncertainties!')
+
+		# Differentiate.
+		# Don't differentiate uncertainties. It won't work.
+		#
+		# @throw [Error] Not implemented for uncertainties.
 		differentiate: (variable) ->
 			throw new Error("Can't differentiate uncertainties!")
 
