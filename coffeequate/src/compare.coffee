@@ -1,11 +1,11 @@
 define ->
 
 	# Compare two values, nodes, or terminals to get an order.
-
+	#
+	# @param a [BasicNode, Terminal] The first item to compare.
+	# @param b [BasicNode, Terminal] The second item to compare.
+	# @return [Number] -1 if a < b, 0 if a = b, 1 if a > b.
 	return compare = (a, b) ->
-		# a < b -> -1
-		# a = b ->  0
-		# a > b ->  1
 		###
 		Order:
 		-6: Constants, by value

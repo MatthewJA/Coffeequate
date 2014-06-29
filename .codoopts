@@ -1,0 +1,9 @@
+--name       "Coffeequate"
+--readme     README.md
+--title      "Coffeequate Documentation"
+--extension  coffee
+--output     ./doc
+.
+-
+LICENSE
+coffeequate/src/grammar.peg

@@ -1,18 +1,23 @@
 define [
 	"nodes"
 	"terminals"
-	"generateInfo"
 	"AlgebraError"
 	"parseArgs"
 	"require"
 	"compare"
 	"prettyRender"
-], (nodes, terminals, generateInfo, AlgebraError, parseArgs, require, compare, prettyRender) ->
+], (nodes, terminals, AlgebraError, parseArgs, require, compare, prettyRender) ->
 
-	# Represent powers as a node.
-
+	# Node in the expression tree representing exponentiation.
 	class Pow extends nodes.BinaryNode
 		# Represent powers.
+		
+		# Make a new power node.
+		# Arguments passed as children will be parsed as children from whatever type they are.
+		#
+		# @param base [Object] The base of this power.
+		# @param power [Object] The exponent of this power.
+		# @return [Pow] A new power node.
 		constructor: (base, power, args...) ->
 			unless base? and power?
 				throw new Error("Pow nodes must have two children.")
@@ -24,16 +29,26 @@ define [
 			[base, power] = parseArgs(base, power)
 			super("**", base, power)
 
+		# Deep-copy this node.
+		#
+		# @return [Mul] A copy of this node.
 		copy: ->
 			return new Pow(
 				(if @children.left.copy? then @children.left.copy() else @children.left),
 				(if @children.right.copy? then @children.right.copy() else @children.right)
 			)
 
+		# Sort this node in-place.
 		sort: ->
 			@children.left.sort?()
 			@children.right.sort?()
 
+		# Check equality between this and another object.
+		#
+		# @param b [Object] An object to check equality with.
+		# @param equivalencies [Object] An object of equivalencies.
+		# @return [Boolean] Whether the objects are equal.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		equals: (b, equivalencies) ->
 			# Check equality between this and another object.
 			unless b instanceof Pow
@@ -55,6 +70,10 @@ define [
 
 			return true
 
+		# Compare this object with another of the same type.
+		#
+		# @param b [Pow] A power node to compare to.
+		# @return [Number] The comparison: 1 if this node is greater than the other, -1 if vice versa, and 0 if they are equal.
 		compareSameType: (b) ->
 			# Compare this object with another of the same type.
 			c = compare(@children.left, b.children.left)
@@ -63,6 +82,12 @@ define [
 			else
 				return compare(@children.right, b.children.right)
 
+		# Get the dimensions/units of a variable in this node.
+		#
+		# @param variable [String] The label of the variable to get dimensions of.
+		# @param equivalencies [Object] An object of equivalencies.
+		# @return [BasicNode] The units of the variable, or null if the variable wasn't found.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		getVariableUnits: (variable, equivalencies) ->
 			variableEquivalencies = if equivalencies? then equivalencies.get(variable) else {get: (z) -> [z]}
 			if @children.left instanceof terminals.Variable and @children.left.label in variableEquivalencies
@@ -79,11 +104,20 @@ define [
 					return rightVariableUnits
 			return null
 
+		# Set the dimensions/units of a variable in this node.
+		#
+		# @param variable [String] The label of the variable to set dimensions of.
+		# @param equivalencies [Object] An object of equivalencies.
+		# @param units [BasicNode] The units to give the variable.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		setVariableUnits: (variable, equivalencies, units) ->
 			variableEquivalencies = if equivalencies? then equivalencies.get(variable) else {get: (z) -> [z]}
 			@children.left.setVariableUnits(variable, equivalencies, units)
 			@children.right.setVariableUnits(variable, equivalencies, units)
 
+		# Expand this node.
+		#
+		# @return [BasicNode, Terminal] This node, expanded.
 		expand: ->
 			Mul = require("operators/Mul")
 			Add = require("operators/Add")
@@ -134,6 +168,11 @@ define [
 				# Can't expand any more!
 				return new Pow(left, right)
 
+		# Simplify this node.
+		#
+		# @param equivalencies [Object] An object of equivalencies.
+		# @return [BasicNode, Terminal] This node, simplified.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		simplify: (equivalencies) ->
 			Mul = require("operators/Mul")
 
@@ -172,12 +211,24 @@ define [
 				else
 					return new Pow(left, right)
 
+		# Expand and then simplify this node.
+		#
+		# @param equivalencies [Object] An object of equivalencies.
+		# @return [BasicNode, Terminal] This node, expanded and simplified.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		expandAndSimplify: (equivalencies) ->
 			expr = @expand()
 			if expr.simplify?
 				return expr.simplify(equivalencies)
 			return expr
 
+		# Solve this node for a variable.
+		#
+		# @param variable [String] The label of the variable to solve for.
+		# @param equivalencies [Object] Optional. An object of equivalencies.
+		# @return [Array<BasicNode>, Array<Terminal>] The solutions for the given variable.
+		# @throw [AlgebraError] If the node cannot be solved.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		solve: (variable, equivalencies) ->
 			Mul = require("operators/Mul")
 
@@ -226,6 +277,15 @@ define [
 			else
 				return expr.solve(variable, equivalencies)
 
+		# Substitute values into variables.
+		#
+		# @param substitutions [Object] A map of variable labels to their values. Values can be any node, terminal, or something interpretable as a terminal.
+		# @param uncertaintySubstitutions [Object] A map of variable labels to the values of their uncertainties.
+		# @param equivalencies [Object] Optional. An object of equivalencies.
+		# @param assumeZeroUncertainty [Boolean] Optional. Whether to assume uncertainties are zero if unknown (default false).
+		# @param evaluateSymbolicConstants [Boolean] Optional. Whether to evaluate symbolic constants (default false).
+		# @return [BasicNode, Terminal] This node with all substitutions substituted.
+		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		sub: (substitutions, uncertaintySubstitutions, equivalencies=null, assumeZeroUncertainty=false, evaluateSymbolicConstants=false) ->
 			# subtitutions: {variable: value}
 			# variable is a label, value is any object - if it is a node,
@@ -276,6 +336,9 @@ define [
 			newPow = newPow.expandAndSimplify(equivalencies)
 			return newPow
 
+		# Get all variable labels used in children of this node.
+		#
+		# @return [Array<String>] A list of all labels of variables in children of this node.
 		getAllVariables: ->
 			variables = {}
 
@@ -298,6 +361,10 @@ define [
 
 			return outVariables
 
+		# Replace variable labels.
+		#
+		# @param replacements [Object] A map of variable labels to their replacement labels.
+		# @return [Pow] This node with variable labels replaced.
 		replaceVariables: (replacements) ->
 			# {variableLabel: replacementLabel}
 			left = @children.left.copy()
@@ -314,6 +381,9 @@ define [
 
 			return new Pow(left, right)
 
+		# Substitute an expression into this node.
+		#
+		# @deprecated (Not sure why this exists)
 		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
 			# Replace all instances of a variable with an expression.
 			# Eliminate the target variable if set to do so.
@@ -354,6 +424,9 @@ define [
 
 			return results
 
+		# Convert this node into a drawing node.
+		#
+		# @return [DrawingNode] A drawing node representing this node.
 		toDrawingNode: ->
 			SurdNode = prettyRender?.Surd
 			PowNode = prettyRender.Pow
@@ -372,6 +445,10 @@ define [
 
 			return new PowNode(@children.left.toDrawingNode(), @children.right.toDrawingNode())
 
+		# Differentiate this node with respect to a variable.
+		#
+		# @param variable [String] The label of the variable to differentiate with respect to.
+		# @todo Add equivalencies. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		differentiate: (variable)  ->
 			Add = require("operators/Add")
 			Mul = require("operators/Mul")
