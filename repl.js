@@ -64,6 +64,5 @@
 	submit("1 + 2");
 	submit("CQ(\"(x+y)**2\").simplify()");
 	submit('CQ("(x+y)**2").simplify().toLaTeX()')
-	submit('CQ("(x+y)**2").solve("x")')
 
 }).call()
