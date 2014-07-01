@@ -4,7 +4,8 @@
 stringToTerminal = function(x) { return x; };
 operators = {
   Add: function(l,r) { return ["+",l,r] },
-  Mul: function(l,r) { return ["*",l,r] }
+  Mul: function(l,r) { return ["*",l,r] },
+  Sub: function(l,r) { return ["-",l,r] }
 };
 }
 
