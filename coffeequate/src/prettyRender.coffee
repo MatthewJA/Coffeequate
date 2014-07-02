@@ -114,7 +114,7 @@ define ->
   DrawingNode.makeWithBrackets = (terms...) ->
     node = new this()
     terms = terms.map((x) ->
-        if x.bindingStrength<= node.bindingStrength()
+        if x.bindingStrength() <= node.bindingStrength()
           return new Bracket(x)
         else
           return x)
