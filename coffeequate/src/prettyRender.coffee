@@ -103,7 +103,7 @@ define ->
     # @param child [DrawingNode] The node to (potentially) bracket.
     # @return [DrawingNode] The bracketed child, or the original child.
     bracketIfNeeded: (child) ->
-      if child.bindingStrength<= @bindingStrength()
+      if child.bindingStrength() <= @bindingStrength()
         return new Bracket(child)
       return child
 
@@ -338,7 +338,7 @@ define ->
 
   # Drawing node representing a fraction.
   class Fraction extends DrawingNode
-    
+
     # Make a new fraction drawing node.
     #
     # @param top [DrawingNode] The node to be drawn on top of the fraction.
@@ -376,7 +376,7 @@ define ->
 
   # Drawing node representing a surd/root.
   class Surd extends DrawingNode
-    
+
     # Make a new surd drawing node.
     #
     # @param contents [DrawingNode] The node to draw inside the root.
@@ -421,7 +421,7 @@ define ->
 
   # Drawing node representing an uncertainty.
   class Uncertainty extends DrawingNode
-    
+
     # Make a new uncertainty drawing node.
     #
     # @param label [String] The label of the variable this uncertainty represents.
