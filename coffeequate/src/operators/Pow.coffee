@@ -11,7 +11,7 @@ define [
 	# Node in the expression tree representing exponentiation.
 	class Pow extends nodes.BinaryNode
 		# Represent powers.
-		
+
 		# Make a new power node.
 		# Arguments passed as children will be parsed as children from whatever type they are.
 		#
@@ -443,7 +443,8 @@ define [
 						return new FractionNode(new NumberNode(1),
 								new SurdNode(@children.left.toDrawingNode(), -@children.right.denominator))
 
-			return new PowNode(@children.left.toDrawingNode(), @children.right.toDrawingNode())
+			return new PowNode(PowNode::bracketIfNeeded(@children.left.toDrawingNode()),
+																			@children.right.toDrawingNode())
 
 		# Differentiate this node with respect to a variable.
 		#
