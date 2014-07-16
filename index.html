@@ -112,13 +112,15 @@
 
           The methods of an expression are listed below.
           <ul>
-            <li><code class="prettyprint">expr.sub(substitutions)</code> - Takes an object mapping variable names to values, and returns a new expression with each variable replaced by its value. Values can be numbers, other variables, or even other expressions.</li>
-            <li><code class="prettyprint">expr.solve(variable)</code> - Takes the name of a variable as a string, and returns the expression solved for this variable as an array of solutions. Expressions are automatically equated to zero.</li>
-            <li><code class="prettyprint">expr.simplify()</code> - Return a simplified version of the expression.</li>
+            <li><code class="prettyprint">expr.sub(substitutions, equivalencies)</code> - Takes an object mapping variable names to values, and returns a new expression with each variable replaced by its value. Values can be numbers, other variables, or even other expressions.</li>
+            <li><code class="prettyprint">expr.solve(variable, equivalencies)</code> - Takes the name of a variable as a string, and returns the expression solved for this variable as an array of solutions. Expressions are automatically equated to zero.</li>
+            <li><code class="prettyprint">expr.simplify(equivalencies)</code> - Return a simplified version of the expression.</li>
+            <li><code class="prettyprint">expr.differentiate(variable, equivalencies)</code> - Takes the name of a variable as a string, and returns the expression solved for this variable as an array of solutions. Expressions are automatically equated to zero.</li>
             <li><code class="prettyprint">expr.toMathML()</code> - Return a MathML string of the expression.</li>
             <li><code class="prettyprint">expr.toLaTeX()</code> - Return a LaTeX string of the expression.</li>
             <li><code class="prettyprint">expr.copy()</code> - Recursively deep-copy the expression.</li>
           </ul>
+          <code>equivalencies</code> is an object mapping variable labels to an array of variable labels that that variable is equivalent to - for example, if <code>x</code> and <code>y</code> are equivalent, then you could have <code>equivalencies = {"x":["x", "y"], "y":["x", "y"]}</code>.
         </p>
       </article>
 
@@ -126,7 +128,7 @@
       <article>
         <header><h3>REPL</h3></header>
         <p>
-          Here's a JS REPL with Coffeequate v0.4.1 already loaded. Try it out!
+          Here's a JS REPL with Coffeequate v0.4.2 already loaded. Try it out!
         </p>
           <div class="repl"></div>
 
@@ -165,6 +167,13 @@
             dilation(10).toString(); // 1<br>
             dilation(1000000000).toString(); // 0.287348<br>
             dilation(CQ("v")).toString(); // 1 + 1.11111e-17*v**2**-1/2
+          </code>
+
+          <h4>Peak of projectile flight</h4>
+          <code class="cb prettyprint">
+            s = CQ("u*t + 0.5*a*t**2"); // Vertical position as a function of time.<br>
+            maxT = s.differentiate("t").solve("t"); // Differentiate and equate to zero to find times where s is maximal or minimal.<br>
+            s.sub({"t":maxT[0]}).toString(); // (-0.5*u**3)/(a**3) + (u**2)/(a**2)<br>
           </code>
         </div>
 

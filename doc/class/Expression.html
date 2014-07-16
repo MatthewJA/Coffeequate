@@ -30,7 +30,7 @@
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>coffeequate&#47;src&#47;Expression.coffee</td>
+          <td>coffeequate\src\Expression.coffee</td>
         </tr>
       </table>
       <h2>Overview</h2>
@@ -84,7 +84,7 @@ It wraps underlying nodes and terminals in a neat interface.</p>
       <a href='#solve-dynamic'>
         #
 (Expression)
-<b>solve</b><span>(variable)</span>
+<b>solve</b><span>(variable, equivalencies = {})</span>
       </a>
     </span>
     <span class='desc'>
@@ -96,7 +96,7 @@ It wraps underlying nodes and terminals in a neat interface.</p>
       <a href='#sub-dynamic'>
         #
 (Expression)
-<b>sub</b><span>(substitutions)</span>
+<b>sub</b><span>(substitutions, equivalencies = {})</span>
       </a>
     </span>
     <span class='desc'>
@@ -120,7 +120,7 @@ It wraps underlying nodes and terminals in a neat interface.</p>
       <a href='#simplify-dynamic'>
         #
 (Expression)
-<b>simplify</b><span>()</span>
+<b>simplify</b><span>(equivalencies = {})</span>
       </a>
     </span>
     <span class='desc'>
@@ -137,6 +137,18 @@ It wraps underlying nodes and terminals in a neat interface.</p>
     </span>
     <span class='desc'>
       Expand this Expression. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#differentiate-dynamic'>
+        #
+(Expression)
+<b>differentiate</b><span>(variable, equivalencies = {})</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Differentiate this expression with respect to a variable. 
     </span>
   </li>
 </ul>
@@ -254,14 +266,10 @@ It wraps underlying nodes and terminals in a neat interface.</p>
     <p class='signature' id='solve-dynamic'>
       #
 (Expression)
-<b>solve</b><span>(variable)</span>
+<b>solve</b><span>(variable, equivalencies = {})</span>
       <br>
     </p>
     <div class='docstring'>
-  <div class='note todo'>
-    <strong>TODO:</strong>
-    Add equivalencies <a href="https://github.com/MatthewJA/Coffeequate/issues/62">#62</a> 
-  </div>
   <p>Equate the Expression to 0 and solve for a variable.</p>
 </div>
 <div class='tags'>
@@ -276,6 +284,16 @@ It wraps underlying nodes and terminals in a neat interface.</p>
       </span>
       &mdash;
       <span class='desc'>The variable to solve for. </span>
+    </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
     </li>
   </ul>
   <h3>Returns:</h3>
@@ -295,14 +313,10 @@ It wraps underlying nodes and terminals in a neat interface.</p>
     <p class='signature' id='sub-dynamic'>
       #
 (Expression)
-<b>sub</b><span>(substitutions)</span>
+<b>sub</b><span>(substitutions, equivalencies = {})</span>
       <br>
     </p>
     <div class='docstring'>
-  <div class='note todo'>
-    <strong>TODO:</strong>
-    Add equivalencies <a href="https://github.com/MatthewJA/Coffeequate/issues/62">#62</a> 
-  </div>
   <div class='note todo'>
     <strong>TODO:</strong>
     Add uncertainties <a href="https://github.com/MatthewJA/Coffeequate/issues/61">#61</a> 
@@ -325,6 +339,16 @@ It wraps underlying nodes and terminals in a neat interface.</p>
       </span>
       &mdash;
       <span class='desc'>A map of variable labels to their values. Values can be integers, Expressions, Terminals, or BasicNodes. </span>
+    </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
     </li>
   </ul>
   <h3>Returns:</h3>
@@ -368,13 +392,26 @@ It wraps underlying nodes and terminals in a neat interface.</p>
     <p class='signature' id='simplify-dynamic'>
       #
 (Expression)
-<b>simplify</b><span>()</span>
+<b>simplify</b><span>(equivalencies = {})</span>
       <br>
     </p>
     <div class='docstring'>
   <p>Simplify this Expression.</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
+    </li>
+  </ul>
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
@@ -412,10 +449,57 @@ It wraps underlying nodes and terminals in a neat interface.</p>
   </ul>
 </div>
   </div>
+  <div class='method_details'>
+    <p class='signature' id='differentiate-dynamic'>
+      #
+(Expression)
+<b>differentiate</b><span>(variable, equivalencies = {})</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Differentiate this expression with respect to a variable.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>variable</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The label of the variable to differentiate with respect to. </span>
+    </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Expression.html'>Expression</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A differentiated expression. </span>
+    </li>
+  </ul>
+</div>
+  </div>
 </div>
     </div>
     <div id='footer'>
-  June 30, 14 00:34:37 by
+  July 16, 14 23:35:48 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

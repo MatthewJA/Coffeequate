@@ -30,7 +30,7 @@
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>coffeequate&#47;src&#47;terminals.coffee</td>
+          <td>coffeequate\src\terminals.coffee</td>
         </tr>
         <tr>
           <td>Inherits:</td>
@@ -143,8 +143,8 @@ Float <code>*</code> Float -&gt; Float</p>
     <span class='signature'>
       <a href='#replaceVariables-dynamic'>
         #
-(void)
-<b>replaceVariables</b><span>(replacements)</span>
+(Constant)
+<b>replaceVariables</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
@@ -168,7 +168,7 @@ Float <code>*</code> Float -&gt; Float</p>
       <a href='#sub-dynamic'>
         #
 (void)
-<b>sub</b><span>(substitutions, uncertaintySubstitutions)</span>
+<b>sub</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
@@ -228,7 +228,7 @@ Float <code>*</code> Float -&gt; Float</p>
       <a href='#substituteExpression-dynamic'>
         #
 (void)
-<b>substituteExpression</b><span>(sourceExpression, variable, equivalencies)</span>
+<b>substituteExpression</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
@@ -264,7 +264,7 @@ Float <code>*</code> Float -&gt; Float</p>
       <a href='#setVariableUnits-dynamic'>
         #
 (void)
-<b>setVariableUnits</b><span>(variable, equivalencies, units)</span>
+<b>setVariableUnits</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
@@ -583,25 +583,23 @@ Float <code>*</code> Float -&gt; Float</p>
   <div class='method_details'>
     <p class='signature' id='replaceVariables-dynamic'>
       #
-(void)
-<b>replaceVariables</b><span>(replacements)</span>
+(Constant)
+<b>replaceVariables</b><span>()</span>
       <br>
     </p>
     <div class='docstring'>
   <p>Alias of copy. Included for API parity.</p>
 </div>
 <div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
+  <h3>Returns:</h3>
+  <ul class='return'>
     <li>
-      <span class='name'>replacements</span>
-      <span class='type'>
-        (
-          <tt>Object</tt>
-        )
-      </span>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Constant.html'>Constant</a></tt>
+      )
       &mdash;
-      <span class='desc'>A map of replacements. Irrelevant. </span>
+      <span class='desc'>A copy of this constant. </span>
     </li>
   </ul>
 </div>
@@ -634,36 +632,13 @@ Float <code>*</code> Float -&gt; Float</p>
     <p class='signature' id='sub-dynamic'>
       #
 (void)
-<b>sub</b><span>(substitutions, uncertaintySubstitutions)</span>
+<b>sub</b><span>()</span>
       <br>
     </p>
     <div class='docstring'>
   <p>Alias of copy. Included for API parity.</p>
 </div>
 <div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>substitutions</span>
-      <span class='type'>
-        (
-          <tt>Object</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>Map of substitutions. Irrelevant. </span>
-    </li>
-    <li>
-      <span class='name'>uncertaintySubstitutions</span>
-      <span class='type'>
-        (
-          <tt>Object</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>Map of uncertainty substitutions. Irrelevant. </span>
-    </li>
-  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -755,7 +730,7 @@ Float <code>*</code> Float -&gt; Float</p>
     <p class='signature' id='substituteExpression-dynamic'>
       #
 (void)
-<b>substituteExpression</b><span>(sourceExpression, variable, equivalencies)</span>
+<b>substituteExpression</b><span>()</span>
       <br>
     </p>
     <div class='docstring'>
@@ -820,46 +795,13 @@ Float <code>*</code> Float -&gt; Float</p>
     <p class='signature' id='setVariableUnits-dynamic'>
       #
 (void)
-<b>setVariableUnits</b><span>(variable, equivalencies, units)</span>
+<b>setVariableUnits</b><span>()</span>
       <br>
     </p>
     <div class='docstring'>
   <p>Set the units of variables. Does nothing. Included for API parity.</p>
 </div>
 <div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>variable</span>
-      <span class='type'>
-        (
-          <tt>String</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>Variable label. Irrelevant. </span>
-    </li>
-    <li>
-      <span class='name'>equivalencies</span>
-      <span class='type'>
-        (
-          <tt>Object</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>Equivalencies map. Irrelevant. </span>
-    </li>
-    <li>
-      <span class='name'>units</span>
-      <span class='type'>
-        (
-          <tt><a href='../class/BasicNode.html'>BasicNode</a></tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>Units for the variable. Irrelevant. </span>
-    </li>
-  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -902,7 +844,7 @@ Float <code>*</code> Float -&gt; Float</p>
 </div>
     </div>
     <div id='footer'>
-  June 30, 14 00:34:37 by
+  July 16, 14 23:35:48 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

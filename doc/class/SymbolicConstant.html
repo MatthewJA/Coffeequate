@@ -30,7 +30,7 @@
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>coffeequate&#47;src&#47;terminals.coffee</td>
+          <td>coffeequate\src\terminals.coffee</td>
         </tr>
         <tr>
           <td>Inherits:</td>
@@ -100,7 +100,7 @@
       <a href='#replaceVariables-dynamic'>
         #
 (SymbolicConstant)
-<b>replaceVariables</b><span>(replacements)</span>
+<b>replaceVariables</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
@@ -196,7 +196,7 @@
       <a href='#getVariableUnits-dynamic'>
         #
 (Object)
-<b>getVariableUnits</b><span>(variable)</span>
+<b>getVariableUnits</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
@@ -208,7 +208,7 @@
       <a href='#setVariableUnits-dynamic'>
         #
 (void)
-<b>setVariableUnits</b><span>(variable, equivalencies, units)</span>
+<b>setVariableUnits</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
@@ -429,11 +429,11 @@ Note that this compares labels, not values - this is a lexiographic sort.</p>
     <p class='signature' id='replaceVariables-dynamic'>
       #
 (SymbolicConstant)
-<b>replaceVariables</b><span>(replacements)</span>
+<b>replaceVariables</b><span>()</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>Replace variables - does nothing. Included for API parity.</p><p>@params replacements [Object] Map of replacements. Irrelevant.</p>
+  <p>Replace variables - does nothing. Included for API parity.</p>
 </div>
 <div class='tags'>
   <h3>Returns:</h3>
@@ -481,10 +481,6 @@ Note that this compares labels, not values - this is a lexiographic sort.</p>
       <br>
     </p>
     <div class='docstring'>
-  <div class='note todo'>
-    <strong>TODO:</strong>
-    Change the way equivalencies are handled. <a href="https://github.com/MatthewJA/Coffeequate/issues/62">#62</a> 
-  </div>
   <p>Substitute values - side effect of evaluation if evaluateSymbolicConstants is true.</p>
 </div>
 <div class='tags'>
@@ -518,7 +514,7 @@ Note that this compares labels, not values - this is a lexiographic sort.</p>
         )
       </span>
       &mdash;
-      <span class='desc'>Optional. Equivalencies object. Irrelevant. </span>
+      <span class='desc'>Optional. Equivalencies map. Irrelevant. </span>
     </li>
     <li>
       <span class='name'>assumeZeroUncertainty</span>
@@ -671,26 +667,13 @@ Note that this compares labels, not values - this is a lexiographic sort.</p>
     <p class='signature' id='getVariableUnits-dynamic'>
       #
 (Object)
-<b>getVariableUnits</b><span>(variable)</span>
+<b>getVariableUnits</b><span>()</span>
       <br>
     </p>
     <div class='docstring'>
   <p>Get units of variable children of this constant. Included for API parity.</p>
 </div>
 <div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>variable</span>
-      <span class='type'>
-        (
-          <tt>String</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>The variable to check for. Irrelevant. </span>
-    </li>
-  </ul>
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
@@ -708,50 +691,13 @@ Note that this compares labels, not values - this is a lexiographic sort.</p>
     <p class='signature' id='setVariableUnits-dynamic'>
       #
 (void)
-<b>setVariableUnits</b><span>(variable, equivalencies, units)</span>
+<b>setVariableUnits</b><span>()</span>
       <br>
     </p>
     <div class='docstring'>
-  <div class='note todo'>
-    <strong>TODO:</strong>
-    Change the way equivalencies are handled. <a href="https://github.com/MatthewJA/Coffeequate/issues/62">#62</a> 
-  </div>
   <p>Set units of variable children. Included for API parity.</p>
 </div>
 <div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>variable</span>
-      <span class='type'>
-        (
-          <tt>String</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>The variable to set for. Irrelevant. </span>
-    </li>
-    <li>
-      <span class='name'>equivalencies</span>
-      <span class='type'>
-        (
-          <tt>Object</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>Equivalencies object. Irrelevant. </span>
-    </li>
-    <li>
-      <span class='name'>units</span>
-      <span class='type'>
-        (
-          <tt>BasicNode, Terminal</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>The units to set. Irrelevant. </span>
-    </li>
-  </ul>
 </div>
   </div>
   <div class='method_details'>
@@ -818,7 +764,7 @@ Note that this compares labels, not values - this is a lexiographic sort.</p>
 </div>
     </div>
     <div id='footer'>
-  June 30, 14 00:34:37 by
+  July 16, 14 23:35:48 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

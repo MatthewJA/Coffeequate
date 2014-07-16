@@ -30,7 +30,7 @@
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>coffeequate&#47;src&#47;terminals.coffee</td>
+          <td>coffeequate\src\terminals.coffee</td>
         </tr>
         <tr>
           <td>Inherits:</td>
@@ -76,7 +76,7 @@
       <a href='#equals-dynamic'>
         #
 (Boolean)
-<b>equals</b><span>(b, equivalencies = null)</span>
+<b>equals</b><span>(b, equivalencies = {})</span>
       </a>
     </span>
     <span class='desc'>
@@ -112,7 +112,7 @@
       <a href='#sub-dynamic'>
         #
 (Variable, Constant)
-<b>sub</b><span>(substitutions, uncertaintySubstitutions)</span>
+<b>sub</b><span>(substitutions, uncertaintySubstitutions, equivalencies = {})</span>
       </a>
     </span>
     <span class='desc'>
@@ -148,7 +148,7 @@
       <a href='#getVariableUnits-dynamic'>
         #
 (BasicNode, Terminal)
-<b>getVariableUnits</b><span>(variable, equivalencies)</span>
+<b>getVariableUnits</b><span>(variable, equivalencies = {})</span>
       </a>
     </span>
     <span class='desc'>
@@ -160,7 +160,7 @@
       <a href='#setVariableUnits-dynamic'>
         #
 (void)
-<b>setVariableUnits</b><span>(variable, equivalencies, units)</span>
+<b>setVariableUnits</b><span>(variable, units, equivalencies = {})</span>
       </a>
     </span>
     <span class='desc'>
@@ -220,11 +220,23 @@
       <a href='#differentiate-dynamic'>
         #
 (Constant)
-<b>differentiate</b><span>(variable)</span>
+<b>differentiate</b><span>(variable, equivalencies = {})</span>
       </a>
     </span>
     <span class='desc'>
       Differentiate the variable. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#evaluate-dynamic'>
+        #
+(Object)
+<b>evaluate</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Evaluate this Variable. 
     </span>
   </li>
 </ul>
@@ -345,14 +357,10 @@
     <p class='signature' id='equals-dynamic'>
       #
 (Boolean)
-<b>equals</b><span>(b, equivalencies = null)</span>
+<b>equals</b><span>(b, equivalencies = {})</span>
       <br>
     </p>
     <div class='docstring'>
-  <div class='note todo'>
-    <strong>TODO:</strong>
-    Change the way equivalencies are handled. <a href="https://github.com/MatthewJA/Coffeequate/issues/62">#62</a> 
-  </div>
   <p>Check equality of this Variable and another object.</p>
 </div>
 <div class='tags'>
@@ -376,7 +384,7 @@
         )
       </span>
       &mdash;
-      <span class='desc'>Equivalencies object. Optional (default is null). </span>
+      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
     </li>
   </ul>
   <h3>Returns:</h3>
@@ -457,7 +465,7 @@
     <p class='signature' id='sub-dynamic'>
       #
 (Variable, Constant)
-<b>sub</b><span>(substitutions, uncertaintySubstitutions)</span>
+<b>sub</b><span>(substitutions, uncertaintySubstitutions, equivalencies = {})</span>
       <br>
     </p>
     <div class='docstring'>
@@ -485,6 +493,16 @@
       </span>
       &mdash;
       <span class='desc'>A map of uncertainty labels to their values. </span>
+    </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
     </li>
   </ul>
   <h3>Returns:</h3>
@@ -545,14 +563,10 @@
     <p class='signature' id='getVariableUnits-dynamic'>
       #
 (BasicNode, Terminal)
-<b>getVariableUnits</b><span>(variable, equivalencies)</span>
+<b>getVariableUnits</b><span>(variable, equivalencies = {})</span>
       <br>
     </p>
     <div class='docstring'>
-  <div class='note todo'>
-    <strong>TODO:</strong>
-    Change the way equivalencies are handled. <a href="https://github.com/MatthewJA/Coffeequate/issues/62">#62</a> 
-  </div>
   <p>Get the units of a given Variable.</p>
 </div>
 <div class='tags'>
@@ -576,7 +590,7 @@
         )
       </span>
       &mdash;
-      <span class='desc'>Equivalencies object. </span>
+      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
     </li>
   </ul>
   <h3>Returns:</h3>
@@ -596,14 +610,10 @@
     <p class='signature' id='setVariableUnits-dynamic'>
       #
 (void)
-<b>setVariableUnits</b><span>(variable, equivalencies, units)</span>
+<b>setVariableUnits</b><span>(variable, units, equivalencies = {})</span>
       <br>
     </p>
     <div class='docstring'>
-  <div class='note todo'>
-    <strong>TODO:</strong>
-    Change the way equivalencies are handled. <a href="https://github.com/MatthewJA/Coffeequate/issues/62">#62</a> 
-  </div>
   <p>Set units for a given Variable.</p>
 </div>
 <div class='tags'>
@@ -620,16 +630,6 @@
       <span class='desc'>The variable to set units for. </span>
     </li>
     <li>
-      <span class='name'>equivalencies</span>
-      <span class='type'>
-        (
-          <tt>Object</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>Equivalencies object. </span>
-    </li>
-    <li>
       <span class='name'>units</span>
       <span class='type'>
         (
@@ -638,6 +638,16 @@
       </span>
       &mdash;
       <span class='desc'>The units to set. </span>
+    </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
     </li>
   </ul>
 </div>
@@ -742,7 +752,7 @@
     <p class='signature' id='differentiate-dynamic'>
       #
 (Constant)
-<b>differentiate</b><span>(variable)</span>
+<b>differentiate</b><span>(variable, equivalencies = {})</span>
       <br>
     </p>
     <div class='docstring'>
@@ -761,6 +771,16 @@
       &mdash;
       <span class='desc'>The label of the variable to differentiate with respect to. </span>
     </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
+    </li>
   </ul>
   <h3>Returns:</h3>
   <ul class='return'>
@@ -775,10 +795,34 @@
   </ul>
 </div>
   </div>
+  <div class='method_details'>
+    <p class='signature' id='evaluate-dynamic'>
+      #
+(Object)
+<b>evaluate</b><span>()</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Evaluate this Variable.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Object</tt>
+      )
+      &mdash;
+      <span class='desc'>null, because this doesn&#39;t have a value. </span>
+    </li>
+  </ul>
+</div>
+  </div>
 </div>
     </div>
     <div id='footer'>
-  June 30, 14 00:34:37 by
+  July 16, 14 23:35:48 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>
