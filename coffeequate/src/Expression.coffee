@@ -77,7 +77,7 @@ define ["parse", "nodes"], (parse, nodes) ->
 		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
 		# @return [Expression] A simplified Expression.
 		simplify: (equivalencies={}) ->
-			new Expression(@expr.simplify())
+			new Expression(@expr.simplify(equivalencies))
 
 		# Expand this Expression.
 		#
