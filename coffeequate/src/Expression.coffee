@@ -40,21 +40,20 @@ define ["parse", "nodes"], (parse, nodes) ->
 		# Equate the Expression to 0 and solve for a variable.
 		#
 		# @param variable [String] The variable to solve for.
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
 		# @return [Expression] A solved Expression representing the variable.
-		# @todo Add equivalencies [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
-		solve: (variable) ->
-			# TODO: Equivalencies.
-			(new Expression(solution) for solution in @expr.solve(variable))
+		solve: (variable, equivalencies={}) ->
+			(new Expression(solution) for solution in @expr.solve(variable, equivalencies))
 
 		# Substitute values into the Expression.
 		#
 		# @param substitutions [Object] A map of variable labels to their values. Values can be integers, Expressions, Terminals, or BasicNodes.
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
 		# @return [Expression] The Expression with substituted values.
-		# @todo Add equivalencies [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		# @todo Add uncertainties [#61](https://github.com/MatthewJA/Coffeequate/issues/61)
 		# @todo Reimplement sub options from the nodes. [#71](https://github.com/MatthewJA/Coffeequate/issues/71)
-		sub: (substitutions) ->
-			# TODO: Uncertainties, equivalencies, options.
+		sub: (substitutions, equivalencies={}) ->
+			# TODO: Uncertainties, options.
 			# TODO: Seems that the way I implemented substituting expressions was different last time for no real reason. Fix.
 
 			# If there are any Expressions in here, we should remove them.
@@ -65,7 +64,7 @@ define ["parse", "nodes"], (parse, nodes) ->
 				else
 					newsubs[key] = substitutions[key]
 
-			return new Expression(@expr.sub(newsubs, null, null).simplify())
+			return new Expression(@expr.sub(newsubs, null, equivalencies).simplify(equivalencies))
 
 		# Deep-copy this Expression.
 		#
@@ -75,9 +74,10 @@ define ["parse", "nodes"], (parse, nodes) ->
 
 		# Simplify this Expression.
 		#
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
 		# @return [Expression] A simplified Expression.
-		simplify: ->
-			new Expression(@expr.simplify())
+		simplify: (equivalencies={}) ->
+			new Expression(@expr.simplify(equivalencies))
 
 		# Expand this Expression.
 		#

@@ -150,8 +150,8 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 
 		# Alias of copy. Included for API parity.
 		#
-		# @param replacements [Object] A map of replacements. Irrelevant.
-		replaceVariables: (replacements) ->
+		# @return [Constant] A copy of this constant.
+		replaceVariables: ->
 			@copy() # Does nothing - this is a constant.
 
 		# Get all variables in this terminal. Included for API parity.
@@ -161,10 +161,7 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 			[]
 
 		# Alias of copy. Included for API parity.
-		# 
-		# @param substitutions [Object] Map of substitutions. Irrelevant.
-		# @param uncertaintySubstitutions [Object] Map of uncertainty substitutions. Irrelevant.
-		sub: (substitutions, uncertaintySubstitutions) ->
+		sub: ->
 			@copy()
 
 		# Simplify this fraction in-place using Euclid's method.
@@ -203,7 +200,7 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		# Substitute an expression into this. Included for API parity.
 		#
 		# @deprecated
-		substituteExpression: (sourceExpression, variable, equivalencies) ->
+		substituteExpression: ->
 			[@copy()]
 
 		# Get uncertainty of this constant.
@@ -219,11 +216,7 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 			null
 
 		# Set the units of variables. Does nothing. Included for API parity.
-		#
-		# @param variable [String] Variable label. Irrelevant.
-		# @param equivalencies [Object] Equivalencies map. Irrelevant.
-		# @param units [BasicNode] Units for the variable. Irrelevant.
-		setVariableUnits: (variable, equivalencies, units) ->
+		setVariableUnits: ->
 
 		# Create a drawing node representing this constant
 		#
@@ -293,9 +286,8 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 
 		# Replace variables - does nothing. Included for API parity.
 		#
-		# @params replacements [Object] Map of replacements. Irrelevant.
 		# @return [SymbolicConstant] A copy of this constant.
-		replaceVariables: (replacements) ->
+		replaceVariables: ->
 			@copy() # Does nothing - this is a constant.
 
 		# Get all variables in this node. Included for API parity.
@@ -304,16 +296,14 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		getAllVariables: ->
 			[]
 
-
 		# Substitute values - side effect of evaluation if evaluateSymbolicConstants is true.
 		# 
 		# @param substitutions [Object] Substitutions map. Irrelevant, included for API parity.
 		# @param uncertaintySubstitutions [Object] Uncertainty substitutions map. Irrelevant.
-		# @param equivalencies [Object] Optional. Equivalencies object. Irrelevant.
+		# @param equivalencies [Object] Optional. Equivalencies map. Irrelevant.
 		# @param assumeZeroUncertainty [Boolean] Optional. Whether to assume unknown uncertainties are zero. Irrelevant.
 		# @param evaluateSymbolicConstants [Boolean] Optional. Whether to evaluate this constant (default is false).
 		# @return [SymbolicConstant, Constant] A copy of this constant if not evaluating symbolic constants, or an evaluated constant otherwise.
-		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		sub: (substitutions, uncertaintySubstitutions, equivalencies=null, assumeZeroUncertainty=false, evaluateSymbolicConstants=false) ->
 			unless evaluateSymbolicConstants
 				return @copy()
@@ -355,18 +345,12 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 
 		# Get units of variable children of this constant. Included for API parity.
 		#
-		# @param variable [String] The variable to check for. Irrelevant.
 		# @return [Object] null - no children.
-		getVariableUnits: (variable) ->
+		getVariableUnits: ->
 			null
 
 		# Set units of variable children. Included for API parity.
-		#
-		# @param variable [String] The variable to set for. Irrelevant.
-		# @param equivalencies [Object] Equivalencies object. Irrelevant.
-		# @param units [BasicNode, Terminal] The units to set. Irrelevant.
-		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
-		setVariableUnits: (variable, equivalencies, units) ->
+		setVariableUnits: ->
 			null
 
 		# Make a drawing node representing this constant.
@@ -414,16 +398,15 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		# Check equality of this Variable and another object.
 		#
 		# @param b [Object] The other object to compare with.
-		# @param equivalencies [Object] Equivalencies object. Optional (default is null).
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
 		# @return [Boolean] Whether the objects are equal.
-		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
-		equals: (b, equivalencies=null) ->
+		equals: (b, equivalencies={}) ->
 			# Check equality between this and some other object.
 			unless b instanceof Variable
 				return false
 
-			if equivalencies?
-				return @label in equivalencies.get(b.label)
+			if b.label of equivalencies
+				return @label in equivalencies[b.label]
 			else
 				return b.label == @label
 
@@ -447,16 +430,22 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		#
 		# @param substitutions [Object] A map of variable labels to their values.
 		# @param uncertaintySubstitutions [Object] A map of uncertainty labels to their values.
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
 		# @return [Variable, Constant] This variable, possibly substituted.
-		sub: (substitutions, uncertaintySubstitutions) ->
-			if @label of substitutions
-				substitute = substitutions[@label]
-				if substitute.copy?
-					return substitute.copy()
-				else
-					return new Constant(substitute)
+		sub: (substitutions, uncertaintySubstitutions, equivalencies={}) ->
+			if @label of equivalencies
+				equivs = equivalencies[@label]
 			else
-				return @copy()
+				equivs = [@label]
+
+			for label in equivs
+				if label of substitutions
+					substitute = substitutions[label]
+					if substitute.copy?
+						return substitute.copy()
+					else
+						return new Constant(substitute)
+			return @copy()
 
 		# Substitute an expression into the Variable.
 		#
@@ -489,12 +478,11 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		# Get the units of a given Variable.
 		#
 		# @param variable [String] Label of the variable to get units for.
-		# @param equivalencies [Object] Equivalencies object.
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
 		# @return [BasicNode, Terminal] Units if this is the Variable being looked for. null otherwise.
-		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
-		getVariableUnits: (variable, equivalencies) ->
-			if equivalencies?
-				if @label in equivalencies.get(variable)
+		getVariableUnits: (variable, equivalencies={}) ->
+			if variable of equivalencies
+				if @label in equivalencies[variable]
 					return @units
 			else if @label == variable
 				return @units
@@ -503,15 +491,20 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		# Set units for a given Variable.
 		#
 		# @param variable [String] The variable to set units for.
-		# @param equivalencies [Object] Equivalencies object.
 		# @param units [BasicNode, Terminal] The units to set.
-		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
-		setVariableUnits: (variable, equivalencies, units) ->
-			if equivalencies?
-				if @label in equivalencies.get(variable)
-					@units = units
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
+		setVariableUnits: (variable, units, equivalencies={}) ->
+			if variable of equivalencies
+				if @label in equivalencies[variable]
+					if units.copy?
+						@units = units.copy()
+					else
+						@units = units
 			else if @label == variable
-				@units = units
+				if units.copy?
+					@units = units.copy()
+				else
+					@units = units
 
 		# Simplify the Variable.
 		#
@@ -541,8 +534,12 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		# Differentiate the variable.
 		#
 		# @param variable [String] The label of the variable to differentiate with respect to.
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
 		# @return [Constant] The differentiated variable.
-		differentiate: (variable) ->
+		differentiate: (variable, equivalencies={}) ->
+			if variable of equivalencies
+				if @label in equivalencies[variable]
+					return new Constant(1)
 			if variable == @label
 				return new Constant(1)
 			return new Constant(0)
@@ -577,16 +574,15 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		# Check equality of this and another object.
 		#
 		# @param b [Object] Object to compare with.
-		# @param equivalencies [Object] Equivalencies object. Optional (default is null).
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
 		# @return [Boolean] Whether the objects are equal.
-		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
 		equals: (b, equivalencies=null) ->
 			# Check equality between this and some other object.
 			unless b instanceof Uncertainty
 				return false
 
-			if equivalencies?
-				return @label in equivalencies.get(b.label)
+			if b.label of equivalencies
+				return @label in equivalencies[b.label]
 			else
 				return b.label == @label
 
@@ -610,17 +606,27 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		#
 		# @param substitutions [Object] Substitutions map. Irrelevant; included for API parity.
 		# @param uncertaintySubstitutions [Object] Map of uncertainty labels to uncertainty values.
-		# @param equivalencies [Object] Equivalencies object. Optional (default is null).
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
 		# @param assumeZero [Boolean] Whether to assume this uncertainty is zero if its value is not defined.
 		sub: (substitutions, uncertaintySubstitutions, equivalencies=null, assumeZero=false) ->
-			if @label of uncertaintySubstitutions and uncertaintySubstitutions[@label]?
-				substitute = uncertaintySubstitutions[@label]
-				if substitute.copy?
-					return substitute.copy()
-				else
-					return new Constant(substitute)
-			else
+			if @label of equivalencies
+				for label in equivalencies[@label]
+					if label of uncertaintySubstitutions and uncertaintySubstitutions[label]?
+						substitute = uncertaintySubstitutions[label]
+						if substitute.copy?
+							return substitute.copy()
+						else
+							return new Constant(substitute)
 				return if not assumeZero then @copy() else new Constant("0")
+			else
+				if @label of uncertaintySubstitutions and uncertaintySubstitutions[@label]?
+					substitute = uncertaintySubstitutions[@label]
+					if substitute.copy?
+						return substitute.copy()
+					else
+						return new Constant(substitute)
+				else
+					return if not assumeZero then @copy() else new Constant("0")
 
 		# Substitute an expression.
 		#
@@ -643,7 +649,7 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		# Set variable units.
 		#
 		# @throw [Error] Not implemented for uncertainties.
-		setVariableUnits: (variable, equivalencies, units) ->
+		setVariableUnits: (variable, units, equivalencies) ->
 			throw new Error("Can't do that with uncertainties")
 
 		# Simplify this node.

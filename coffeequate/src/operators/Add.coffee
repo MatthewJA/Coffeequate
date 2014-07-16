@@ -70,11 +70,10 @@ define [
 		# Get the dimensions/units of a variable in this node.
 		#
 		# @param variable [String] The label of the variable to get dimensions of.
-		# @param equivalencies [Object] An object of equivalencies.
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
 		# @return [BasicNode] The units of the variable, or null if the variable wasn't found.
-		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
-		getVariableUnits: (variable, equivalencies) ->
-			variableEquivalencies = if equivalencies? then equivalencies.get(variable) else [variable]
+		getVariableUnits: (variable, equivalencies={}) ->
+			variableEquivalencies = if variable of equivalencies then equivalencies[variable] else [variable]
 			for child in @children
 				if child instanceof terminals.Variable and child.label in variableEquivalencies
 					return child.units
@@ -87,13 +86,11 @@ define [
 		# Set the dimensions/units of a variable in this node.
 		#
 		# @param variable [String] The label of the variable to set dimensions of.
-		# @param equivalencies [Object] An object of equivalencies.
 		# @param units [BasicNode] The units to give the variable.
-		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
-		setVariableUnits: (variable, equivalencies, units) ->
-			variableEquivalencies = if equivalencies? then equivalencies.get(variable) else {get: (z) -> [z]}
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
+		setVariableUnits: (variable, units, equivalencies={}) ->
 			for child in @children
-				child.setVariableUnits(variable, equivalencies, units)
+				child.setVariableUnits(variable, units, equivalencies)
 
 		# Expand this node.
 		#
@@ -128,10 +125,9 @@ define [
 		# Check equality between this and another object.
 		#
 		# @param b [Object] An object to check equality with.
-		# @param equivalencies [Object] An object of equivalencies.
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
 		# @return [Boolean] Whether the objects are equal.
-		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
-		equals: (b, equivalencies) ->
+		equals: (b, equivalencies={}) ->
 			unless b instanceof Add
 				return false
 			unless b.children.length == @children.length
@@ -147,14 +143,10 @@ define [
 
 		# Simplify this node.
 		#
-		# @param equivalencies [Object] An object of equivalencies.
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
 		# @return [BasicNode, Terminal] This node, simplified.
-		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
-		simplify: (equivalencies) ->
+		simplify: (equivalencies={}) ->
 			Mul = require("operators/Mul")
-
-			unless equivalencies?
-				equivalencies = {get: (variable) -> [variable]}
 
 			terms = []
 			for child in @children
@@ -271,10 +263,9 @@ define [
 
 		# Expand and then simplify this node.
 		#
-		# @param equivalencies [Object] An object of equivalencies.
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
 		# @return [BasicNode, Terminal] This node, expanded and simplified.
-		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
-		expandAndSimplify: (equivalencies) ->
+		expandAndSimplify: (equivalencies={}) ->
 			expr = @expand()
 			if expr.simplify?
 				return expr.simplify(equivalencies)
@@ -283,18 +274,14 @@ define [
 		# Solve this node for a variable.
 		#
 		# @param variable [String] The label of the variable to solve for.
-		# @param equivalencies [Object] Optional. An object of equivalencies.
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
 		# @return [Array<BasicNode>, Array<Terminal>] The solutions for the given variable.
 		# @throw [AlgebraError] If the node cannot be solved.
-		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
-		solve: (variable, equivalencies=null) ->
+		solve: (variable, equivalencies={}) ->
 			Mul = require("operators/Mul")
 			Pow = require("operators/Pow")
 
 			expr = @expandAndSimplify(equivalencies)
-
-			unless equivalencies?
-				equivalencies = {get: (variable) -> [variable]}
 
 			# Sort the expression into terms containing v, and terms not containing v.
 			# Since we expanded, every term we deal with should be either a Mul with v as a direct
@@ -303,15 +290,16 @@ define [
 			termsContainingVariable = []
 			termsNotContainingVariable = []
 
-			variableUnits = null
-			for equiv in equivalencies
+			variableUnits = null # The units of the variable to solve for.
+			equivs = if variable of equivalencies then equivalencies[variable] else [variable] # List of equivalencies.
+			for equiv in equivs
 				units = @getVariableUnits(equiv)
 				if units?
 					variableUnits = units
 					break
 
 			if expr instanceof terminals.Terminal
-				if expr instanceof terminals.Variable and (expr.label == variable or expr.label in equivalencies.get(variable))
+				if expr instanceof terminals.Variable and (expr.label == variable or expr.label in equivs)
 					return [new terminals.Constant("0")]
 				else
 					throw new AlgebraError(expr.toString(), variable)
@@ -324,28 +312,28 @@ define [
 					term = term.copy()
 
 				if term instanceof Pow
-					if term.children.left instanceof terminals.Variable and (term.children.left.label == variable or term.children.left.label in equivalencies.get(variable))
+					if term.children.left instanceof terminals.Variable and (term.children.left.label == variable or term.children.left.label in equivs)
 						termsContainingVariable.push(term)
 					else
 						termsNotContainingVariable.push(term)
 				else if term instanceof Mul
 					added = false
 					for subterm in term.children
-						if subterm instanceof terminals.Variable and (subterm.label == variable or subterm.label in equivalencies.get(variable))
+						if subterm instanceof terminals.Variable and (subterm.label == variable or subterm.label in equivs)
 							termsContainingVariable.push(term)
 							added = true
 							break
 						else if (
 							subterm instanceof Pow and
 							subterm.children.left instanceof terminals.Variable and
-							(subterm.children.left.label == variable or subterm.children.left.label in equivalencies.get(variable)))
+							(subterm.children.left.label == variable or subterm.children.left.label in equivs))
 							termsContainingVariable.push(term)
 							added = true
 							break
 
 					unless added
 						termsNotContainingVariable.push(term)
-				else if term instanceof terminals.Variable and (term.label == variable or term.label in equivalencies.get(variable))
+				else if term instanceof terminals.Variable and (term.label == variable or term.label in equivs)
 					termsContainingVariable.push(term)
 				else
 					termsNotContainingVariable.push(term)
@@ -379,7 +367,7 @@ define [
 					unless term.children.right instanceof terminals.Constant
 						throw new AlgebraError(expr.toString(), variable)
 					power = term.children.right.evaluate()
-					if term.children.left instanceof terminals.Variable and (term.children.left.label == variable or term.children.left.label in equivalencies.get(variable))
+					if term.children.left instanceof terminals.Variable and (term.children.left.label == variable or term.children.left.label in equivs)
 						if power == 1
 							factorised.push(new terminals.Constant("1"))
 						else if power == 2
@@ -399,12 +387,12 @@ define [
 					inv = false
 					invSquare = false
 					for subterm in term.children
-						if subterm instanceof terminals.Variable and (subterm.label == variable or subterm.label in equivalencies.get(variable)) then # pass
+						if subterm instanceof terminals.Variable and (subterm.label == variable or subterm.label in equivs) then # pass
 						else if subterm instanceof Pow
 							unless subterm.children.right instanceof terminals.Constant
 								throw new AlgebraError(expr.toString(), variable)
 							power = subterm.children.right.evaluate()
-							if subterm.children.left instanceof terminals.Variable and (subterm.children.left.label == variable or subterm.children.left.label in equivalencies.get(variable))
+							if subterm.children.left instanceof terminals.Variable and (subterm.children.left.label == variable or subterm.children.left.label in equivs)
 								if power == 1 then # pass
 								else if power == 2
 									quadratic = true # We operate on the assumption that there's only one term with our target variable in it here.
@@ -631,12 +619,11 @@ define [
 		#
 		# @param substitutions [Object] A map of variable labels to their values. Values can be any node, terminal, or something interpretable as a terminal.
 		# @param uncertaintySubstitutions [Object] A map of variable labels to the values of their uncertainties.
-		# @param equivalencies [Object] Optional. An object of equivalencies.
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
 		# @param assumeZeroUncertainty [Boolean] Optional. Whether to assume uncertainties are zero if unknown (default false).
 		# @param evaluateSymbolicConstants [Boolean] Optional. Whether to evaluate symbolic constants (default false).
 		# @return [BasicNode, Terminal] This node with all substitutions substituted.
-		# @todo Change the way equivalencies are handled. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
-		sub: (substitutions, uncertaintySubstitutions, equivalencies=null, assumeZeroUncertainty=false, evaluateSymbolicConstants=false) ->
+		sub: (substitutions, uncertaintySubstitutions, equivalencies={}, assumeZeroUncertainty=false, evaluateSymbolicConstants=false) ->
 			# substitutions: {variable: value}
 			# variable is a label, value is any object - if it is a node,
 			# it will be substituted in; otherwise it is interpreted as a
@@ -647,13 +634,10 @@ define [
 				unless substitutions[variable].copy? # All nodes and terminals should implement this.
 					substitutions[variable] = new terminals.Constant(substitutions[variable])
 
-			unless equivalencies?
-				equivalencies = {get: (z) -> [z]}
-
 			children = []
 			for child in @children
 				if child instanceof terminals.Variable
-					variableEquivalencies = equivalencies.get(child.label)
+					variableEquivalencies = if child.label of equivalencies then equivalencies[child.label] else [child.label]
 					subbed = false
 					for equiv in variableEquivalencies
 						if equiv of substitutions
@@ -719,12 +703,13 @@ define [
 		# Differentiate this node with respect to a variable.
 		#
 		# @param variable [String] The label of the variable to differentiate with respect to.
-		# @todo Add equivalencies. [#62](https://github.com/MatthewJA/Coffeequate/issues/62)
-		differentiate: (variable) ->
-			newChildren = @children.map (x) -> x.differentiate(variable)
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
+		# @return [BasicNode, Terminal] This node differentiated with respect to the given variable.
+		differentiate: (variable, equivalencies={}) ->
+			newChildren = @children.map (x) -> x.differentiate(variable, equivalencies)
 
 			derivative = new Add(newChildren...)
 
-			return derivative.expandAndSimplify()
+			return derivative.expandAndSimplify(equivalencies)
 
 	return Add
