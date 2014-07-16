@@ -544,6 +544,12 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 				return new Constant(1)
 			return new Constant(0)
 
+		# Evaluate this Variable.
+		#
+		# @return [Object] null, because this doesn't have a value.
+		evaluate: ->
+			null
+
 	# Represents an uncertainty.
 	class Uncertainty extends Terminal
 

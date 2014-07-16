@@ -85,4 +85,12 @@ define ["parse", "nodes"], (parse, nodes) ->
 		expand: ->
 			new Expression(@expr.expand())
 
+		# Differentiate this expression with respect to a variable.
+		#
+		# @param variable [String] The label of the variable to differentiate with respect to.
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
+		# @return [Expression] A differentiated expression.
+		differentiate: (variable, equivalencies={}) ->
+			new Expression(@expr.differentiate(variable, equivalencies))
+
 	return Expression
