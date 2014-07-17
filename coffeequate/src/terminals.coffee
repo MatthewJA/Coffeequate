@@ -5,12 +5,6 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 	# Base class for terminals.
 	class Terminal extends nodes.BasicNode
 
-		# Evaluate this node.
-		#
-		# @throw [Error] Not implemented.
-		evaluate: ->
-			throw new Error("Not implemented.")
-
 		# Deep-copy this node.
 		#
 		# @throw [Error] Not implemented.

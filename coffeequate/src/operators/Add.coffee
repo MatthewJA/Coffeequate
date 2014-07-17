@@ -629,6 +629,8 @@ define [
 			# it will be substituted in; otherwise it is interpreted as a
 			# constant (and any exceptions that might cause will be thrown).
 
+			console.log uncertaintySubstitutions
+
 			# Interpret substitutions.
 			for variable of substitutions
 				unless substitutions[variable].copy? # All nodes and terminals should implement this.

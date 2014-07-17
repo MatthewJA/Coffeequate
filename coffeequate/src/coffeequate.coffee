@@ -3,7 +3,7 @@
 require.config
 		baseUrl: "./"
 
-define ["operators", "Expression", "parse"], (operators, Expression, parse) ->
+define ["operators", "Expression", "parse", "uncertainties"], (operators, Expression, parse, uncertainties) ->
 
 	# Converts string inputs into Expressions, which Coffeequate can then work with.
 	# (Public interface for Coffeequate - this is all that the user will see!)

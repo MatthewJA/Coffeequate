@@ -49,11 +49,11 @@ define ["parse", "nodes"], (parse, nodes) ->
 		#
 		# @param substitutions [Object] A map of variable labels to their values. Values can be integers, Expressions, Terminals, or BasicNodes.
 		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
+		# @param substituteUncertainties [Boolean] Optional. Whether to substitute values into uncertainties instead of variables (default false).
 		# @return [Expression] The Expression with substituted values.
-		# @todo Add uncertainties [#61](https://github.com/MatthewJA/Coffeequate/issues/61)
 		# @todo Reimplement sub options from the nodes. [#71](https://github.com/MatthewJA/Coffeequate/issues/71)
-		sub: (substitutions, equivalencies={}) ->
-			# TODO: Uncertainties, options.
+		sub: (substitutions, equivalencies={}, substituteUncertainties=false) ->
+			# TODO: Options.
 			# TODO: Seems that the way I implemented substituting expressions was different last time for no real reason. Fix.
 
 			# If there are any Expressions in here, we should remove them.
@@ -64,7 +64,14 @@ define ["parse", "nodes"], (parse, nodes) ->
 				else
 					newsubs[key] = substitutions[key]
 
-			return new Expression(@expr.sub(newsubs, null, equivalencies).simplify(equivalencies))
+			if substituteUncertainties
+				uncertaintySubs = newsubs
+				variableSubs = {}
+			else
+				uncertaintySubs = {}
+				variableSubs = newsubs
+
+			return new Expression(@expr.sub(variableSubs, uncertaintySubs, equivalencies).simplify(equivalencies))
 
 		# Deep-copy this Expression.
 		#
@@ -92,6 +99,12 @@ define ["parse", "nodes"], (parse, nodes) ->
 		# @return [Expression] A differentiated expression.
 		differentiate: (variable, equivalencies={}) ->
 			new Expression(@expr.differentiate(variable, equivalencies))
+
+		# Get the uncertainty in this Expression.
+		#
+		# @return [Expression] An Expression representing the uncertainty in this Expression.
+		getUncertainty: ->
+			new Expression(@expr.getUncertainty())
 
 		# Convert this expression to a JavaScript function.
 		#
