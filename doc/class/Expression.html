@@ -2,28 +2,17 @@
 <html>
   <head>
   <meta charset='UTF-8'>
-  <title>Coffeequate Documentation</title>
+  <title>CoffeeScript API Documentation</title>
   <script src='../javascript/application.js'></script>
   <script src='../javascript/search.js'></script>
   <link rel='stylesheet' href='../stylesheets/application.css' type='text/css'>
-  <script>
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'undefined']);
-    _gaq.push(['_trackPageview']);
-  
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  </script>
 </head>
   <body>
     <div id='base' data-path='../'></div>
 <div id='header'>
   <div id='menu'>
-    <a href='../extra/README.md.html' title>
-      true
+    <a href='../extra/README.md.html' title='Coffeequate" --readme     README.md --title      "Coffeequate Documentation" --extension  coffee --output     ./doc . - LICENSE coffeequate/src/grammar.peg '>
+      Coffeequate&quot; --readme     README.md --title      &quot;Coffeequate Documentation&quot; --extension  coffee --output     .&#47;doc . - LICENSE coffeequate&#47;src&#47;grammar.peg 
     </a>
     &raquo;
     <a href='../alphabetical_index.html' title='Index'>
@@ -107,7 +96,7 @@ It wraps underlying nodes and terminals in a neat interface.</p>
       <a href='#sub-dynamic'>
         #
 (Expression)
-<b>sub</b><span>(substitutions, equivalencies = {})</span>
+<b>sub</b><span>(substitutions, equivalencies = {}, substituteUncertainties = false)</span>
       </a>
     </span>
     <span class='desc'>
@@ -160,6 +149,18 @@ It wraps underlying nodes and terminals in a neat interface.</p>
     </span>
     <span class='desc'>
       Differentiate this expression with respect to a variable. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getUncertainty-dynamic'>
+        #
+(Expression)
+<b>getUncertainty</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Get the uncertainty in this Expression. 
     </span>
   </li>
   <li>
@@ -336,14 +337,10 @@ It wraps underlying nodes and terminals in a neat interface.</p>
     <p class='signature' id='sub-dynamic'>
       #
 (Expression)
-<b>sub</b><span>(substitutions, equivalencies = {})</span>
+<b>sub</b><span>(substitutions, equivalencies = {}, substituteUncertainties = false)</span>
       <br>
     </p>
     <div class='docstring'>
-  <div class='note todo'>
-    <strong>TODO:</strong>
-    Add uncertainties <a href="https://github.com/MatthewJA/Coffeequate/issues/61">#61</a> 
-  </div>
   <div class='note todo'>
     <strong>TODO:</strong>
     Reimplement sub options from the nodes. <a href="https://github.com/MatthewJA/Coffeequate/issues/71">#71</a> 
@@ -372,6 +369,16 @@ It wraps underlying nodes and terminals in a neat interface.</p>
       </span>
       &mdash;
       <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
+    </li>
+    <li>
+      <span class='name'>substituteUncertainties</span>
+      <span class='type'>
+        (
+          <tt>Boolean</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. Whether to substitute values into uncertainties instead of variables (default false). </span>
     </li>
   </ul>
   <h3>Returns:</h3>
@@ -520,6 +527,30 @@ It wraps underlying nodes and terminals in a neat interface.</p>
 </div>
   </div>
   <div class='method_details'>
+    <p class='signature' id='getUncertainty-dynamic'>
+      #
+(Expression)
+<b>getUncertainty</b><span>()</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Get the uncertainty in this Expression.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Expression.html'>Expression</a></tt>
+      )
+      &mdash;
+      <span class='desc'>An Expression representing the uncertainty in this Expression. </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
     <p class='signature' id='toFunction-dynamic'>
       #
 (Function)
@@ -569,7 +600,7 @@ It wraps underlying nodes and terminals in a neat interface.</p>
 </div>
     </div>
     <div id='footer'>
-  July 17, 14 11:03:06 by
+  July 17, 14 12:15:05 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

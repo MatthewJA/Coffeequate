@@ -113,12 +113,13 @@
           The methods of an expression are listed below.</p>
 
         <ul>
-          <li><code class="prettyprint">expr.sub(substitutions, equivalencies)</code> - Takes an object mapping variable names to values, and returns a new expression with each variable replaced by its value. Values can be numbers, other variables, or even other expressions.</li>
           <li><code class="prettyprint">expr.solve(variable, equivalencies)</code> - Takes the name of a variable as a string, and returns the expression solved for this variable as an array of solutions. Expressions are automatically equated to zero.</li>
           <li><code class="prettyprint">expr.simplify(equivalencies)</code> - Return a simplified version of the expression.</li>
+          <li><code class="prettyprint">expr.sub(substitutions, equivalencies, substituteUncertainties)</code> - Takes an object mapping variable names to values, and returns a new expression with each variable replaced by its value. Values can be numbers, other variables, or even other expressions. If substituteUncertainties is true (default is false), then instead of substituting the values into variables, the values will be substituted into the uncertainties of those variables instead.</li>
           <li><code class="prettyprint">expr.differentiate(variable, equivalencies)</code> - Takes the name of a variable as a string, and returns the expression solved for this variable as an array of solutions. Expressions are automatically equated to zero.</li>
-          <li><code class="prettyprint">expr.toMathML()</code> - Return a MathML string of the expression.</li>
-          <li><code class="prettyprint">expr.toLaTeX()</code> - Return a LaTeX string of the expression.</li>
+          <li><code class="prettyprint">expr.getUncertainty()</code> - Returns an expression representing the uncertainty of this expression.</li>
+          <li><code class="prettyprint">expr.toMathML()</code> - Returns a MathML string of the expression.</li>
+          <li><code class="prettyprint">expr.toLaTeX()</code> - Returns a LaTeX string of the expression.</li>
           <li><code class="prettyprint">expr.toFunction(variables..., equivalencies)</code> - Takes multiple variable labels and returns a JavaScript function that takes values for those variables in order, and then substitutes them into the expression.</li>
           <li><code class="prettyprint">expr.copy()</code> - Recursively deep-copy the expression.</li>
         </ul>
@@ -133,7 +134,7 @@
       <article>
         <header><h3>REPL</h3></header>
         <p>
-          Here's a JS REPL with Coffeequate v0.4.3 already loaded. Try it out!
+          Here's a JS REPL with Coffeequate v0.4.4 already loaded. Try it out!
         </p>
           <div class="repl"></div>
 
