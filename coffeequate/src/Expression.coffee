@@ -93,4 +93,26 @@ define ["parse", "nodes"], (parse, nodes) ->
 		differentiate: (variable, equivalencies={}) ->
 			new Expression(@expr.differentiate(variable, equivalencies))
 
+		# Convert this expression to a JavaScript function.
+		#
+		# @param variables... [Array<String>] An array of variables for the function to accept, in order that they should appear in the final function.
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels. This will be used in the returned function.
+		# @return [Function] A function that takes variable values and returns an Expression object.
+		toFunction: (variables..., equivalencies) ->
+			if typeof equivalencies == "string" or equivalencies instanceof String # We had no equivalencies object after all.
+				variables.push(equivalencies)
+				equivalencies = {}
+
+			fun = (subs...) =>
+				# Zip variables and subs together into an object.
+				substitutions = {}
+				for variable, index in variables
+					if subs[index]?
+						substitutions[variable] = subs[index]
+
+				# Substitute these values into this expression and return the result.
+				return @sub(substitutions, equivalencies)
+
+			return fun
+
 	return Expression
