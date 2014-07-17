@@ -119,11 +119,12 @@
           <li><code class="prettyprint">expr.differentiate(variable, equivalencies)</code> - Takes the name of a variable as a string, and returns the expression solved for this variable as an array of solutions. Expressions are automatically equated to zero.</li>
           <li><code class="prettyprint">expr.toMathML()</code> - Return a MathML string of the expression.</li>
           <li><code class="prettyprint">expr.toLaTeX()</code> - Return a LaTeX string of the expression.</li>
+          <li><code class="prettyprint">expr.toFunction(variables..., equivalencies)</code> - Takes multiple variable labels and returns a JavaScript function that takes values for those variables in order, and then substitutes them into the expression.</li>
           <li><code class="prettyprint">expr.copy()</code> - Recursively deep-copy the expression.</li>
         </ul>
 
         <p>
-          <code>equivalencies</code> is an object mapping variable labels to an array of variable labels that that variable is equivalent to - for example, if <code>x</code> and <code>y</code> are equivalent, then you could have <code>equivalencies = {"x":["x", "y"], "y":["x", "y"]}</code>.
+          <code>equivalencies</code> is an object mapping variable labels to an array of variable labels that that variable is equivalent to - for example, if <code>x</code> and <code>y</code> are equivalent, then you could have <code>equivalencies = {"x":["x", "y"], "y":["x", "y"]}</code>. Equivalencies is always an optional parameter.
         </p>
         
       </article>
@@ -132,7 +133,7 @@
       <article>
         <header><h3>REPL</h3></header>
         <p>
-          Here's a JS REPL with Coffeequate v0.4.2 already loaded. Try it out!
+          Here's a JS REPL with Coffeequate v0.4.3 already loaded. Try it out!
         </p>
           <div class="repl"></div>
 
