@@ -14,7 +14,7 @@ doc/*
 */**/.DS_Store/*
 
 ### Libraries ###
-!coffeequate/src/lib/**/*.js
+!coffeequate/src/vendor/**/*.js
 
 ### Tests ###
 # This is temporary, while these are outdated.

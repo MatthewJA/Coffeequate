@@ -2,9 +2,9 @@
 
 ({
   "baseUrl": "./",
-  "name": "lib/almond",
+  "name": "vendor/almond",
   "paths": {
-  	"requireLib": "lib/require"
+  	"requireLib": "vendor/require"
   },
   "include": [
     "coffeequate"
