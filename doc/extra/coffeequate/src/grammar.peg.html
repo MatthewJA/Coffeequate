@@ -3,23 +3,27 @@
   <head>
   <meta charset='UTF-8'>
   <title>Coffeequate Documentation</title>
-  <script src='../../javascript/application.js'></script>
-  <script src='../../javascript/search.js'></script>
-  <link rel='stylesheet' href='../../stylesheets/application.css' type='text/css'>
+  <script src='../../../javascript/application.js'></script>
+  <script src='../../../javascript/search.js'></script>
+  <link rel='stylesheet' href='../../../stylesheets/application.css' type='text/css'>
 </head>
   <body>
-    <div id='base' data-path='../../'></div>
+    <div id='base' data-path='../../../'></div>
 <div id='header'>
   <div id='menu'>
-    <a href='../../extra/README.md.html' title='Coffeequate'>
+    <a href='../../../extra/README.md.html' title='Coffeequate'>
       Coffeequate
     </a>
     &raquo;
-    <a href='../../alphabetical_index.html' title='Index'>
+    <a href='../../../alphabetical_index.html' title='Index'>
       Index
     </a>
     &raquo;
-    <span class='title'>coffeequate\src\grammar.peg</span>
+    <span class='title'>coffeequate</span>
+    &raquo;
+    <span class='title'>src</span>
+    &raquo;
+    <span class='title'>grammar.peg</span>
   </div>
 </div>
     <div id='content'>
@@ -34,11 +38,11 @@
         </p>
       </nav>
       <div id='filecontents'>
-        <p>{<br/>// These dummy definitions make it easier to test<br/><br/>stringToTerminal = function(x) { return x; };<br/>operators = {<br/>  Add: function(l,r) { return ["+",l,r] },<br/>  Mul: function(l,r) { return ["*",l,r] },<br/>  Sub: function(l,r) { return ["-",l,r] },<br/>  Pow: function(l,r) { return ["**",l,r] }<br/>};<br/>}<br/><br/>start<br/>  = expr<br/><br/>expr<br/>  = left:term "+" right:expr { return new operators.Add(left, right); }<br/>  / left:term "-" right:expr { return new operators.Add(left, new operators.Mul(right, "-1")); }<br/>  / x:term { return x; }<br/><br/>term<br/>  = l:powerTerm "*" r:term { return new operators.Mul(l, r); }<br/>  / l:powerTerm "/" r:term { return new operators.Mul(l, new operators.Pow(r, "-1")); }<br/>  / f:powerTerm { return f; }<br/><br/>powerTerm<br/>  = l:factor "**" r:factor { return new operators.Pow(l, r); }<br/>  / f:factor { return f; }<br/><br/><br/>factor<br/>  = terminal:[^()+\-*/{}:]+ "::{" u:[^{}]+ "}" { return stringToTerminal(terminal.join("") + "::{" + u.join("") + "}"); }<br/>  / terminal:[^()+\-*/{}:]+ { return stringToTerminal(terminal.join("")); }<br/>  / "(" x:expr ")" { return x; }<br/>  / "-" x:factor { return new operators.Mul(x, "-1") }</p>
+        <p>{<br/>// These dummy definitions make it easier to test<br/><br/>stringToTerminal = function(x) { return x; };<br/>operators = {<br/>  Add: function(l,r) { return ["+",l,r] },<br/>  Mul: function(l,r) { return ["*",l,r] },<br/>  Sub: function(l,r) { return ["-",l,r] },<br/>  Pow: function(l,r) { return ["**",l,r] }<br/>};<br/>}<br/><br/>start<br/>  = expr<br/><br/>expr<br/>  = left:term "+" right:expr { return new operators.Add(left, right); }<br/>  / left:term "-" right:expr { return new operators.Add(left, new operators.Mul(right, "-1")); }<br/>  / x:term { return x; }<br/><br/>term<br/>  = l:powerTerm "*" r:term { return new operators.Mul(l, r); }<br/>  / l:powerTerm "/" r:term { return new operators.Mul(l, new operators.Pow(r, "-1")); }<br/>  / f:powerTerm { return f; }<br/><br/>powerTerm<br/>  = l:factor "**" r:factor { return new operators.Pow(l, r); }<br/>  / f:factor { return f; }<br/><br/><br/>factor<br/>  = terminal:[^()+\-*/{}:]+ "::{" u:[^{}]+ "}" { return stringToTerminal(terminal.join("") + "::{" + u.join("") + "}"); }<br/>  / terminal:[^()+\-*/{}:]+ { return stringToTerminal(terminal.join("")); }<br/>  / "(" x:expr ")" { return x; }<br/>  / "-" x:factor { return new operators.Mul(x, "-1") }</p>
       </div>
     </div>
     <div id='footer'>
-  July 17, 14 12:14:48 by
+  July 23, 14 13:12:39 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>
