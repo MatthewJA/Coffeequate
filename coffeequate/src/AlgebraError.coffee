@@ -11,6 +11,10 @@ define ->
 		# @return [AlgebraError] A new AlgebraError.
 		constructor: (@expr, @variable, @postscript=null) ->
 			super("Unsolvable: #{@expr} for #{@variable}#{if @postscript then "; " + @postscript else ""}")
+
+		# Get a string representation of this error.
+		#
+		# @return [String] A string representing this error.
 		toString: ->
 			"Unsolvable: #{@expr} for #{@variable}#{if @postscript then "; " + @postscript else ""}"
 

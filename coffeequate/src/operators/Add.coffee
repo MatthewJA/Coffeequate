@@ -307,8 +307,6 @@ define [
 
 			expr = @expandAndSimplify(equivalencies).expandAndSimplify(equivalencies)
 
-			console.log expr.toString()
-
 			unless expr instanceof Add
 				unless expr.containsVariable(variable, equivalencies)
 					throw new AlgebraError(expr.toString(), variable, "(variable not found)") # The simplified input doesn't contain the variable.
@@ -358,9 +356,6 @@ define [
 				else
 					nonPolynomialTerms.push(term)
 
-			console.log "linearTerms", linearTerms.toString()
-			console.log "powerTerms", powerTerms.toString()
-			console.log "nonPolynomialTerms", nonPolynomialTerms.toString()
 
 			# If we have non-polynomial terms, we can't solve this at the moment.
 			# Later, if we add more functions, we should check if those functions have a known inverse. If that's the case, we can solve!
@@ -402,7 +397,6 @@ define [
 				else
 					# Must be a Mul.
 					# One child should be a Pow which contains the variable, so let's find that and add everything else to powerFactors.
-					console.log term, term.toString()
 					mulFactors = []
 					for child in term.children
 						if child instanceof Pow and child.containsVariable(variable, equivalencies)
@@ -420,7 +414,6 @@ define [
 
 			# If we got this far, we can almost solve this.
 			# If we have linear terms and powers that aren't 2, we can't solve (yet).
-			console.log "seenPower", seenPower.toString()
 			if linearTerms.length > 0 and seenPower.evaluate() != 2
 				throw new AlgebraError(expr.toString(), variable, "(can't solve polynomials of degree > 2 yet)")
 
@@ -432,7 +425,6 @@ define [
 				a = new Add(powerFactors...)
 				b = new Add(getLinearFactors(linearTerms, variable, equivalencies)...)
 				c = if independentTerms.length then new Add(independentTerms...) else new terminals.Constant("0")
-				console.log a.toString(), b.toString(), c.toString()
 				discriminant = new Pow(new Add(new Pow(b.copy(), "2"), new Mul("-4", a.copy(), c)), new Pow("2", "-1"))
 				discriminantSide = new Mul(discriminant, new Pow(new Mul("2", a), "-1"))
 				leftSide = new Mul("-1", b, new Pow(new Mul("2", a), "-1"))
@@ -450,7 +442,6 @@ define [
 				solution = new Pow(product, root) # (-z/a)**(1/n)
 
 				# The only catch is if the power is even, in which case we get two solutions.
-				console.log seenPower.evaluate?(equivalencies) and seenPower.evaluate(equivalencies)%2 == 0
 				if seenPower.evaluate?(equivalencies) and seenPower.evaluate(equivalencies)%2 == 0
 					return [solution.expandAndSimplify(equivalencies), (new Mul("-1", solution)).expandAndSimplify(equivalencies)]
 				else
@@ -508,7 +499,6 @@ define [
 			# it will be substituted in; otherwise it is interpreted as a
 			# constant (and any exceptions that might cause will be thrown).
 
-			console.log uncertaintySubstitutions
 
 			# Interpret substitutions.
 			for variable of substitutions
