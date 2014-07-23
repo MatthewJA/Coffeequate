@@ -608,4 +608,86 @@ define [
 				g = new Mul(@children.slice(1)...)
 				return new Add(new Mul(f, g.differentiate(variable, equivalencies)),
 											 new Mul(g, f.differentiate(variable, equivalencies))).expandAndSimplify(equivalencies)
+
+		# Check if this node contains a given variable.
+		#
+		# @param variable [String] The label of the variable to check that this node contains.
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
+		# @return [Boolean] Whether or not this node contains the given variable.
+		containsVariable: (variable, equivalencies={}) ->
+			for child in @children
+				if child.containsVariable(variable, equivalencies)
+					return true
+			return false
+
+		# Check if this node is linear in a variable.
+		# That is, for the variable x, is this of the form a*x, where a is independent of x?
+		# Also returns true if the node is constant in x.
+		# Note that this returns false if the node expands into a non-Mul node.
+		#
+		# @param variable [String] The label of the variable to check if this node is linear in.
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
+		# @return [Boolean] Whether or not this node is linear in the given variable.
+		isLinear: (variable, equivalencies={}) ->
+			dependentCount = 0 # How many dependent items we have found.
+			terminalCount = 0 # How many dependent terminals we have found.
+
+			expr = @expandAndSimplify(equivalencies)
+
+			unless expr instanceof Mul
+				return false
+
+			for child in expr.children
+				if child instanceof terminals.Variable
+					if child.containsVariable(variable, equivalencies)
+						terminalCount += 1
+				else
+					if child.containsVariable(variable, equivalencies)
+						dependentCount += 1
+
+			if dependentCount > 0
+				return false
+			if terminalCount > 1
+				return false
+			return true
+
+		# Check if this node is polynomial in a variable.
+		# That is, for the variable x, is this of the form a*x**n, where a and n are independent of x?
+		# Also returns true if the node is constant in x or linear in x.
+		# Note that this returns false if the node expands into a non-Mul node.
+		#
+		# @param variable [String] The label of the variable to check if this node is polynomial in.
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
+		# @return [Boolean] Whether or not this node is polynomial in the given variable.
+		isPolynomial: (variable, equivalencies={}) ->
+			Pow = require("operators/Pow")
+
+			terminalCount = 0 # How many dependent terminals we have found.
+			powerCount = 0 # How many dependent powers we have found.
+			dependentCount = 0 # How many dependent other items we have found.
+
+			expr = @expandAndSimplify(equivalencies)
+
+			unless expr instanceof Mul
+				return false
+
+			for child in expr.children
+				if child instanceof terminals.Variable and child.containsVariable(variable, equivalencies)
+					terminalCount += 1
+				else if child instanceof Pow and child.containsVariable(variable, equivalencies) and not child.children.right.containsVariable(variable, equivalencies)
+					powerCount += 1
+				else
+					if child.containsVariable(variable, equivalencies)
+						dependentCount += 1
+
+			if dependentCount > 0
+				return false
+			if terminalCount > 0
+				if powerCount > 0
+					return false
+				return true
+			if powerCount > 1
+				return false
+			return true
+
 	return Mul
