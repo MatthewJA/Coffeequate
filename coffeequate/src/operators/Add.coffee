@@ -305,18 +305,19 @@ define [
 			Mul = require("operators/Mul")
 			Pow = require("operators/Pow")
 
-			expr = @expandAndSimplify(equivalencies)
+			expr = @expandAndSimplify(equivalencies).expandAndSimplify(equivalencies)
+
+			console.log expr.toString()
 
 			unless expr instanceof Add
-				console.log expr.containsVariable(variable, equivalencies)
 				unless expr.containsVariable(variable, equivalencies)
-					throw new AlgebraError(expr.toString(), variable) # The simplified input doesn't contain the variable.
+					throw new AlgebraError(expr.toString(), variable, "(variable not found)") # The simplified input doesn't contain the variable.
 				return expr.solve(variable, equivalencies)
 
 			# Separate children into terms containing variable and terms not containing variable.
 			dependentTerms = []
 			independentTerms = []
-			for term in @children
+			for term in expr.children
 				if term.containsVariable(variable, equivalencies)
 					dependentTerms.push(term.copy())
 				else
@@ -324,7 +325,7 @@ define [
 
 			# If there are no dependent terms, we can't solve this for the given variable.
 			if dependentTerms.length == 0
-				throw new AlgebraError(expr.toString(), variable)
+				throw new AlgebraError(expr.toString(), variable, "(variable not found)")
 
 			# Now split up the dependent terms into terms of the following forms:
 			# 	a x
@@ -357,10 +358,14 @@ define [
 				else
 					nonPolynomialTerms.push(term)
 
+			console.log "linearTerms", linearTerms.toString()
+			console.log "powerTerms", powerTerms.toString()
+			console.log "nonPolynomialTerms", nonPolynomialTerms.toString()
+
 			# If we have non-polynomial terms, we can't solve this at the moment.
 			# Later, if we add more functions, we should check if those functions have a known inverse. If that's the case, we can solve!
 			if nonPolynomialTerms.length > 0
-				throw new AlgebraError(expr.toString(), variable)
+				throw new AlgebraError(expr.toString(), variable, "(can't solve non-polynomial equations yet)")
 
 			# If we have no power terms, then we have a linear equation 0 = a x + z. The solution is then -z/a.
 			if powerTerms.length == 0 # We don't have to check linear terms because we have to have SOME terms or we can't solve this at all (and would have already rejected it).
@@ -393,27 +398,31 @@ define [
 							powerFactors.push(new terminals.Constant("1"))
 						else
 							# Can't solve yet!
-							throw new AlgebraError(expr.toString(), variable)
+							throw new AlgebraError(expr.toString(), variable, "(can't solve polynomials of degree > 2 yet)")
 				else
 					# Must be a Mul.
 					# One child should be a Pow which contains the variable, so let's find that and add everything else to powerFactors.
+					console.log term, term.toString()
+					mulFactors = []
 					for child in term.children
 						if child instanceof Pow and child.containsVariable(variable, equivalencies)
 							unless seenPower?
-								seenPower = child
-								powerFactors.push(new terminals.Constant("1"))
+								seenPower = child.children.right
+								mulFactors.push(new terminals.Constant("1"))
 							else
-								if seenPower.equals(child, equivalencies)
-									powerFactors.push(new terminals.Constant("1"))
+								if seenPower.equals(child.children.right, equivalencies)
+									mulFactors.push(new terminals.Constant("1"))
 								else
-									throw new AlgebraError(expr.toString(), variable)
+									throw new AlgebraError(expr.toString(), variable, "(can't solve polynomials of degree > 2 yet)")
 						else
-							powerFactors.push(child)
+							mulFactors.push(child)
+					powerFactors.push(new Mul(mulFactors...))
 
 			# If we got this far, we can almost solve this.
 			# If we have linear terms and powers that aren't 2, we can't solve (yet).
+			console.log "seenPower", seenPower.toString()
 			if linearTerms.length > 0 and seenPower.evaluate() != 2
-				throw new AlgebraError(expr.toString(), variable)
+				throw new AlgebraError(expr.toString(), variable, "(can't solve polynomials of degree > 2 yet)")
 
 			# We can solve it!
 			if linearTerms.length > 0
@@ -423,6 +432,7 @@ define [
 				a = new Add(powerFactors...)
 				b = new Add(getLinearFactors(linearTerms, variable, equivalencies)...)
 				c = if independentTerms.length then new Add(independentTerms...) else new terminals.Constant("0")
+				console.log a.toString(), b.toString(), c.toString()
 				discriminant = new Pow(new Add(new Pow(b.copy(), "2"), new Mul("-4", a.copy(), c)), new Pow("2", "-1"))
 				discriminantSide = new Mul(discriminant, new Pow(new Mul("2", a), "-1"))
 				leftSide = new Mul("-1", b, new Pow(new Mul("2", a), "-1"))
