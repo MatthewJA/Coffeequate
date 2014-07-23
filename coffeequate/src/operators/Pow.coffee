@@ -188,7 +188,7 @@ define [
 
 			if right.evaluate?() == 1
 				return left
-			else if left.evaluate?() == 1
+			else if left.evaluate?() == 1 or left.evaluate?() == 0
 				return left
 			else if right.evaluate?() == 0
 				return new terminals.Constant("1")
@@ -444,3 +444,11 @@ define [
 			return new Mul(new Pow(@children.left, new Add(@children.right, new Constant(-1))),
 										 @children.left.differentiate(variable, equivalencies),
 										 @children.right).expandAndSimplify(equivalencies)
+
+		# Check if this node contains a given variable.
+		#
+		# @param variable [String] The label of the variable to differentiate with respect to.
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
+		# @return [Boolean] Whether or not this node contains the given variable.
+		containsVariable: (variable, equivalencies={}) ->
+			return @children.left.containsVariable(variable, equivalencies) or @children.right.containsVariable(variable, equivalencies)

@@ -11,6 +11,14 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		copy: ->
 			throw new Error("Not implemented.")
 
+		# Check if this node contains a given variable.
+		#
+		# @param variable [String] The label of the variable to differentiate with respect to.
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
+		# @return [Boolean] Whether or not this node contains the given variable.
+		containsVariable: (variable, equivalencies={}) ->
+			false # We will override this only for variable nodes.
+
 	# A constant in the equation tree, e.g. 0.5 or 1/2.
 	# Can be represented as a rational (1/2) or a float (0.5).
 	# If a constant is produced by negative exponentiation
@@ -543,6 +551,16 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		# @return [Object] null, because this doesn't have a value.
 		evaluate: ->
 			null
+
+		# Check if this node contains a given variable.
+		#
+		# @param variable [String] The label of the variable to differentiate with respect to.
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
+		# @return [Boolean] Whether or not this node contains the given variable.
+		containsVariable: (variable, equivalencies={}) ->
+			if variable of equivalencies
+				return @label in equivalencies[variable]
+			return variable == @label
 
 	# Represents an uncertainty.
 	class Uncertainty extends Terminal

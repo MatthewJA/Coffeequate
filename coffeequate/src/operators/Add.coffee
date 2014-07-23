@@ -22,6 +22,30 @@ define [
 					results.push([i].concat(ii))
 			return results
 
+	# Pull out terms that are dependent on a variable and return the rest in an array.
+	#
+	# @param linearTerms [Array<BasicNode>, Array<Terminal>] A list of terms containing a variable.
+	# @param variable [String] The label of the variable to factorise out.
+	# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
+	# @return [Array<BasicNode>, Array<Terminal>] A list of terms that have had the variable extracted.
+	getLinearFactors = (linearTerms, variable, equivalencies={}) ->
+		Mul = require("operators/Mul")
+		factors = [] # List of a, b, c... in a x + b x + c x
+		for term in linearTerms
+			if term instanceof terminals.Variable
+				# This must just be the variable in question, so the term out the front is 1.
+				factors.push(new terminals.Constant("1"))
+			else
+				# This must be a multiplication node.
+				subfactors = []
+				for child in term.children
+					unless child.containsVariable(variable, equivalencies)
+						subfactors.push(child)
+				factor = new Mul(subfactors...)
+				factors.push(factor)
+
+		return factors
+
 	# Node in the expression tree representing addition.
 	class Add extends nodes.RoseNode
 
@@ -283,301 +307,146 @@ define [
 
 			expr = @expandAndSimplify(equivalencies)
 
-			# Sort the expression into terms containing v, and terms not containing v.
-			# Since we expanded, every term we deal with should be either a Mul with v as a direct
-			# child, a Pow with v as the left child, or the latter in a Mul.
-
-			termsContainingVariable = []
-			termsNotContainingVariable = []
-
-			variableUnits = null # The units of the variable to solve for.
-			equivs = if variable of equivalencies then equivalencies[variable] else [variable] # List of equivalencies.
-			for equiv in equivs
-				units = @getVariableUnits(equiv)
-				if units?
-					variableUnits = units
-					break
-
-			if expr instanceof terminals.Terminal
-				if expr instanceof terminals.Variable and (expr.label == variable or expr.label in equivs)
-					return [new terminals.Constant("0")]
-				else
-					throw new AlgebraError(expr.toString(), variable)
-
 			unless expr instanceof Add
+				console.log expr.containsVariable(variable, equivalencies)
+				unless expr.containsVariable(variable, equivalencies)
+					throw new AlgebraError(expr.toString(), variable) # The simplified input doesn't contain the variable.
 				return expr.solve(variable, equivalencies)
 
-			for term in expr.children
-				if term.copy?
-					term = term.copy()
-
-				if term instanceof Pow
-					if term.children.left instanceof terminals.Variable and (term.children.left.label == variable or term.children.left.label in equivs)
-						termsContainingVariable.push(term)
-					else
-						termsNotContainingVariable.push(term)
-				else if term instanceof Mul
-					added = false
-					for subterm in term.children
-						if subterm instanceof terminals.Variable and (subterm.label == variable or subterm.label in equivs)
-							termsContainingVariable.push(term)
-							added = true
-							break
-						else if (
-							subterm instanceof Pow and
-							subterm.children.left instanceof terminals.Variable and
-							(subterm.children.left.label == variable or subterm.children.left.label in equivs))
-							termsContainingVariable.push(term)
-							added = true
-							break
-
-					unless added
-						termsNotContainingVariable.push(term)
-				else if term instanceof terminals.Variable and (term.label == variable or term.label in equivs)
-					termsContainingVariable.push(term)
+			# Separate children into terms containing variable and terms not containing variable.
+			dependentTerms = []
+			independentTerms = []
+			for term in @children
+				if term.containsVariable(variable, equivalencies)
+					dependentTerms.push(term.copy())
 				else
-					termsNotContainingVariable.push(term)
+					independentTerms.push(term.copy())
 
-			if termsContainingVariable.length == 0
+			# If there are no dependent terms, we can't solve this for the given variable.
+			if dependentTerms.length == 0
 				throw new AlgebraError(expr.toString(), variable)
 
-			# The rest of the terms need to be manipulated to solve the equation.
-			# (a * v) + (b * v) -> ((a + b) * v)
-			# (a * v) + (b * v) + (c * (v ** 2)) -> ((a + b) * v) + (c * (v ** 2))
-			# If we detect a power > 2, reject the equation.
+			# Now split up the dependent terms into terms of the following forms:
+			# 	a x
+			#	a x**n
+			# 	a f(x)
+			# 	a f(x)g(x)
+			linearTerms = [] # a x
+			powerTerms = [] # a x**n
+			nonPolynomialTerms = [] # a f(x)
 
-			# Not everything can be solved this way. At this point we could have
-			# one of these:
-			# 0 = a + b / v + c / (v ** 2)
-			# 0 = a + b / v
-			# 0 = a + b / (v ** 2)
-			# 0 = a + v + b / v
-			# 0 = a + v ** 2 + b / v (not solvable)
-			# 0 = a + v + v ** 2 + 1 / v (not solvable)
-
-			factorised = [] # (a + b) in the above example.
-			factorisedSquares = [] # c in the above example.
-			inversed = [] # Handles 1/v and v**-1.
-			inversedSquares = [] # Handles 1/v**2 and v**-2.
-
-			for term in termsContainingVariable
+			for term in dependentTerms
+				# The term could be a variable, in which case it is the variable we want and we can put it in linearTerms.
 				if term instanceof terminals.Variable
-					factorised.push(new terminals.Constant("1"))
-				else if term instanceof Pow
-					unless term.children.right instanceof terminals.Constant
-						throw new AlgebraError(expr.toString(), variable)
-					power = term.children.right.evaluate()
-					if term.children.left instanceof terminals.Variable and (term.children.left.label == variable or term.children.left.label in equivs)
-						if power == 1
-							factorised.push(new terminals.Constant("1"))
-						else if power == 2
-							factorisedSquares.push(new terminals.Constant("1"))
-						else if power == -1
-							inversed.push(new terminals.Constant("1"))
-						else if power == -2
-							inversedSquares.push(new terminals.Constant("1"))
-						else
-							throw new AlgebraError(expr.toString(), variable, " (not supported)")
+					linearTerms.push(term)
+
+				# The term could be the product of some things that are not the variable and the variable itself.
+				else if term instanceof Mul and term.isLinear(variable, equivalencies)
+					linearTerms.push(term)
+
+				# The term could be a power term, in which case we want to put it in powerTerms.
+				else if term instanceof Pow and term.containsVariable(variable, equivalencies) and not term.children.right.containsVariable(variable, equivalencies)
+					powerTerms.push(term)
+					# Note that if it's of the form x**f(x) then it doesn't go in powerTerms - that's a non-polynomial term.
+
+				# The term could be a power term with a coefficient, in which case it should go in powerTerms.
+				else if term instanceof Mul and term.isPolynomial(variable, equivalencies)
+					powerTerms.push(term)
+
+				# The term must be a non-polynomial term.
+				else
+					nonPolynomialTerms.push(term)
+
+			# If we have non-polynomial terms, we can't solve this at the moment.
+			# Later, if we add more functions, we should check if those functions have a known inverse. If that's the case, we can solve!
+			if nonPolynomialTerms.length > 0
+				throw new AlgebraError(expr.toString(), variable)
+
+			# If we have no power terms, then we have a linear equation 0 = a x + z. The solution is then -z/a.
+			if powerTerms.length == 0 # We don't have to check linear terms because we have to have SOME terms or we can't solve this at all (and would have already rejected it).
+				negativeIndependents = new Mul("-1", new Add(independentTerms...)) # -z
+				# We need to find the divisor - we need to factorise!
+				factors = getLinearFactors(linearTerms, variable, equivalencies)
+				
+				# Now we add all of those factors together and reciprocate it.
+				reciprocal = new Pow(new Add(factors...), "-1") # 1/a
+				# Multiply the reciprocal by the negative independents to get the final solution.
+				solution = new Mul(negativeIndependents, reciprocal)
+				return [solution.expandAndSimplify(equivalencies)]
+
+			# If we have power terms, we can only solve the equation if these are all the same kind of power.
+			# Later, we can detect cubics and quartics and solve them, but the formulae for those are very complicated.
+			# So we'll stick with quadratics for now.
+			seenPower = null
+			powerFactors = []
+			# Loop through the powers and figure out what the power is.
+			# While we're here, store the non-power factors.
+			for term in powerTerms
+				if term instanceof Pow
+					unless seenPower?
+						seenPower = term.children.right
+						powerFactors.push(new terminals.Constant("1"))
 					else
-						# I don't think this should happen, ever?
-						throw new AlgebraError(expr.toString(), variable, " (this shouldn't happen)")
-				else if term instanceof Mul
-					subterms = [] # Non-variable terms.
-					quadratic = false
-					inv = false
-					invSquare = false
-					for subterm in term.children
-						if subterm instanceof terminals.Variable and (subterm.label == variable or subterm.label in equivs) then # pass
-						else if subterm instanceof Pow
-							unless subterm.children.right instanceof terminals.Constant
-								throw new AlgebraError(expr.toString(), variable)
-							power = subterm.children.right.evaluate()
-							if subterm.children.left instanceof terminals.Variable and (subterm.children.left.label == variable or subterm.children.left.label in equivs)
-								if power == 1 then # pass
-								else if power == 2
-									quadratic = true # We operate on the assumption that there's only one term with our target variable in it here.
-									# This should be possible due to expandAndSimplify.
-								else if power == -1
-									inv = true
-								else if power == -2
-									invSquare = true
-								else
-									throw new AlgebraError(expr.toString(), variable, " (not supported)")
-							else
-								subterms.push(subterm)
+						# Have we seen this power?
+						if seenPower.equals(term.children.right, equivalencies)
+							# We know the base of this power is our variable, so the factor here is 1.
+							powerFactors.push(new terminals.Constant("1"))
 						else
-							subterms.push(subterm)
-
-					factorisedTerm = if subterms.length > 0 then new Mul(subterms...) else new terminals.Constant("1")
-					if quadratic
-						factorisedSquares.push(factorisedTerm)
-					else if inv
-						inversed.push(factorisedTerm)
-					else if invSquare
-						inversedSquares.push(factorisedTerm)
-					else
-						factorised.push(factorisedTerm)
-
-			negatedTerms = []
-			# Terms not containing the variable need to be negated. They will form part of the returned result.
-			for term in termsNotContainingVariable
-				newMul = new Mul("-1", (if term.copy? then term.copy() else term))
-				newMul = newMul.simplify(equivalencies)
-				negatedTerms.push(newMul)
-
-			negatedTermsEquatable = new Add(negatedTerms...) unless negatedTerms.length == 0
-			nonNegatedTermsEquatable = new Add(termsNotContainingVariable...) unless termsNotContainingVariable.length == 0
-			factorisedEquatable = new Add(factorised...) unless factorised.length == 0
-			factorisedSquaresEquatable = new Add(factorisedSquares...) unless factorisedSquares.length == 0
-			inversedEquatable = new Add(inversed...) unless inversed.length == 0
-			inversedSquaresEquatable = new Add(inversedSquares...) unless inversedSquares.length == 0
-
-			# Let's just... enumerate everything. That will probably work.
-
-			if negatedTerms.length == 0
-				negatedTermsEquatable = new terminals.Constant("0")
-
-			if factorisedSquares.length == 0
-				## Outdated comment follows:
-				# We now have terms on the other side of the equation (negatedTermsEquatable) and
-				# terms factorised out from this side of the equation (factorisedEquatable).
-				# (factorisedEquatable * v) = negatedTermsEquatable
-				# Hence the solution is simply (negatedTermsEquatable * (factorisedEquatable ** -1)).
-				## Saved for posterity. New comment follows:
-				# There are no squares in the equation.
-				if factorised.length == 0
-					# There are no standalone variables in the equation.
-					if inversed.length == 0
-						# There are no standalones or squares or inversed variables.
-						if inversedSquares.length == 0
-							# There is nothing. There is nothing here. All is lost.
+							# Can't solve yet!
 							throw new AlgebraError(expr.toString(), variable)
-						else
-							# We have only inversed squares.
-							# -a = b/v**2
-							# v = +/(b/-a)**1/2
-							answer = new Mul(new Pow(inversedSquaresEquatable, "1/2"), new Pow(negatedTermsEquatable, "-1/2"))
-							a1 = new Mul(-1, answer.copy())
-							a1 = a1.expandAndSimplify(equivalencies)
-							a2 = answer.expandAndSimplify(equivalencies)
-							if a1.equals?(a2)
-								return [a1]
+				else
+					# Must be a Mul.
+					# One child should be a Pow which contains the variable, so let's find that and add everything else to powerFactors.
+					for child in term.children
+						if child instanceof Pow and child.containsVariable(variable, equivalencies)
+							unless seenPower?
+								seenPower = child
+								powerFactors.push(new terminals.Constant("1"))
 							else
-								return [a1, a2]
-					else
-						# There are no standalones, but there are inversed variables.
-						if inversedSquares.length == 0
-							# We only have inversed variables.
-							# -a = b/v
-							# v = b/-a
-							answer = new Mul(inversedEquatable, new Pow(negatedTermsEquatable, "-1"))
-							return [answer.expandAndSimplify(equivalencies)]
+								if seenPower.equals(child, equivalencies)
+									powerFactors.push(new terminals.Constant("1"))
+								else
+									throw new AlgebraError(expr.toString(), variable)
 						else
-							# We have inversed variables and inversed squares.
-							# -a = b/v + c/v**2
-							# Ewwwww
-							# Ewwwwwwwwwwwwwwwwwww
-							# 0 = a + b/v + c/v**2
-							# 0 = a v**2 + b v + c
-							newAdd = new Add(new Mul(nonNegatedTermsEquatable, new Pow(new terminals.Variable(variable, variableUnits), 2)),
-								new Mul(inversedEquatable, new terminals.Variable(variable, variableUnits)),
-								inversedSquaresEquatable)
-							return newAdd.solve(variable, equivalencies)
-				else if inversed.length == 0
-					# There are standalone variables, but there aren't any inversed ones.
-					if inversedSquares.length == 0
-						# There are no inversed squares, so there are just standalone variables.
-						# -a = b v
-						# v = -a / b
-						answer = new Mul(negatedTermsEquatable, new Pow(factorisedEquatable, "-1"))
-						return [answer.expandAndSimplify(equivalencies)]
-					else
-						# There are inversed squares and standalone variables.
-						# That's a cubic, c'mon.
-						# Technically, this is solvable if negatedTerms.length == 0, but
-						# is that ever likely to actually happen?
-						## FIXME
-						throw new AlgebraError(expr.toString(), variable, " (not supported)")
-				# else if inversedSquares.length == 0
-					# There are standalone variables and inversed variables, but there aren't any
-					# inversed squares.
-					# This actually exhausts all possibilities, so I'll comment this else out for clarity.
-				else
-					# There are standalone variables and inversed variables and inversed squares,
-					# so this is unsolvable.
-					throw new AlgebraError(expr.toString(), variable, " (not supported)")
-			else if factorised.length == 0
-				# We have squared terms, but no standalone terms.
-				if inversed.length == 0
-					# We have squared terms, but no standalone terms or inversed terms.
-					if inversedSquares.length == 0
-						# There are no inversed squares, so there is only squared terms.
-						# -a = b v**2
-						# v**2 = -a / b
-						answer = new Pow(new Mul(negatedTermsEquatable, new Pow(factorisedSquaresEquatable, "-1")), "1/2")
-						a1 = new Mul("-1", answer.copy())
-						a1 = a1.expandAndSimplify(equivalencies)
-						a2 = answer.expandAndSimplify(equivalencies)
-						if a1.equals?(a2)
-							return [a1]
-						else
-							return [a1, a2]
-					else
-						# We have squared terms and inverse squared terms.
-						# That is a quartic, and as quartics are a danger to the very moral fabric of our
-						# society, we don't solve them here.
-						## FIXME: This is solvable if negatedTerms.length == 0.
-						throw new AlgebraError(expr.toString(), variable, " (not supported)")
-				else
-					# We have squares and we have inversed variables, so this is usually unsolvable, except if
-					# inversed squares and negated terms are both of 0 length.
-					## FIXME: Deal with that situation.
-					throw new AlgebraError(expr.toString(), variable, " (not supported)")
-			else
-				# There are squares and standalone variables. Unsolvable if we have any inverses whatsoever.
-				if inversed.length > 0 or inversedSquares.length > 0
-					throw new AlgebraError(expr.toString(), variable, " (not supported)")
+							powerFactors.push(child)
 
-				# We have a quadratic equation.
-				# ((factorisedSquaresEquatable) * (v ** 2)) + (factorisedEquatable * v) + (nonNegatedTerms) = 0
-				if nonNegatedTermsEquatable?
-					# a = fSE
-					# b = fE
-					# c = nonNegatedTermsEquatable
-					# d = ((b ** 2) + (-4 * a * c))
-					# rd = (d ** 1/2)
-					# v = ((-1 * b) + rd) * ((2 * a) ** -1)
-					# v = (-1 * (b + rd)) * ((2 * a) ** -1)
-					a = factorisedSquaresEquatable
-					b = factorisedEquatable
-					c = nonNegatedTermsEquatable
-					d = new Add(
-							new Pow(b, "2"),
-							new Mul("-4", a, c)
-						)
-					rd = new Pow(d, "1/2")
-					v1 = new Mul(
-							new Add(
-								new Mul("-1", b),
-								rd),
-							new Pow(
-								new Mul("2", a),
-								"-1")
-						)
-					v2 = new Mul("-1", new Add(b, rd), new Pow(new Mul("2", a), "-1"))
-					v1 = v1.expandAndSimplify(equivalencies)
-					v2 = v2.expandAndSimplify(equivalencies)
-					if v1.equals? and v1.equals(v2)
-						return [v1]
-					return [v1, v2]
+			# If we got this far, we can almost solve this.
+			# If we have linear terms and powers that aren't 2, we can't solve (yet).
+			if linearTerms.length > 0 and seenPower.evaluate() != 2
+				throw new AlgebraError(expr.toString(), variable)
+
+			# We can solve it!
+			if linearTerms.length > 0
+				# Quadratic! :D
+				# a x**2 + b x + c = 0
+				# (-b +- sqrt(b**2 - 4 a c))/(2a)
+				a = new Add(powerFactors...)
+				b = new Add(getLinearFactors(linearTerms, variable, equivalencies)...)
+				c = if independentTerms.length then new Add(independentTerms...) else new terminals.Constant("0")
+				discriminant = new Pow(new Add(new Pow(b.copy(), "2"), new Mul("-4", a.copy(), c)), new Pow("2", "-1"))
+				discriminantSide = new Mul(discriminant, new Pow(new Mul("2", a), "-1"))
+				leftSide = new Mul("-1", b, new Pow(new Mul("2", a), "-1"))
+				return [(new Add(leftSide.copy(), discriminantSide.copy())).expandAndSimplify(), (new Add(leftSide, new Mul("-1", discriminantSide))).expandAndSimplify()]
+			else
+				# This is easy to solve now. We have 0 = z + a * x**n, so the solution is (-z/a)**(1/n) = (-z/a)**(n**(-1)).
+				if independentTerms.length # Do we have some terms on the other side?
+					negativeIndependents = new Mul("-1", new Add(independentTerms...)) # -z
 				else
-					# (((fSE * v) + fE) * v) = 0
-					# v = 0
-					# v = (-1 * fE * (fSE ** -1)))
-					newPow = new Pow(factorisedSquaresEquatable, "-1")
-					newMul = new Mul("-1", factorisedEquatable, newPow)
-					newMul = newMul.simplify(equivalencies)
-					return [0, newMul]
+					negativeIndependents = new terminals.Constant("0")
+
+				reciprocal = if powerFactors.length then new Pow(new Add(powerFactors...), "-1") else new terminals.Constant("1") # 1/a
+				product = new Mul(negativeIndependents, reciprocal) # -z/a
+				root = new Pow(seenPower, "-1") # 1/n
+				solution = new Pow(product, root) # (-z/a)**(1/n)
+
+				# The only catch is if the power is even, in which case we get two solutions.
+				console.log seenPower.evaluate?(equivalencies) and seenPower.evaluate(equivalencies)%2 == 0
+				if seenPower.evaluate?(equivalencies) and seenPower.evaluate(equivalencies)%2 == 0
+					return [solution.expandAndSimplify(equivalencies), (new Mul("-1", solution)).expandAndSimplify(equivalencies)]
+				else
+					return [solution.expandAndSimplify(equivalencies)]
+
+			throw new AlgebraError(expr.toString(), variable, " (reached end with no solution)")
 
 		# Get all variable labels used in children of this node.
 		#
@@ -713,5 +582,16 @@ define [
 			derivative = new Add(newChildren...)
 
 			return derivative.expandAndSimplify(equivalencies)
+
+		# Check if this node contains a given variable.
+		#
+		# @param variable [String] The label of the variable to differentiate with respect to.
+		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
+		# @return [Boolean] Whether or not this node contains the given variable.
+		containsVariable: (variable, equivalencies={}) ->
+			for child in @children
+				if child.containsVariable(variable, equivalencies)
+					return true
+			return false
 
 	return Add
