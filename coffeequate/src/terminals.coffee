@@ -53,7 +53,7 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		#
 		# @return [Number] A float representation of this constant.
 		evaluate: ->
-			parseFloat(@numerator/@denominator)
+			parseFloat(@numerator)/parseFloat(@denominator)
 
 		# Deep-copy this constant.
 		#
@@ -278,7 +278,7 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 			return null
 
 		# Check equality of this and another object.
-		# 
+		#
 		# @param b [Object] The object to compare with.
 		# @return [Boolean] Whether the objects are equal.
 		equals: (b) ->
@@ -299,7 +299,7 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 			[]
 
 		# Substitute values - side effect of evaluation if evaluateSymbolicConstants is true.
-		# 
+		#
 		# @param substitutions [Object] Substitutions map. Irrelevant, included for API parity.
 		# @param uncertaintySubstitutions [Object] Uncertainty substitutions map. Irrelevant.
 		# @param equivalencies [Object] Optional. Equivalencies map. Irrelevant.
@@ -373,7 +373,7 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 	class Variable extends Terminal
 
 		# Make a new Variable.
-		# 
+		#
 		# @param label [String] The label of this variable.
 		# @param units [BasicNode, Terminal] Optional. Units of this variable (default is null).
 		constructor: (@label, @units=null) ->
