@@ -542,6 +542,14 @@ define [
 			Pow = require("operators/Pow")
 			terminals = require("terminals")
 
+			if @children[0] instanceof terminals.Constant
+				if @children[0].numerator < 0
+					newChildren = @children.slice(0)
+					newChildren[0] = new terminals.Constant(@children[0].numerator * -1,
+																									@children[0].denominator)
+					mul = new Mul(newChildren...)
+					return new prettyRender.Negate(mul.toDrawingNode())
+
 			top = []
 			bottom = []
 
@@ -581,10 +589,19 @@ define [
 			else if bottom.length > 1
 				newBottom = prettyRender.Mul.makeWithBrackets(bottom...)
 
+			negated = false
+			if top.length >= 1
+				if top[0] instanceof terminals.Constant
+					if top[0].numerator < 0
+						top[0].numerator *= -1
+						negated = true
+
 			if top.length == 1
 				top = top[0]
 			else if top.length > 1
 				top = prettyRender.Mul.makeWithBrackets(top...)
+
+
 
 			if bottom.length == 0
 				return top

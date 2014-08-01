@@ -136,28 +136,45 @@ define ->
     bindingStrength: ->
       4
 
+    drawPretty: (renderFunction, plus, minus) ->
+      out = ""
+
+      if @terms[0] instanceof Negate
+        out += minus
+        out += @terms[0].contents[renderFunction]()
+      else
+        out += @terms[0][renderFunction]()
+
+      for term in @terms.slice(1)
+        if term instanceof Negate
+          out += minus
+          out += term.contents[renderFunction]()
+        else
+          out += plus
+          out += term[renderFunction]()
+
+      out
+
     # Draw the node as a LaTeX string.
     #
     # @return [String] This node drawn as LaTeX.
     renderLaTeX: ->
-      return @terms.map((x) -> x.renderLaTeX()).join(" + ")
+      return @drawPretty("renderLaTeX", "+", "-")
 
     # Draw the node as a string.
     #
     # @return [String] This node drawn as a string.
     renderString: ->
-      return @terms.map((x) -> x.renderString()).join(" + ")
+      return @drawPretty("renderString", " + ", " - ")
 
     # Draw the node as a MathML string.
     #
     # @return [String] This node drawn as MathML.
     renderMathML: ->
-      return @terms.map((x) -> x.renderMathML())
-                   .join("<mo>+</mo>")
+      return @drawPretty("renderMathML", "<mo>+</mo>", "<mo>-</mo>")
 
   # Drawing node representing multiplication.
   class Mul extends DrawingNode
-
     # Make a new multiplication drawing node.
     #
     # @param terms... [Array<DrawingNode>] Drawing nodes to multiply together.
@@ -419,6 +436,34 @@ define ->
                   #{@contents.renderMathML(x...)}
                 </msqrt>"
 
+  # Drawing node representing the negation of something.
+  class Negate extends DrawingNode
+
+    # Make a new negation drawing node.
+    #
+    # @param contents [DrawingNode] The node to draw inside the root.
+    # @param power [Number] Optional. The number of this root. For example, 2 for a sqrt and 3 for a cbrt.
+    constructor: (@contents) ->
+
+    # Draw the node as a LaTeX string.
+    #
+    # @return [String] This node drawn as LaTeX.
+    renderLaTeX: ->
+      "-\\left(#{@contents}\\right)"
+
+    # Draw the node as a string.
+    #
+    # @return [String] This node drawn as a string.
+    renderString: ->
+      "-(#{@contents.renderString()})"
+
+    # Draw the node as MathML.
+    #
+    # @return [String] This node drawn as MathML.
+    renderMathML: (x...) ->
+      "<mrow><mo>-</mo>#{@contents.renderMathML()}</mrow>"
+
+
   # Drawing node representing an uncertainty.
   class Uncertainty extends DrawingNode
 
@@ -466,4 +511,5 @@ define ->
     Fraction: Fraction
     Surd: Surd
     Uncertainty: Uncertainty
+    Negate: Negate
   }

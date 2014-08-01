@@ -53,7 +53,7 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		#
 		# @return [Number] A float representation of this constant.
 		evaluate: ->
-			parseFloat(@numerator)/parseFloat(@denominator)
+			@numerator/@denominator
 
 		# Deep-copy this constant.
 		#
@@ -226,9 +226,20 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		toDrawingNode: ->
 			NumberNode = prettyRender.Number
 			FractionNode = prettyRender.Fraction
-			if @denominator == 1
-				return new NumberNode(@numerator)
-			return new FractionNode(new NumberNode(@numerator), new NumberNode(@denominator))
+			NegateNode = prettyRender.Negate
+
+			if @numerator > 0
+				if @denominator == 1
+					return new NumberNode(@numerator)
+				return new FractionNode(new NumberNode(@numerator), new NumberNode(@denominator))
+			else
+				if @denominator == 1
+					return new NegateNode(new NumberNode(-@numerator))
+				return new NegateNode(
+										new FractionNode(
+												new NumberNode(@numerator),
+												new NumberNode(@denominator)))
+
 
 		# Differentiate this constant.
 		#

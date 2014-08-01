@@ -12,9 +12,9 @@ define ["parse", "nodes"], (parse, nodes) ->
 		constructor: (val) ->
 			if val instanceof String or typeof val == "string"
 				# The string we pass in is just a representation to parse.
-				@expr = parse.stringToExpression(val)
+				@expr = parse.stringToExpression(val).simplify()
 			else if val.copy?
-				@expr = val.copy()
+				@expr = val.copy().simplify()
 			else
 				console.log("Received argument: ", val)
 				throw new Error("Unknown argument: `#{val}'.")
