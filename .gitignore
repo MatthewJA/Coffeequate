@@ -5,6 +5,9 @@
 #!coffeequate/build/coffeequate.js
 #!coffeequate/build/coffeequate.min.js
 
+# Don't ignore the grammar.
+!coffeequate/src/grammar.js
+
 ### Compiled Docs ###
 doc/*
 
