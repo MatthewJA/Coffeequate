@@ -467,7 +467,7 @@ return parser;}
 		stringToExpression: (string, simplify=true) ->
 			operators = require("operators")
 			expr = parser(operators).parse(string)
-			if simplify
+			if simplify and expr.simplify?
 				return expr.simplify()
 			return expr
 
