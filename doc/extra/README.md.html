@@ -34,7 +34,7 @@
         </p>
       </nav>
       <div id='filecontents'>
-        <h1 id="coffeequate-sub-sup-v0-5-1-sup-sub-">Coffeequate <sub><sup>v0.5.1</sup></sub></h1><p>A computer algebra system for JavaScript. More information at <a href="http://matthewja.com/Coffeequate">the webpage</a>.</p><h2 id="installation">Installation</h2><p>Include Coffeequate with an AMD loader, or load it into a <code>&lt;script&gt;</code> tag.</p><pre><code class="lang-javascript">require.config({
+        <h1 id="coffeequate-sub-sup-v1-0-0-sub-rc1-sub-sup-sub-">Coffeequate <sub><sup>v1.0.0<sub>rc1</sub></sup></sub></h1><p>A computer algebra system for JavaScript. More information at <a href="http://matthewja.com/Coffeequate">the webpage</a>.</p><h2 id="installation">Installation</h2><p>Include Coffeequate with an AMD loader, or load it into a <code>&lt;script&gt;</code> tag.</p><pre><code class="lang-javascript">require.config({
     paths: {
       &quot;coffeequate&quot;: &quot;coffeequate.min&quot;
     }
@@ -44,11 +44,11 @@
 </code></pre>
 <h2 id="use">Use</h2><p>Coffeequate gives you a <code>CQ</code> function which wraps the functionality of Coffeequate. An alias of this function is <code>coffeequate</code>.</p><p>To make a new expression, just call <code>CQ</code>:</p><pre><code class="lang-javascript">expr = CQ(&quot;m * c**2&quot;);
 </code></pre><p>You can also make an expression with equation syntax, as follows:</p><pre><code class="lang-javascript">expr = CQ(&quot;E = m * c**2&quot;);
-</code></pre><p>All expressions will be equated to zero.</p><p>The formatting of these strings must be as follows: You can use <code>*</code> for multiplication, <code>**</code> for exponentiation, <code>+</code> for addition, <code>-</code> for negation or subtraction, <code>/</code> for division, and <code>()</code> parentheses to change the order of operations. Negation and parenthesising are higher precedence than exponentiation, which is higher precedence than multiplication and division, which are higher precedence than addition and subtraction.</p><h2 id="license">License</h2><p>All current and previous versions licensed under the MIT License. See /LICENSE for a copy of this license.</p>
+</code></pre><p>All expressions will be equated to zero.</p><p>The formatting of these strings must be as follows: You can use <code>*</code> for multiplication, <code>**</code> for exponentiation, <code>+</code> for addition, <code>-</code> for negation or subtraction, <code>/</code> for division, and <code>()</code> parentheses to change the order of operations. Negation and parenthesising are higher precedence than exponentiation, which is higher precedence than multiplication and division, which are higher precedence than addition and subtraction.</p><p>Terminals can be numbers, variables, or symbolic constants - the latter are entered with a backslash, for example, <code>\G</code> or <code>\π</code>. Note that if you are entering this as a string, you will have to escape the backslash (e.g., <code>CQ(&quot;\\π * r**2&quot;)</code>).</p><h2 id="license">License</h2><p>All current and previous versions licensed under the MIT License. See /LICENSE for a copy of this license.</p>
       </div>
     </div>
     <div id='footer'>
-  July 23, 14 13:12:39 by
+  August 13, 14 00:35:56 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

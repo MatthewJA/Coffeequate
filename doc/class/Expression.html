@@ -30,7 +30,7 @@
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>coffeequate&#47;src&#47;Expression.coffee</td>
+          <td>coffeequate\src\Expression.coffee</td>
         </tr>
       </table>
       <h2>Overview</h2>
@@ -96,7 +96,7 @@ It wraps underlying nodes and terminals in a neat interface.</p>
       <a href='#sub-dynamic'>
         #
 (Expression)
-<b>sub</b><span>(substitutions, equivalencies = {}, substituteUncertainties = false)</span>
+<b>sub</b><span>(substitutions, equivalencies = {}, substituteUncertainties = false, evaluateSymbolicConstants = false)</span>
       </a>
     </span>
     <span class='desc'>
@@ -337,14 +337,10 @@ It wraps underlying nodes and terminals in a neat interface.</p>
     <p class='signature' id='sub-dynamic'>
       #
 (Expression)
-<b>sub</b><span>(substitutions, equivalencies = {}, substituteUncertainties = false)</span>
+<b>sub</b><span>(substitutions, equivalencies = {}, substituteUncertainties = false, evaluateSymbolicConstants = false)</span>
       <br>
     </p>
     <div class='docstring'>
-  <div class='note todo'>
-    <strong>TODO:</strong>
-    Reimplement sub options from the nodes. <a href="https://github.com/MatthewJA/Coffeequate/issues/71">#71</a> 
-  </div>
   <p>Substitute values into the Expression.</p>
 </div>
 <div class='tags'>
@@ -379,6 +375,16 @@ It wraps underlying nodes and terminals in a neat interface.</p>
       </span>
       &mdash;
       <span class='desc'>Optional. Whether to substitute values into uncertainties instead of variables (default false). </span>
+    </li>
+    <li>
+      <span class='name'>evaluateSymbolicConstants</span>
+      <span class='type'>
+        (
+          <tt>Boolean</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. Whether to evaluate symbolic constants (as opposed to leaving them symbolic) (default false). </span>
     </li>
   </ul>
   <h3>Returns:</h3>
@@ -600,7 +606,7 @@ It wraps underlying nodes and terminals in a neat interface.</p>
 </div>
     </div>
     <div id='footer'>
-  July 23, 14 13:12:39 by
+  August 13, 14 00:35:56 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

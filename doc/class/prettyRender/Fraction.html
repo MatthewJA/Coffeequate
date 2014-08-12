@@ -2,30 +2,32 @@
 <html>
   <head>
   <meta charset='UTF-8'>
-  <title>CoffeeScript API Documentation</title>
-  <script src='../javascript/application.js'></script>
-  <script src='../javascript/search.js'></script>
-  <link rel='stylesheet' href='../stylesheets/application.css' type='text/css'>
+  <title>Coffeequate Documentation</title>
+  <script src='../../javascript/application.js'></script>
+  <script src='../../javascript/search.js'></script>
+  <link rel='stylesheet' href='../../stylesheets/application.css' type='text/css'>
 </head>
   <body>
-    <div id='base' data-path='../'></div>
+    <div id='base' data-path='../../'></div>
 <div id='header'>
   <div id='menu'>
-    <a href='../extra/README.md.html' title='Coffeequate" --readme     README.md --title      "Coffeequate Documentation" --extension  coffee --output     ./doc . - LICENSE coffeequate/src/grammar.peg '>
-      Coffeequate&quot; --readme     README.md --title      &quot;Coffeequate Documentation&quot; --extension  coffee --output     .&#47;doc . - LICENSE coffeequate&#47;src&#47;grammar.peg 
+    <a href='../../extra/README.md.html' title='Coffeequate'>
+      Coffeequate
     </a>
     &raquo;
-    <a href='../alphabetical_index.html' title='Index'>
+    <a href='../../alphabetical_index.html' title='Index'>
       Index
     </a>
     &raquo;
-    <span class='title'>Surd</span>
+    <span class='title'>prettyRender</span>
+    &raquo;
+    <span class='title'>Fraction</span>
   </div>
 </div>
     <div id='content'>
       <h1>
         Class:
-        Surd
+        prettyRender.Fraction
       </h1>
       <table class='box'>
         <tr>
@@ -35,18 +37,30 @@
         <tr>
           <td>Inherits:</td>
           <td>
-            <a href='../class/DrawingNode.html'>DrawingNode</a>
+            <a href='../../class/prettyRender/DrawingNode.html'>prettyRender.DrawingNode</a>
           </td>
         </tr>
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>Drawing node representing a surd/root.</p>
+  <p>Drawing node representing a fraction.</p>
 </div>
 <div class='tags'>
 </div>
       <h2>Instance Method Summary</h2>
       <ul class='summary'>
+  <li>
+    <span class='signature'>
+      <a href='#bindingStrength-dynamic'>
+        #
+(Number)
+<b>bindingStrength</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+      How strongly this node is bound. 
+    </span>
+  </li>
   <li>
     <span class='signature'>
       <a href='#renderLaTeX-dynamic'>
@@ -76,7 +90,7 @@
       <a href='#renderMathML-dynamic'>
         #
 (String)
-<b>renderMathML</b><span>(x...)</span>
+<b>renderMathML</b><span>(x, y)</span>
       </a>
     </span>
     <span class='desc'>
@@ -88,12 +102,12 @@
         <small>Inherited Method Summary</small>
         <h3 class='inherited'>
           Methods inherited from
-          <a href='../class/DrawingNode.html'>DrawingNode</a>
+          <a href='../../class/prettyRender/DrawingNode.html'>prettyRender.DrawingNode</a>
         </h3>
         <p class='inherited'>
-          <a href='../class/DrawingNode.html#renderLaTeX-dynamic'>#renderLaTeX</a>
-          <a href='../class/DrawingNode.html#bindingStrength-dynamic'>#bindingStrength</a>
-          <a href='../class/DrawingNode.html#bracketIfNeeded-dynamic'>#bracketIfNeeded</a>
+          <a href='../../class/prettyRender/DrawingNode.html#renderLaTeX-dynamic'>#renderLaTeX</a>
+          <a href='../../class/prettyRender/DrawingNode.html#bindingStrength-dynamic'>#bindingStrength</a>
+          <a href='../../class/prettyRender/DrawingNode.html#bracketIfNeeded-dynamic'>#bracketIfNeeded</a>
         </p>
       </h2>
       <h2>Constructor Details</h2>
@@ -101,35 +115,46 @@
   <div class='method_details'>
     <p class='signature' id='constructor-dynamic'>
       #
-(void)
-<b>constructor</b><span>(contents, power = null)</span>
+(prettyRender.Fraction)
+<b>constructor</b><span>(top, bottom)</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>Make a new surd drawing node.</p>
+  <p>Make a new fraction drawing node.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>contents</span>
+      <span class='name'>top</span>
       <span class='type'>
         (
-          <tt><a href='../class/DrawingNode.html'>DrawingNode</a></tt>
+          <tt><a href='../../class/prettyRender/DrawingNode.html'>prettyRender.DrawingNode</a></tt>
         )
       </span>
       &mdash;
-      <span class='desc'>The node to draw inside the root. </span>
+      <span class='desc'>The node to be drawn on top of the fraction. </span>
     </li>
     <li>
-      <span class='name'>power</span>
+      <span class='name'>bottom</span>
       <span class='type'>
         (
-          <tt><a href='../class/Number.html'>Number</a></tt>
+          <tt><a href='../../class/prettyRender/DrawingNode.html'>prettyRender.DrawingNode</a></tt>
         )
       </span>
       &mdash;
-      <span class='desc'>Optional. The number of this root. For example, 2 for a sqrt and 3 for a cbrt. </span>
+      <span class='desc'>The node to be drawn on the bottom of the fraction. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../../class/prettyRender/Fraction.html'>prettyRender.Fraction</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A new fraction drawing node. </span>
     </li>
   </ul>
 </div>
@@ -137,6 +162,30 @@
 </div>
       <h2>Instance Method Details</h2>
       <div class='methods'>
+  <div class='method_details'>
+    <p class='signature' id='bindingStrength-dynamic'>
+      #
+(Number)
+<b>bindingStrength</b><span>()</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>How strongly this node is bound.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Number</tt>
+      )
+      &mdash;
+      <span class='desc'>Binding strength. </span>
+    </li>
+  </ul>
+</div>
+  </div>
   <div class='method_details'>
     <p class='signature' id='renderLaTeX-dynamic'>
       #
@@ -189,7 +238,7 @@
     <p class='signature' id='renderMathML-dynamic'>
       #
 (String)
-<b>renderMathML</b><span>(x...)</span>
+<b>renderMathML</b><span>(x, y)</span>
       <br>
     </p>
     <div class='docstring'>
@@ -212,7 +261,7 @@
 </div>
     </div>
     <div id='footer'>
-  July 17, 14 12:15:05 by
+  August 13, 14 00:35:56 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

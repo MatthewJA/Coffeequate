@@ -111,12 +111,15 @@
             expr = expr.sub({"m": CQ("F * a**-1"), "c": 10}); // 100 * F * a**-1
           </code>
 
+          Valid terminals are variables, which are alphanumeric strings that begin with a letter; constants, which are numbers as digits which may include decimal points, or scientific notation (e.g. `2e-3`); or symbolic constants, which are variables preceded by a backslash. A list of known symbolic constants is located <a href="https://github.com/MatthewJA/Coffeequate/blob/master/coffeequate/src/constants.coffee">here</a>.
+
           The methods of an expression are listed below.</p>
 
         <ul>
           <li><code class="prettyprint">expr.solve(variable, equivalencies)</code> - Takes the name of a variable as a string, and returns the expression solved for this variable as an array of solutions. Expressions are automatically equated to zero.</li>
           <li><code class="prettyprint">expr.simplify(equivalencies)</code> - Return a simplified version of the expression.</li>
-          <li><code class="prettyprint">expr.sub(substitutions, equivalencies, substituteUncertainties)</code> - Takes an object mapping variable names to values, and returns a new expression with each variable replaced by its value. Values can be numbers, other variables, or even other expressions. If substituteUncertainties is true (default is false), then instead of substituting the values into variables, the values will be substituted into the uncertainties of those variables instead.</li>
+          <li><code class="prettyprint">expr.expand()</code> - Return an expanded version of the expression.</li>
+          <li><code class="prettyprint">expr.sub(substitutions, equivalencies, substituteUncertainties, evaluateSymbolicConstants)</code> - Takes an object mapping variable names to values, and returns a new expression with each variable replaced by its value. Values can be numbers, other variables, or even other expressions. If substituteUncertainties is true (default is false), then instead of substituting the values into variables, the values will be substituted into the uncertainties of those variables instead. If evaluateSymbolicConstants is true (default is false), known symbolic constants will be evaluated.</li>
           <li><code class="prettyprint">expr.differentiate(variable, equivalencies)</code> - Takes the name of a variable as a string, and returns the expression solved for this variable as an array of solutions. Expressions are automatically equated to zero.</li>
           <li><code class="prettyprint">expr.getUncertainty()</code> - Returns an expression representing the uncertainty of this expression.</li>
           <li><code class="prettyprint">expr.toMathML()</code> - Returns a MathML string of the expression.</li>
@@ -135,7 +138,7 @@
       <article>
         <header><h3>REPL</h3></header>
         <p>
-          Here's a JS REPL with Coffeequate v0.5.1 already loaded. Try it out!
+          Here's a JS REPL with Coffeequate v1.0.0.rc1 already loaded. Try it out!
         </p>
           <div class="repl"></div>
 

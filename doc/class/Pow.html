@@ -30,18 +30,18 @@
       <table class='box'>
         <tr>
           <td>Defined in:</td>
-          <td>coffeequate&#47;src&#47;prettyRender.coffee</td>
+          <td>coffeequate\src\operators\Pow.coffee</td>
         </tr>
         <tr>
           <td>Inherits:</td>
           <td>
-            <a href='../class/DrawingNode.html'>DrawingNode</a>
+            nodes.BinaryNode
           </td>
         </tr>
       </table>
       <h2>Overview</h2>
       <div class='docstring'>
-  <p>Drawing node representing exponentiation.</p>
+  <p>Node in the expression tree representing exponentiation.</p>
 </div>
 <div class='tags'>
 </div>
@@ -49,87 +49,232 @@
       <ul class='summary'>
   <li>
     <span class='signature'>
-      <a href='#renderLaTeX-dynamic'>
+      <a href='#copy-dynamic'>
         #
-(String)
-<b>renderLaTeX</b><span>()</span>
+(Pow)
+<b>copy</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
-      Draw the node as a LaTeX string. 
+      Deep-copy this node. 
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#renderString-dynamic'>
+      <a href='#sort-dynamic'>
         #
-(String)
-<b>renderString</b><span>()</span>
+(void)
+<b>sort</b><span>()</span>
       </a>
     </span>
     <span class='desc'>
-      Draw the node as a string. 
+      Sort this node in-place. 
     </span>
   </li>
   <li>
     <span class='signature'>
-      <a href='#renderMathML-dynamic'>
+      <a href='#equals-dynamic'>
         #
-(String)
-<b>renderMathML</b><span>()</span>
+(Boolean)
+<b>equals</b><span>(b, equivalencies = {})</span>
       </a>
     </span>
     <span class='desc'>
-      Draw the node as a MathML string. 
+      Check equality between this and another object. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#compareSameType-dynamic'>
+        #
+(Number)
+<b>compareSameType</b><span>(b)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Compare this object with another of the same type. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getVariableUnits-dynamic'>
+        #
+(BasicNode)
+<b>getVariableUnits</b><span>(variable, equivalencies)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Get the dimensions/units of a variable in this node. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#setVariableUnits-dynamic'>
+        #
+(void)
+<b>setVariableUnits</b><span>(variable, units, equivalencies = {})</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Set the dimensions/units of a variable in this node. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#expand-dynamic'>
+        #
+(BasicNode, Terminal)
+<b>expand</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Expand this node. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#simplify-dynamic'>
+        #
+(BasicNode, Terminal)
+<b>simplify</b><span>(equivalencies = {})</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Simplify this node. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#expandAndSimplify-dynamic'>
+        #
+(BasicNode, Terminal)
+<b>expandAndSimplify</b><span>(equivalencies = {})</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Expand and then simplify this node. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#solve-dynamic'>
+        #
+(Array&lt;BasicNode&gt;, Array&lt;Terminal&gt;)
+<b>solve</b><span>(variable, equivalencies = {})</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Solve this node for a variable. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#sub-dynamic'>
+        #
+(BasicNode, Terminal)
+<b>sub</b><span>(substitutions, uncertaintySubstitutions, equivalencies = {}, assumeZeroUncertainty = false, evaluateSymbolicConstants = false)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Substitute values into variables. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#getAllVariables-dynamic'>
+        #
+(Array&lt;String&gt;)
+<b>getAllVariables</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Get all variable labels used in children of this node. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#replaceVariables-dynamic'>
+        #
+(Pow)
+<b>replaceVariables</b><span>(replacements)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Replace variable labels. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#toDrawingNode-dynamic'>
+        #
+(DrawingNode)
+<b>toDrawingNode</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Convert this node into a drawing node. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#differentiate-dynamic'>
+        #
+(void)
+<b>differentiate</b><span>(variable, equivalencies = {})</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Differentiate this node with respect to a variable. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#containsVariable-dynamic'>
+        #
+(Boolean)
+<b>containsVariable</b><span>(variable, equivalencies = {})</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Check if this node contains a given variable. 
     </span>
   </li>
 </ul>
-      <h2>
-        <small>Inherited Method Summary</small>
-        <h3 class='inherited'>
-          Methods inherited from
-          <a href='../class/DrawingNode.html'>DrawingNode</a>
-        </h3>
-        <p class='inherited'>
-          <a href='../class/DrawingNode.html#renderLaTeX-dynamic'>#renderLaTeX</a>
-          <a href='../class/DrawingNode.html#bindingStrength-dynamic'>#bindingStrength</a>
-          <a href='../class/DrawingNode.html#bracketIfNeeded-dynamic'>#bracketIfNeeded</a>
-        </p>
-      </h2>
       <h2>Constructor Details</h2>
       <div class='methods'>
   <div class='method_details'>
     <p class='signature' id='constructor-dynamic'>
       #
 (Pow)
-<b>constructor</b><span>(left, right)</span>
+<b>constructor</b><span>(base, power, args...)</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>Make a new exponentiation drawing node.</p>
+  <p>Make a new power node.
+Arguments passed as children will be parsed as children from whatever type they are.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>left</span>
+      <span class='name'>base</span>
       <span class='type'>
         (
-          <tt><a href='../class/DrawingNode.html'>DrawingNode</a></tt>
+          <tt>Object</tt>
         )
       </span>
       &mdash;
-      <span class='desc'>The base of the power node. </span>
+      <span class='desc'>The base of this power. </span>
     </li>
     <li>
-      <span class='name'>right</span>
+      <span class='name'>power</span>
       <span class='type'>
         (
-          <tt><a href='../class/DrawingNode.html'>DrawingNode</a></tt>
+          <tt>Object</tt>
         )
       </span>
       &mdash;
-      <span class='desc'>The exponent of the power node. </span>
+      <span class='desc'>The exponent of this power. </span>
     </li>
   </ul>
   <h3>Returns:</h3>
@@ -140,7 +285,7 @@
         <tt><a href='../class/Pow.html'>Pow</a></tt>
       )
       &mdash;
-      <span class='desc'>A new exponentiation drawing node. </span>
+      <span class='desc'>A new power node. </span>
     </li>
   </ul>
 </div>
@@ -149,14 +294,14 @@
       <h2>Instance Method Details</h2>
       <div class='methods'>
   <div class='method_details'>
-    <p class='signature' id='renderLaTeX-dynamic'>
+    <p class='signature' id='copy-dynamic'>
       #
-(String)
-<b>renderLaTeX</b><span>()</span>
+(Pow)
+<b>copy</b><span>()</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>Draw the node as a LaTeX string.</p>
+  <p>Deep-copy this node.</p>
 </div>
 <div class='tags'>
   <h3>Returns:</h3>
@@ -164,47 +309,213 @@
     <li>
       <span class='type'></span>
       (
-        <tt>String</tt>
+        <tt><a href='../class/Pow.html'>Pow</a></tt>
       )
       &mdash;
-      <span class='desc'>This node drawn as LaTeX. </span>
+      <span class='desc'>A copy of this node. </span>
     </li>
   </ul>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='renderString-dynamic'>
+    <p class='signature' id='sort-dynamic'>
       #
-(String)
-<b>renderString</b><span>()</span>
+(void)
+<b>sort</b><span>()</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>Draw the node as a string.</p>
+  <p>Sort this node in-place.</p>
 </div>
 <div class='tags'>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='equals-dynamic'>
+      #
+(Boolean)
+<b>equals</b><span>(b, equivalencies = {})</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Check equality between this and another object.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>b</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>An object to check equality with. </span>
+    </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
+    </li>
+  </ul>
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
       <span class='type'></span>
       (
-        <tt>String</tt>
+        <tt>Boolean</tt>
       )
       &mdash;
-      <span class='desc'>This node drawn as a string. </span>
+      <span class='desc'>Whether the objects are equal. </span>
     </li>
   </ul>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='renderMathML-dynamic'>
+    <p class='signature' id='compareSameType-dynamic'>
       #
-(String)
-<b>renderMathML</b><span>()</span>
+(Number)
+<b>compareSameType</b><span>(b)</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>Draw the node as a MathML string.</p>
+  <p>Compare this object with another of the same type.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>b</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/Pow.html'>Pow</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>A power node to compare to. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Number</tt>
+      )
+      &mdash;
+      <span class='desc'>The comparison: 1 if this node is greater than the other, -1 if vice versa, and 0 if they are equal. </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getVariableUnits-dynamic'>
+      #
+(BasicNode)
+<b>getVariableUnits</b><span>(variable, equivalencies)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Get the dimensions/units of a variable in this node.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>variable</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The label of the variable to get dimensions of. </span>
+    </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/BasicNode.html'>BasicNode</a></tt>
+      )
+      &mdash;
+      <span class='desc'>The units of the variable, or null if the variable wasn&#39;t found. </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='setVariableUnits-dynamic'>
+      #
+(void)
+<b>setVariableUnits</b><span>(variable, units, equivalencies = {})</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Set the dimensions/units of a variable in this node.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>variable</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The label of the variable to set dimensions of. </span>
+    </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
+    </li>
+    <li>
+      <span class='name'>units</span>
+      <span class='type'>
+        (
+          <tt><a href='../class/BasicNode.html'>BasicNode</a></tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The units to give the variable. </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='expand-dynamic'>
+      #
+(BasicNode, Terminal)
+<b>expand</b><span>()</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Expand this node.</p>
 </div>
 <div class='tags'>
   <h3>Returns:</h3>
@@ -212,10 +523,387 @@
     <li>
       <span class='type'></span>
       (
-        <tt>String</tt>
+        <tt>BasicNode, Terminal</tt>
       )
       &mdash;
-      <span class='desc'>This node drawn as MathML. </span>
+      <span class='desc'>This node, expanded. </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='simplify-dynamic'>
+      #
+(BasicNode, Terminal)
+<b>simplify</b><span>(equivalencies = {})</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Simplify this node.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>BasicNode, Terminal</tt>
+      )
+      &mdash;
+      <span class='desc'>This node, simplified. </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='expandAndSimplify-dynamic'>
+      #
+(BasicNode, Terminal)
+<b>expandAndSimplify</b><span>(equivalencies = {})</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Expand and then simplify this node.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>BasicNode, Terminal</tt>
+      )
+      &mdash;
+      <span class='desc'>This node, expanded and simplified. </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='solve-dynamic'>
+      #
+(Array&lt;BasicNode&gt;, Array&lt;Terminal&gt;)
+<b>solve</b><span>(variable, equivalencies = {})</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Solve this node for a variable.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>variable</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The label of the variable to solve for. </span>
+    </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
+    </li>
+  </ul>
+  <h3>Throws:</h3>
+  <ul class='throw'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/AlgebraError.html'>AlgebraError</a></tt>
+      )
+      &mdash;
+      <span class='desc'>If the node cannot be solved. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Array&lt;BasicNode&gt;, Array&lt;Terminal&gt;</tt>
+      )
+      &mdash;
+      <span class='desc'>The solutions for the given variable. </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='sub-dynamic'>
+      #
+(BasicNode, Terminal)
+<b>sub</b><span>(substitutions, uncertaintySubstitutions, equivalencies = {}, assumeZeroUncertainty = false, evaluateSymbolicConstants = false)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Substitute values into variables.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>substitutions</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>A map of variable labels to their values. Values can be any node, terminal, or something interpretable as a terminal. </span>
+    </li>
+    <li>
+      <span class='name'>uncertaintySubstitutions</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>A map of variable labels to the values of their uncertainties. </span>
+    </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
+    </li>
+    <li>
+      <span class='name'>assumeZeroUncertainty</span>
+      <span class='type'>
+        (
+          <tt>Boolean</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. Whether to assume uncertainties are zero if unknown (default false). </span>
+    </li>
+    <li>
+      <span class='name'>evaluateSymbolicConstants</span>
+      <span class='type'>
+        (
+          <tt>Boolean</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. Whether to evaluate symbolic constants (default false). </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>BasicNode, Terminal</tt>
+      )
+      &mdash;
+      <span class='desc'>This node with all substitutions substituted. </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='getAllVariables-dynamic'>
+      #
+(Array&lt;String&gt;)
+<b>getAllVariables</b><span>()</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Get all variable labels used in children of this node.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Array&lt;String&gt;</tt>
+      )
+      &mdash;
+      <span class='desc'>A list of all labels of variables in children of this node. </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='replaceVariables-dynamic'>
+      #
+(Pow)
+<b>replaceVariables</b><span>(replacements)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Replace variable labels.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>replacements</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>A map of variable labels to their replacement labels. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Pow.html'>Pow</a></tt>
+      )
+      &mdash;
+      <span class='desc'>This node with variable labels replaced. </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='toDrawingNode-dynamic'>
+      #
+(DrawingNode)
+<b>toDrawingNode</b><span>()</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Convert this node into a drawing node.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>DrawingNode</tt>
+      )
+      &mdash;
+      <span class='desc'>A drawing node representing this node. </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='differentiate-dynamic'>
+      #
+(void)
+<b>differentiate</b><span>(variable, equivalencies = {})</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Differentiate this node with respect to a variable.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>variable</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The label of the variable to differentiate with respect to. </span>
+    </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='containsVariable-dynamic'>
+      #
+(Boolean)
+<b>containsVariable</b><span>(variable, equivalencies = {})</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Check if this node contains a given variable.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>variable</span>
+      <span class='type'>
+        (
+          <tt>String</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>The label of the variable to differentiate with respect to. </span>
+    </li>
+    <li>
+      <span class='name'>equivalencies</span>
+      <span class='type'>
+        (
+          <tt>Object</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Boolean</tt>
+      )
+      &mdash;
+      <span class='desc'>Whether or not this node contains the given variable. </span>
     </li>
   </ul>
 </div>
@@ -223,7 +911,7 @@
 </div>
     </div>
     <div id='footer'>
-  July 23, 14 13:12:39 by
+  August 13, 14 00:35:56 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>
