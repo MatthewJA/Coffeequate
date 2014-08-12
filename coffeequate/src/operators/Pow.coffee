@@ -364,49 +364,6 @@ define [
 
 			return new Pow(left, right)
 
-		# Substitute an expression into this node.
-		#
-		# @deprecated (Not sure why this exists)
-		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
-			# Replace all instances of a variable with an expression.
-			# Eliminate the target variable if set to do so.
-			if eliminate
-				sourceExpressions = sourceExpression.solve(variable, equivalencies)
-			else
-				sourceExpressions = [sourceExpression]
-
-			# Generate an equivalencies index if necessary.
-			if not equivalencies?
-				equivalencies = {get: (variable) -> [variable]}
-
-			variableEquivalencies = equivalencies.get(variable)
-
-			results = []
-
-			for expression in sourceExpressions
-				# variable = sourceExpression
-				left = [@children.left.copy()]
-				right = [@children.right.copy()]
-
-				if @children.left instanceof terminals.Variable and (@children.left.label == variable or @children.left.label in variableEquivalencies)
-					left = [expression.copy()]
-				else if not (@children.left instanceof terminals.Terminal)
-					left = @children.left.substituteExpression(expression, variable, equivalencies)
-
-				if @children.right instanceof terminals.Variable and (@children.right.label == variable or @children.right.label in variableEquivalencies)
-					right = [expression.copy()]
-				else if not (@children.right instanceof terminals.Terminal)
-					right = @children.right.substituteExpression(expression, variable, equivalencies)
-
-
-				for i in left
-					for j in right
-						newPow = new Pow(i, j)
-						newPow = newPow.expandAndSimplify(equivalencies)
-						results.push(newPow)
-
-			return results
-
 		# Convert this node into a drawing node.
 		#
 		# @return [DrawingNode] A drawing node representing this node.

@@ -202,12 +202,6 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		expandAndSimplify: ->
 			@simplify()
 
-		# Substitute an expression into this. Included for API parity.
-		#
-		# @deprecated
-		substituteExpression: ->
-			[@copy()]
-
 		# Get uncertainty of this constant.
 		#
 		# @return [Constant] 0, as there is no uncertainty in a constant.
@@ -347,12 +341,6 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		expandAndSimplify: ->
 			@copy()
 
-		# Substitutes an expression into this constant.
-		#
-		# @deprecated
-		substituteExpression: (sourceExpression, variable, equivalencies) ->
-			[@copy()]
-
 		# Get uncertainty of this constant.
 		#
 		# @return [Constant] 0, as we assume no uncertainty in a symbolic constant.
@@ -462,28 +450,6 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 					else
 						return new Constant(substitute)
 			return @copy()
-
-		# Substitute an expression into the Variable.
-		#
-		# @deprecated
-		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
-			# Replace all instances of a variable with an expression.
-
-			# Generate an equivalencies index if necessary.
-			if not equivalencies?
-				equivalencies = {get: (variable) -> [variable]}
-
-			variableEquivalencies = equivalencies.get(variable)
-
-			# Eliminate the target variable if set to do so.
-			if eliminate
-				sourceExpressions = sourceExpression.solve(variable)
-			else
-				sourceExpressions = [sourceExpression]
-			if @label == variable or @label in variableEquivalencies
-				return (e.copy() for e in sourceExpressions)
-			else
-				return [@copy()]
 
 		# Get uncertainty of this Variable.
 		#
@@ -659,12 +625,6 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 						return new Constant(substitute)
 				else
 					return if not assumeZero then @copy() else new Constant("0")
-
-		# Substitute an expression.
-		#
-		# @deprecated
-		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
-			throw new Error("Can't sub uncertainties")
 
 		# Get uncertainty.
 		#

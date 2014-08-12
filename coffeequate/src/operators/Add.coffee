@@ -526,44 +526,6 @@ define [
 			newAdd = newAdd.expandAndSimplify(equivalencies)
 			return newAdd
 
-		# Substitute an expression into this node.
-		#
-		# @deprecated (Not sure why this exists)
-		substituteExpression: (sourceExpression, variable, equivalencies=null, eliminate=false) ->
-			# Replace all instances of a variable with an expression.
-			# Eliminate the target variable if set to do so.
-			if eliminate
-				sourceExpressions = sourceExpression.solve(variable, equivalencies)
-			else
-				sourceExpressions = [sourceExpression]
-
-			# Generate an equivalencies index if necessary.
-			if not equivalencies?
-				equivalencies = {get: (variable) -> [variable]}
-
-			variableEquivalencies = equivalencies.get(variable)
-
-			results = []
-
-			for expression in sourceExpressions
-				childrenExpressions = []
-				for child in @children
-					if child instanceof terminals.Variable and (child.label == variable or child.label in variableEquivalencies)
-						childrenExpressions.push([expression.copy()])
-					else if child.substituteExpression?
-						childrenExpressions.push(child.substituteExpression(expression, variable, equivalencies))
-					else
-						childrenExpressions.push([child.copy()])
-
-				# childrenExpressions is now an array of arrays. We want every combination of them.
-				childrenArray = combinations(childrenExpressions)
-
-			for children in childrenArray
-				newAdd = new Add(children...)
-				results.push(newAdd.expandAndSimplify(equivalencies))
-
-			return results
-
 		# Convert this node into a drawing node.
 		#
 		# @return [DrawingNode] A drawing node representing this node.
