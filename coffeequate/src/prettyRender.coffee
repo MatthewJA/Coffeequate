@@ -74,8 +74,10 @@ greekLatexDictionary =
 
 define ->
 
+  prettyRender = {}
+
   # Generic drawing node, parent of all other drawing nodes.
-  class DrawingNode
+  class prettyRender.DrawingNode
 
     # Draw the node as a string.
     #
@@ -91,7 +93,7 @@ define ->
 
     # This tells us how strongly bound together the node is.
     # As in, because `x+y*z` is parsed as `x+(y*z)`, `*` binds more closely than `+` does.
-    # When we want to express `(x+y)*z`, we put the `x+y` Add node inside a Bracket
+    # When we want to express `(x+y)*z`, we put the `x+y` prettyRender.Add node inside a Bracket
     # node, which binds very tightly.
     #
     # @return [Number] Binding strength.
@@ -100,34 +102,34 @@ define ->
 
     # Wraps the node in brackets if a node has lower precedence than this node.
     #
-    # @param child [DrawingNode] The node to (potentially) bracket.
-    # @return [DrawingNode] The bracketed child, or the original child.
+    # @param child [prettyRender.DrawingNode] The node to (potentially) bracket.
+    # @return [prettyRender.DrawingNode] The bracketed child, or the original child.
     bracketIfNeeded: (child) ->
       if child.bindingStrength() <= @bindingStrength()
-        return new Bracket(child)
+        return new prettyRender.Bracket(child)
       return child
 
   # Make a new drawing node from terms.
   #
-  # @param terms... [Array<DrawingNode>] An array of terms to make into a drawing node.
-  # @return [DrawingNode] A new drawing node from the terms provided.
-  DrawingNode.makeWithBrackets = (terms...) ->
+  # @param terms... [Array<prettyRender.DrawingNode>] An array of terms to make into a drawing node.
+  # @return [prettyRender.DrawingNode] A new drawing node from the terms provided.
+  prettyRender.DrawingNode.makeWithBrackets = (terms...) ->
     node = new this()
     terms = terms.map((x) ->
         if x.bindingStrength() <= node.bindingStrength()
-          return new Bracket(x)
+          return new prettyRender.Bracket(x)
         else
           return x)
     node.terms = terms
     return node
 
   # Drawing node representing addition.
-  class Add extends DrawingNode
+  class prettyRender.Add extends prettyRender.DrawingNode
 
-    # Make a new Add drawing node.
+    # Make a new prettyRender.Add drawing node.
     #
-    # @param terms... [Array<DrawingNode>] Drawing nodes to add together.
-    # @return [Add] A new addition drawing node.
+    # @param terms... [Array<prettyRender.DrawingNode>] Drawing nodes to add together.
+    # @return [prettyRender.Add] A new addition drawing node.
     constructor: (@terms...) ->
 
     # How strongly bound the node is.
@@ -136,17 +138,23 @@ define ->
     bindingStrength: ->
       4
 
+    # Pretty-print subtraction.
+    #
+    # @param renderFunction [String] What function to render with.
+    # @param plus [String] What plus looks like.
+    # @param minus [String] What minus looks like.
+    # @return [String] Pretty-printed add node.
     drawPretty: (renderFunction, plus, minus) ->
       out = ""
 
-      if @terms[0] instanceof Negate
+      if @terms[0] instanceof prettyRender.Negate
         out += minus
         out += @terms[0].contents[renderFunction]()
       else
         out += @terms[0][renderFunction]()
 
       for term in @terms.slice(1)
-        if term instanceof Negate
+        if term instanceof prettyRender.Negate
           out += minus
           out += term.contents[renderFunction]()
         else
@@ -174,11 +182,11 @@ define ->
       return @drawPretty("renderMathML", "<mo>+</mo>", "<mo>-</mo>")
 
   # Drawing node representing multiplication.
-  class Mul extends DrawingNode
+  class prettyRender.Mul extends prettyRender.DrawingNode
     # Make a new multiplication drawing node.
     #
-    # @param terms... [Array<DrawingNode>] Drawing nodes to multiply together.
-    # @return [Mul] A new multiplication drawing mode.
+    # @param terms... [Array<prettyRender.DrawingNode>] Drawing nodes to multiply together.
+    # @return [prettyRender.Mul] A new multiplication drawing mode.
     constructor: (@terms...) ->
 
     # How strongly this node is bound.
@@ -204,13 +212,13 @@ define ->
       return @terms.map((x) -> x.renderMathML()).join("<mo>&middot;</mo>")
 
   # Drawing node representing exponentiation.
-  class Pow extends DrawingNode
+  class prettyRender.Pow extends prettyRender.DrawingNode
 
     # Make a new exponentiation drawing node.
     #
-    # @param left [DrawingNode] The base of the power node.
-    # @param right [DrawingNode] The exponent of the power node.
-    # @return [Pow] A new exponentiation drawing node.
+    # @param left [prettyRender.DrawingNode] The base of the power node.
+    # @param right [prettyRender.DrawingNode] The exponent of the power node.
+    # @return [prettyRender.Pow] A new exponentiation drawing node.
     constructor: (@left, @right) ->
 
     # Draw the node as a LaTeX string.
@@ -232,12 +240,12 @@ define ->
       "<msup>#{@left.renderMathML()}#{@right.renderMathML()}</msup>"
 
   # Drawing node representing bracketing.
-  class Bracket extends DrawingNode
+  class prettyRender.Bracket extends prettyRender.DrawingNode
 
     # Make a new bracket drawing node.
     #
-    # @param contents [Array<DrawingNode>] Drawing nodes inside the brackets.
-    # @return [Bracket] A new bracket node.
+    # @param contents [Array<prettyRender.DrawingNode>] Drawing nodes inside the brackets.
+    # @return [prettyRender.Bracket] A new bracket node.
     constructor: (@contents) ->
 
     # How strongly bound this node is.
@@ -265,13 +273,13 @@ define ->
       return "<mfenced><mrow>#{@contents.renderMathML()}</mrow></mfenced>"
 
   # Drawing node representing a number.
-  class Number extends DrawingNode
+  class prettyRender.Number extends prettyRender.DrawingNode
 
     # Make a new number drawing node.
     #
     # @param value [Number] The value of the number.
     # @param classname [String] Optional. The name that should be set as the class for this node if drawn as MathML or similar.
-    # @return [Number] A new drawing node representing this number.
+    # @return [prettyRender.Number] A new drawing node representing this number.
     constructor: (@value, @classname="constant") ->
 
     # How strongly this node is bound.
@@ -299,13 +307,13 @@ define ->
       return "<mn class=\"#{@classname}\">#{@value}</mn>"
 
   # Drawing node representing a variable.
-  class Variable extends DrawingNode
+  class prettyRender.Variable extends prettyRender.DrawingNode
 
     # Make a new variable drawing node.
     #
     # @param label [String] The label of this variable.
     # @param classname [String] Optional. The name that should be set as the class for this node if drawn as MathML or similar.
-    # @return [Variable] A new variable drawing node.
+    # @return [prettyRender.Variable] A new variable drawing node.
     constructor: (@label, @classname="variable") ->
 
     # How strongly this node is bound.
@@ -354,13 +362,13 @@ define ->
         return '<mi class="' + @classname + '">' + label + '</mi>'
 
   # Drawing node representing a fraction.
-  class Fraction extends DrawingNode
+  class prettyRender.Fraction extends prettyRender.DrawingNode
 
     # Make a new fraction drawing node.
     #
-    # @param top [DrawingNode] The node to be drawn on top of the fraction.
-    # @param bottom [DrawingNode] The node to be drawn on the bottom of the fraction.
-    # @return [Fraction] A new fraction drawing node.
+    # @param top [prettyRender.DrawingNode] The node to be drawn on top of the fraction.
+    # @param bottom [prettyRender.DrawingNode] The node to be drawn on the bottom of the fraction.
+    # @return [prettyRender.Fraction] A new fraction drawing node.
     constructor: (@top, @bottom) ->
 
     # How strongly this node is bound.
@@ -392,12 +400,13 @@ define ->
 
 
   # Drawing node representing a surd/root.
-  class Surd extends DrawingNode
+  class prettyRender.Surd extends prettyRender.DrawingNode
 
     # Make a new surd drawing node.
     #
-    # @param contents [DrawingNode] The node to draw inside the root.
+    # @param contents [prettyRender.DrawingNode] The node to draw inside the root.
     # @param power [Number] Optional. The number of this root. For example, 2 for a sqrt and 3 for a cbrt.
+    # @return [prettyRender.Surd] The drawing node representing this surd.
     constructor: (@contents, @power = null) ->
 
     # Draw the node as a LaTeX string.
@@ -437,12 +446,13 @@ define ->
                 </msqrt>"
 
   # Drawing node representing the negation of something.
-  class Negate extends DrawingNode
+  class prettyRender.Negate extends prettyRender.DrawingNode
 
     # Make a new negation drawing node.
     #
-    # @param contents [DrawingNode] The node to draw inside the root.
+    # @param contents [prettyRender.DrawingNode] The node to draw inside the root.
     # @param power [Number] Optional. The number of this root. For example, 2 for a sqrt and 3 for a cbrt.
+    # @return [prettyRender.Negate] A negation drawing node.
     constructor: (@contents) ->
 
     # Draw the node as a LaTeX string.
@@ -465,12 +475,13 @@ define ->
 
 
   # Drawing node representing an uncertainty.
-  class Uncertainty extends DrawingNode
+  class prettyRender.Uncertainty extends prettyRender.DrawingNode
 
     # Make a new uncertainty drawing node.
     #
     # @param label [String] The label of the variable this uncertainty represents.
     # @param class [String] Optional. The name that should be set as the class for this node if drawn as MathML or similar.
+    # @return [prettyRender.Uncertainty] An uncertainty drawing node.
     constructor: (@label, @class="default") ->
 
     # How strongly this node is bound.
@@ -499,17 +510,4 @@ define ->
       return "<msub><mo>&sigma;</mo>#{dummy.renderMathML(x...)}</msub>"
 
 
-  return {
-
-    DrawingNode: DrawingNode
-    Add: Add
-    Mul: Mul
-    Pow: Pow
-    Bracket: Bracket
-    Number: Number
-    Variable: Variable
-    Fraction: Fraction
-    Surd: Surd
-    Uncertainty: Uncertainty
-    Negate: Negate
-  }
+  return prettyRender
