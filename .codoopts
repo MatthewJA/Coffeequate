@@ -6,4 +6,4 @@
 .
 -
 LICENSE
-coffeequate/src/grammar.peg
+coffeequate/src/grammar.jison
