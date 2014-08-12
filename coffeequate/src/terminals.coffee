@@ -48,6 +48,8 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 					@denominator = parseFloat(@denominator)
 					@numerator /= @denominator
 					@denominator = 1
+				else
+					throw new Error("Unknown constant mode: #{@mode}.")
 
 		# Evaluate the constant.
 		#
@@ -186,7 +188,8 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		# @return [Constant] A simplified version of this constant.
 		simplify: ->
 			constant = @copy()
-			constant.simplifyInPlace()
+			if @mode == "rational"
+				constant.simplifyInPlace()
 			return constant
 
 		# Expand this constant. Included for API parity.
@@ -321,9 +324,9 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 			unless evaluateSymbolicConstants
 				return @copy()
 			if @value?
-				return new Constant(@value)
+				return new Constant(@value, 1, "float")
 			if @label of constants
-				return new Constant(constants[@label])
+				return new Constant(constants[@label], 1, "float")
 			return @copy()
 
 		# Simplify this constant.

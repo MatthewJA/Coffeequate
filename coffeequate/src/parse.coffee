@@ -12,11 +12,12 @@ define ["require"], (require) ->
 		# @param type [String] The type of object that the input was being parsed as.
 		# @return [ParseError] A new ParseError.
 		constructor: (@input, @type) ->
+            console.trace()
 
-		# The string displayed when this error is thrown.
-		#
-		# @return [String] The string displayed when this error is thrown.
-		toString: ->
+        # The string displayed when this error is thrown.
+        #
+        # @return [String] The string displayed when this error is thrown.
+        toString: ->
 			"Could not parse '#{@input}' as #{@type}"
 
 	# Regular expressions that match the various types of terminal recognised by Coffeequate.
@@ -164,7 +165,7 @@ case 7:this.$ = new operators.Mul("-1",$$[$0]);
 break;
 case 8:this.$ = $$[$0-1];
 break;
-case 9:this.$ = yytext.trim();
+case 9:this.$ = stringToTerminal(yytext.trim());
 break;
 }
 },
@@ -467,7 +468,7 @@ return parser;}
 		stringToExpression: (string, simplify=true) ->
 			operators = require("operators")
 			expr = parser(operators).parse(string)
-			if simplify
+			if simplify and expr.simplify?
 				return expr.simplify()
 			return expr
 

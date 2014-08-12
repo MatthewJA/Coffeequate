@@ -12,7 +12,9 @@ define ["parse", "nodes"], (parse, nodes) ->
 		constructor: (val) ->
 			if val instanceof String or typeof val == "string"
 				# The string we pass in is just a representation to parse.
-				@expr = parse.stringToExpression(val).simplify()
+				@expr = parse.stringToExpression(val)
+				if @expr.simplify?
+					@expr = @expr.simplify()
 			else if val.copy?
 				@expr = val.copy().simplify()
 			else
@@ -50,12 +52,9 @@ define ["parse", "nodes"], (parse, nodes) ->
 		# @param substitutions [Object] A map of variable labels to their values. Values can be integers, Expressions, Terminals, or BasicNodes.
 		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
 		# @param substituteUncertainties [Boolean] Optional. Whether to substitute values into uncertainties instead of variables (default false).
+		# @param evaluateSymbolicConstants [Boolean] Optional. Whether to evaluate symbolic constants (as opposed to leaving them symbolic) (default false).
 		# @return [Expression] The Expression with substituted values.
-		# @todo Reimplement sub options from the nodes. [#71](https://github.com/MatthewJA/Coffeequate/issues/71)
-		sub: (substitutions, equivalencies={}, substituteUncertainties=false) ->
-			# TODO: Options.
-			# TODO: Seems that the way I implemented substituting expressions was different last time for no real reason. Fix.
-
+		sub: (substitutions, equivalencies={}, substituteUncertainties=false, evaluateSymbolicConstants=false) ->
 			# If there are any Expressions in here, we should remove them.
 			newsubs = {}
 			for key of substitutions
@@ -71,7 +70,10 @@ define ["parse", "nodes"], (parse, nodes) ->
 				uncertaintySubs = {}
 				variableSubs = newsubs
 
-			return new Expression(@expr.sub(variableSubs, uncertaintySubs, equivalencies).simplify(equivalencies))
+			subbed = @expr.sub(variableSubs, uncertaintySubs, equivalencies, false, evaluateSymbolicConstants)
+			if subbed.simplify?
+				subbed = subbed.simplify(equivalencies)
+			return new Expression(subbed)
 
 		# Deep-copy this Expression.
 		#
@@ -84,13 +86,21 @@ define ["parse", "nodes"], (parse, nodes) ->
 		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
 		# @return [Expression] A simplified Expression.
 		simplify: (equivalencies={}) ->
-			new Expression(@expr.simplify(equivalencies))
+			if @expr.simplify?
+				expr = @expr.simplify(equivalencies)
+			else
+				expr = @expr.copy()
+			new Expression(expr)
 
 		# Expand this Expression.
 		#
 		# @return [Expression] An expanded Expression.
 		expand: ->
-			new Expression(@expr.expand())
+			if @expr.expand?
+				expr = @expr.expand()
+			else
+				expr = @expr.copy()
+			new Expression(expr)
 
 		# Differentiate this expression with respect to a variable.
 		#
@@ -116,6 +126,7 @@ define ["parse", "nodes"], (parse, nodes) ->
 				variables.push(equivalencies)
 				equivalencies = {}
 
+			# The function we will return.
 			fun = (subs...) =>
 				# Zip variables and subs together into an object.
 				substitutions = {}
