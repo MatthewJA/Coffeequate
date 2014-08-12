@@ -55,7 +55,6 @@ define ["parse", "nodes"], (parse, nodes) ->
 		# @param evaluateSymbolicConstants [Boolean] Optional. Whether to evaluate symbolic constants (as opposed to leaving them symbolic) (default false).
 		# @return [Expression] The Expression with substituted values.
 		sub: (substitutions, equivalencies={}, substituteUncertainties=false, evaluateSymbolicConstants=false) ->
-
 			# If there are any Expressions in here, we should remove them.
 			newsubs = {}
 			for key of substitutions
