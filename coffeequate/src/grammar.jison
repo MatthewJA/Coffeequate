@@ -2,15 +2,16 @@
 
 %%
 \s+				/* skip whitespace */
-[^()+\-*/]+		return 'TERMINAL';
-"**"			return '**';
-"*"				return '*';
-"/"				return '/';
-"+"				return '+';
-"-"				return '-';
-"("				return '(';
-")" 			return ')';
-<<EOF>>			return 'EOF';
+[\-]?[0-9]+e[\-+]?[0-9]+	return 'TERMINAL'; /* scientific notation */
+[^()+\-*/]+					return 'TERMINAL';
+"**"						return '**';
+"*"							return '*';
+"/"							return '/';
+"+"							return '+';
+"-"							return '-';
+"("							return '(';
+")" 						return ')';
+<<EOF>>						return 'EOF';
 
 /lex
 
