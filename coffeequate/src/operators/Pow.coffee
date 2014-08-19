@@ -281,19 +281,20 @@ define [
 			# Interpret substitutions.
 			for variable of substitutions
 				unless substitutions[variable].copy?
-					substitutions[variable] = new terminals.Constant(substitutions[variable])
+					if substitutions[variable] % 1 == 0
+						substitutions[variable] = new terminals.Constant(substitutions[variable])
+					else
+						substitutions[variable] = new terminals.Constant(substitutions[variable], 1, "float")
 
 			left = null
 			right = null
 			if @children.left instanceof terminals.Variable
 				variableEquivalencies = if @children.left.label of equivalencies then equivalencies[@children.left.label] else [@children.left.label]
-				subbed = false
 				for equiv in variableEquivalencies
 					if equiv of substitutions
 						left = substitutions[equiv].copy()
-						subbed = true
 						break
-				unless subbed
+				unless left?
 					left = @children.left.copy()
 			else if @children.left.sub?
 				left = @children.left.sub(substitutions, uncertaintySubstitutions, equivalencies, assumeZeroUncertainty, evaluateSymbolicConstants)

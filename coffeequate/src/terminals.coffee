@@ -38,6 +38,9 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		constructor: (@numerator, @denominator=1, @mode="rational") ->
 			@cmp = -6
 
+			if (typeof @numerator == "number" or @numerator instanceof Number) and @numerator % 1 != 0
+				@mode = "float"
+
 			switch @mode
 				when "rational"
 					@numerator = parseInt(@numerator)
@@ -448,7 +451,10 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 					if substitute.copy?
 						return substitute.copy()
 					else
-						return new Constant(substitute)
+						if (substitute % 1 == 0)
+							return new Constant(substitute)
+						else
+							return new Constant(substitute, 1, "float")
 			return @copy()
 
 		# Get uncertainty of this Variable.
