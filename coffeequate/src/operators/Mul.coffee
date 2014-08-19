@@ -470,7 +470,7 @@ define [
 			children = []
 			for child in @children
 				if child instanceof terminals.Variable
-					variableEquivalencies = if variable of equivalencies then equivalencies[variable] else [variable]
+					variableEquivalencies = if child.label of equivalencies then equivalencies[child.label] else [child.label]
 					subbed = false
 					for equiv in variableEquivalencies
 						if equiv of substitutions
