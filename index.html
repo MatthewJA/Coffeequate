@@ -100,6 +100,13 @@
           </code>
         </p>
 
+        <p>
+          If you really want, you can play around with Coffeequate in development by using this site's version of Coffeequate, CDN style. Obviously, this is not a good idea for production.
+          <code class="cb prettyprint">
+          &lt;script src="http://matthewja.com/Coffeequate/coffeequate.min.js"&gt;&lt;/script&gt;
+          </code>
+        </p>
+
         <header><h3>Using Coffeequate</h3></header>
         <p>
           Coffeequate gives you a <code class="prettyprint">CQ</code> function (or <code class="prettyprint">coffeequate</code> if you'd prefer). This function converts strings to Coffeequate expressions, which you can then operate on with methods.
@@ -131,7 +138,7 @@
         <p>
           <code>equivalencies</code> is an object mapping variable labels to an array of variable labels that that variable is equivalent to - for example, if <code>x</code> and <code>y</code> are equivalent, then you could have <code>equivalencies = {"x":["x", "y"], "y":["x", "y"]}</code>. Equivalencies is always an optional parameter.
         </p>
-        
+
       </article>
 
       <header><h2>Examples and REPL</h2></header>
