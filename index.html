@@ -190,7 +190,7 @@
           <code class="cb prettyprint">
             s = CQ("u*t + 0.5*a*t**2"); // Vertical position as a function of time.<br>
             maxT = s.differentiate("t").solve("t"); // Differentiate and equate to zero to find times where s is maximal or minimal.<br>
-            s.sub({"t":maxT[0]}).toString(); // (-0.5*u**3)/(a**3) + (u**2)/(a**2)<br>
+            s.sub({"t":maxT[0]}).toString(); // -((0.5*u**2)/a)<br>
           </code>
         </div>
 
