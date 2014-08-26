@@ -1,4 +1,4 @@
-Coffeequate <sub><sup>v1.0.0<sub>rc1</sub></sup></sub>
+Coffeequate <sub><sup>v1.0.0</sup></sub>
 =============================
 
 A computer algebra system for JavaScript. More information at [the webpage](http://matthewja.com/Coffeequate).

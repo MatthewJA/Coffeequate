@@ -1,3 +1,8 @@
+/**
+ * Coffeequate v1.0.0
+ * http://matthewja.com/Coffeequate
+ */
+
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         //Allow using this built library as an AMD module
