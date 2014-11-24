@@ -59,7 +59,9 @@
 			event.preventDefault();
 		}
 	});
-	entryButton.addEventListener('click', submit);
+	entryButton.addEventListener('click', function (e) {
+		submit(entry.value);
+	});
 
 	submit("1 + 2");
 	submit("CQ(\"(x+y)**2\").simplify()");
