@@ -3,7 +3,7 @@
 require.config
 		baseUrl: "./"
 
-define ["operators", "Expression", "parse", "uncertainties"], (operators, Expression, parse, uncertainties) ->
+define ["operators", "Expression", "parse", "uncertainties", "terminals"], (operators, Expression, parse, uncertainties, terminals) ->
 
 	# Converts string inputs into Expressions, which Coffeequate can then work with.
 	# (Public interface for Coffeequate - this is all that the user will see!)
@@ -26,5 +26,17 @@ define ["operators", "Expression", "parse", "uncertainties"], (operators, Expres
 		else
 			# This is an expression.
 			return new Expression(input)
+
+	# Adding a way to access the raw nodes.
+	CQ.raw = {
+		Add: operators.Add
+		Mul: operators.Mul
+		Pow: operators.Pow
+		Terminal: terminals.Terminal
+		Variable: terminals.Variable
+		Constant: terminals.Constant
+		SymbolicConstant: terminals.SymbolicConstant
+		Uncertainty: terminals.Uncertainty
+	}
 
 	return CQ
