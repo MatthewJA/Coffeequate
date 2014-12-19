@@ -86,8 +86,8 @@ define [
 		# @param fun [Function] A function to map over variables.
 		# @return [Pow] A copy of this node with the function mapped over all variables.
 		mapOverVariables: (fun) ->
-			left = @left.mapOverVariables(fun)
-			right = @right.mapOverVariables(fun)
+			left = @children.left.mapOverVariables(fun)
+			right = @children.right.mapOverVariables(fun)
 			return (new Pow(left, right))
 
 		# Expand this node.
