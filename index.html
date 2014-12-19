@@ -100,6 +100,13 @@
           </code>
         </p>
 
+        <p>
+          If you really want, you can play around with Coffeequate in development by using this site's version of Coffeequate, CDN style. Obviously, this is not a good idea for production.
+          <code class="cb prettyprint">
+          &lt;script src="http://matthewja.com/Coffeequate/coffeequate.min.js"&gt;&lt;/script&gt;
+          </code>
+        </p>
+
         <header><h3>Using Coffeequate</h3></header>
         <p>
           Coffeequate gives you a <code class="prettyprint">CQ</code> function (or <code class="prettyprint">coffeequate</code> if you'd prefer). This function converts strings to Coffeequate expressions, which you can then operate on with methods.
@@ -135,14 +142,14 @@
         <p>
           If you find yourself in need of checking the type of a CQ expression node, or you want to monkeypatch CQ, the raw nodes are provided in <code>CQ.raw</code>: <code>{Add, Mul, Pow, Terminal, Variable, Constant, SymbolicConstant, Uncertainty}</code>.
         </p>
-        
+
       </article>
 
       <header><h2>Examples and REPL</h2></header>
       <article>
         <header><h3>REPL</h3></header>
         <p>
-          Here's a JS REPL with Coffeequate v1.0.0.rc1 already loaded. Try it out!
+          Here's a JS REPL with Coffeequate v1.0.0 already loaded. Try it out!
         </p>
           <div class="repl"></div>
 
@@ -187,7 +194,7 @@
           <code class="cb prettyprint">
             s = CQ("u*t + 0.5*a*t**2"); // Vertical position as a function of time.<br>
             maxT = s.differentiate("t").solve("t"); // Differentiate and equate to zero to find times where s is maximal or minimal.<br>
-            s.sub({"t":maxT[0]}).toString(); // (-0.5*u**3)/(a**3) + (u**2)/(a**2)<br>
+            s.sub({"t":maxT[0]}).toString(); // -((0.5*u**2)/a)<br>
           </code>
         </div>
 
