@@ -237,26 +237,14 @@ Float <code>*</code> Float -&gt; Float</p>
   </li>
   <li>
     <span class='signature'>
-      <a href='#getVariableUnits-dynamic'>
+      <a href='#mapOverVariables-dynamic'>
         #
-(Object)
-<b>getVariableUnits</b><span>()</span>
+(Constant)
+<b>mapOverVariables</b><span>(fun)</span>
       </a>
     </span>
     <span class='desc'>
-      Get the units of variables. 
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#setVariableUnits-dynamic'>
-        #
-(void)
-<b>setVariableUnits</b><span>()</span>
-      </a>
-    </span>
-    <span class='desc'>
-      Set the units of variables. 
+      Map a function over all variables in this node. 
     </span>
   </li>
   <li>
@@ -739,40 +727,40 @@ Float <code>*</code> Float -&gt; Float</p>
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='getVariableUnits-dynamic'>
+    <p class='signature' id='mapOverVariables-dynamic'>
       #
-(Object)
-<b>getVariableUnits</b><span>()</span>
+(Constant)
+<b>mapOverVariables</b><span>(fun)</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>Get the units of variables. Included for API parity.</p>
+  <p>Map a function over all variables in this node. Does nothing, included for API parity.</p>
 </div>
 <div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>fun</span>
+      <span class='type'>
+        (
+          <tt>Function</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>A function to map over variables. </span>
+    </li>
+  </ul>
   <h3>Returns:</h3>
   <ul class='return'>
     <li>
       <span class='type'></span>
       (
-        <tt>Object</tt>
+        <tt><a href='../class/Constant.html'>Constant</a></tt>
       )
       &mdash;
-      <span class='desc'>null - Constants don&#39;t have units. </span>
+      <span class='desc'>A copy of this node with the function mapped over all variables. </span>
     </li>
   </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='setVariableUnits-dynamic'>
-      #
-(void)
-<b>setVariableUnits</b><span>()</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Set the units of variables. Does nothing. Included for API parity.</p>
-</div>
-<div class='tags'>
 </div>
   </div>
   <div class='method_details'>
@@ -815,7 +803,7 @@ Float <code>*</code> Float -&gt; Float</p>
 </div>
     </div>
     <div id='footer'>
-  August 13, 14 00:35:56 by
+  December 19, 14 21:26:48 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

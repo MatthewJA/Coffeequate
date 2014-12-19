@@ -105,6 +105,30 @@ It wraps underlying nodes and terminals in a neat interface.</p>
   </li>
   <li>
     <span class='signature'>
+      <a href='#getAllVariables-dynamic'>
+        #
+(Array&lt;String&gt;)
+<b>getAllVariables</b><span>()</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Get all variable names in this expression. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
+      <a href='#mapOverVariables-dynamic'>
+        #
+(Expression)
+<b>mapOverVariables</b><span>(fun)</span>
+      </a>
+    </span>
+    <span class='desc'>
+      Map a function over all variables in this expression. 
+    </span>
+  </li>
+  <li>
+    <span class='signature'>
       <a href='#copy-dynamic'>
         #
 (Expression)
@@ -401,6 +425,67 @@ It wraps underlying nodes and terminals in a neat interface.</p>
 </div>
   </div>
   <div class='method_details'>
+    <p class='signature' id='getAllVariables-dynamic'>
+      #
+(Array&lt;String&gt;)
+<b>getAllVariables</b><span>()</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Get all variable names in this expression.</p>
+</div>
+<div class='tags'>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt>Array&lt;String&gt;</tt>
+      )
+      &mdash;
+      <span class='desc'>An array of variable labels. </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
+    <p class='signature' id='mapOverVariables-dynamic'>
+      #
+(Expression)
+<b>mapOverVariables</b><span>(fun)</span>
+      <br>
+    </p>
+    <div class='docstring'>
+  <p>Map a function over all variables in this expression.</p>
+</div>
+<div class='tags'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
+    <li>
+      <span class='name'>fun</span>
+      <span class='type'>
+        (
+          <tt>Function</tt>
+        )
+      </span>
+      &mdash;
+      <span class='desc'>A function to map over variables. </span>
+    </li>
+  </ul>
+  <h3>Returns:</h3>
+  <ul class='return'>
+    <li>
+      <span class='type'></span>
+      (
+        <tt><a href='../class/Expression.html'>Expression</a></tt>
+      )
+      &mdash;
+      <span class='desc'>A copy of this expression with the function mapped over all variables. </span>
+    </li>
+  </ul>
+</div>
+  </div>
+  <div class='method_details'>
     <p class='signature' id='copy-dynamic'>
       #
 (Expression)
@@ -606,7 +691,7 @@ It wraps underlying nodes and terminals in a neat interface.</p>
 </div>
     </div>
     <div id='footer'>
-  August 13, 14 00:35:56 by
+  December 19, 14 21:26:48 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

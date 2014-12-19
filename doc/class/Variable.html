@@ -133,26 +133,14 @@
   </li>
   <li>
     <span class='signature'>
-      <a href='#getVariableUnits-dynamic'>
+      <a href='#mapOverVariables-dynamic'>
         #
-(BasicNode, Terminal)
-<b>getVariableUnits</b><span>(variable, equivalencies = {})</span>
+(Variable)
+<b>mapOverVariables</b><span>(fun)</span>
       </a>
     </span>
     <span class='desc'>
-      Get the units of a given Variable. 
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#setVariableUnits-dynamic'>
-        #
-(void)
-<b>setVariableUnits</b><span>(variable, units, equivalencies = {})</span>
-      </a>
-    </span>
-    <span class='desc'>
-      Set units for a given Variable. 
+      Map a function over all variables in this node. 
     </span>
   </li>
   <li>
@@ -543,37 +531,27 @@
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='getVariableUnits-dynamic'>
+    <p class='signature' id='mapOverVariables-dynamic'>
       #
-(BasicNode, Terminal)
-<b>getVariableUnits</b><span>(variable, equivalencies = {})</span>
+(Variable)
+<b>mapOverVariables</b><span>(fun)</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>Get the units of a given Variable.</p>
+  <p>Map a function over all variables in this node.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>variable</span>
+      <span class='name'>fun</span>
       <span class='type'>
         (
-          <tt>String</tt>
+          <tt>Function</tt>
         )
       </span>
       &mdash;
-      <span class='desc'>Label of the variable to get units for. </span>
-    </li>
-    <li>
-      <span class='name'>equivalencies</span>
-      <span class='type'>
-        (
-          <tt>Object</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
+      <span class='desc'>A function to map over variables. </span>
     </li>
   </ul>
   <h3>Returns:</h3>
@@ -581,56 +559,10 @@
     <li>
       <span class='type'></span>
       (
-        <tt>BasicNode, Terminal</tt>
+        <tt><a href='../class/Variable.html'>Variable</a></tt>
       )
       &mdash;
-      <span class='desc'>Units if this is the Variable being looked for. null otherwise. </span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='setVariableUnits-dynamic'>
-      #
-(void)
-<b>setVariableUnits</b><span>(variable, units, equivalencies = {})</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Set units for a given Variable.</p>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>variable</span>
-      <span class='type'>
-        (
-          <tt>String</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>The variable to set units for. </span>
-    </li>
-    <li>
-      <span class='name'>units</span>
-      <span class='type'>
-        (
-          <tt>BasicNode, Terminal</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>The units to set. </span>
-    </li>
-    <li>
-      <span class='name'>equivalencies</span>
-      <span class='type'>
-        (
-          <tt>Object</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
+      <span class='desc'>A copy of this node with the function mapped over all variables. </span>
     </li>
   </ul>
 </div>
@@ -852,7 +784,7 @@
 </div>
     </div>
     <div id='footer'>
-  August 13, 14 00:35:56 by
+  December 19, 14 21:26:48 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

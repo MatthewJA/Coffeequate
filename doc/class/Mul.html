@@ -100,26 +100,14 @@
   </li>
   <li>
     <span class='signature'>
-      <a href='#getVariableUnits-dynamic'>
+      <a href='#mapOverVariables-dynamic'>
         #
-(BasicNode)
-<b>getVariableUnits</b><span>(variable, equivalencies = {})</span>
+(Mul)
+<b>mapOverVariables</b><span>(fun)</span>
       </a>
     </span>
     <span class='desc'>
-      Get the dimensions/units of a variable in this node. 
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#setVariableUnits-dynamic'>
-        #
-(void)
-<b>setVariableUnits</b><span>(variable, units, equivalencies = {})</span>
-      </a>
-    </span>
-    <span class='desc'>
-      Set the dimensions/units of a variable in this node. 
+      Map a function over all variables in this node. 
     </span>
   </li>
   <li>
@@ -470,37 +458,27 @@ Arguments passed as children will be parsed as children from whatever type they 
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='getVariableUnits-dynamic'>
+    <p class='signature' id='mapOverVariables-dynamic'>
       #
-(BasicNode)
-<b>getVariableUnits</b><span>(variable, equivalencies = {})</span>
+(Mul)
+<b>mapOverVariables</b><span>(fun)</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>Get the dimensions/units of a variable in this node.</p>
+  <p>Map a function over all variables in this node.</p>
 </div>
 <div class='tags'>
   <h3>Parameters:</h3>
   <ul class='param'>
     <li>
-      <span class='name'>variable</span>
+      <span class='name'>fun</span>
       <span class='type'>
         (
-          <tt>String</tt>
+          <tt>Function</tt>
         )
       </span>
       &mdash;
-      <span class='desc'>The label of the variable to get dimensions of. </span>
-    </li>
-    <li>
-      <span class='name'>equivalencies</span>
-      <span class='type'>
-        (
-          <tt>Object</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
+      <span class='desc'>A function to map over variables. </span>
     </li>
   </ul>
   <h3>Returns:</h3>
@@ -508,56 +486,10 @@ Arguments passed as children will be parsed as children from whatever type they 
     <li>
       <span class='type'></span>
       (
-        <tt><a href='../class/BasicNode.html'>BasicNode</a></tt>
+        <tt><a href='../class/Mul.html'>Mul</a></tt>
       )
       &mdash;
-      <span class='desc'>The units of the variable, or null if the variable wasn&#39;t found. </span>
-    </li>
-  </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='setVariableUnits-dynamic'>
-      #
-(void)
-<b>setVariableUnits</b><span>(variable, units, equivalencies = {})</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Set the dimensions/units of a variable in this node.</p>
-</div>
-<div class='tags'>
-  <h3>Parameters:</h3>
-  <ul class='param'>
-    <li>
-      <span class='name'>variable</span>
-      <span class='type'>
-        (
-          <tt>String</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>The label of the variable to set dimensions of. </span>
-    </li>
-    <li>
-      <span class='name'>units</span>
-      <span class='type'>
-        (
-          <tt><a href='../class/BasicNode.html'>BasicNode</a></tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>The units to give the variable. </span>
-    </li>
-    <li>
-      <span class='name'>equivalencies</span>
-      <span class='type'>
-        (
-          <tt>Object</tt>
-        )
-      </span>
-      &mdash;
-      <span class='desc'>Optional. A map of variable labels to a list of equivalent variable labels. </span>
+      <span class='desc'>A copy of this node with the function mapped over all variables. </span>
     </li>
   </ul>
 </div>
@@ -1126,7 +1058,7 @@ Note that this returns false if the node expands into a non-Mul node.</p>
 </div>
     </div>
     <div id='footer'>
-  August 13, 14 00:35:56 by
+  December 19, 14 21:26:48 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>

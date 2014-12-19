@@ -128,6 +128,8 @@
           <li><code class="prettyprint">expr.expand()</code> - Return an expanded version of the expression.</li>
           <li><code class="prettyprint">expr.sub(substitutions, equivalencies, substituteUncertainties, evaluateSymbolicConstants)</code> - Takes an object mapping variable names to values, and returns a new expression with each variable replaced by its value. Values can be numbers, other variables, or even other expressions. If substituteUncertainties is true (default is false), then instead of substituting the values into variables, the values will be substituted into the uncertainties of those variables instead. If evaluateSymbolicConstants is true (default is false), known symbolic constants will be evaluated.</li>
           <li><code class="prettyprint">expr.differentiate(variable, equivalencies)</code> - Takes the name of a variable as a string, and returns the expression solved for this variable as an array of solutions. Expressions are automatically equated to zero.</li>
+          <li><code class="prettyprint">expr.getAllVariables()</code> - Returns an array of labels of variables that are in the expression.</li>
+          <li><code class="prettyprint">expr.mapOverVariables(fun)</code> - Maps the function <code>fun</code> over all variables, replacing those variables with the return value of <code>fun(variable)</code>. Returns a new expression.</li>
           <li><code class="prettyprint">expr.getUncertainty()</code> - Returns an expression representing the uncertainty of this expression.</li>
           <li><code class="prettyprint">expr.toMathML()</code> - Returns a MathML string of the expression.</li>
           <li><code class="prettyprint">expr.toLaTeX()</code> - Returns a LaTeX string of the expression.</li>
@@ -149,7 +151,7 @@
       <article>
         <header><h3>REPL</h3></header>
         <p>
-          Here's a JS REPL with Coffeequate v1.0.0 already loaded. Try it out!
+          Here's a JS REPL with Coffeequate v1.1.0 already loaded. Try it out!
         </p>
           <div class="repl"></div>
 

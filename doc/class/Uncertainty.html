@@ -133,26 +133,14 @@
   </li>
   <li>
     <span class='signature'>
-      <a href='#getVariableUnits-dynamic'>
+      <a href='#mapOverVariables-dynamic'>
         #
-(void)
-<b>getVariableUnits</b><span>(variable, equivalencies)</span>
+(Uncertainty)
+<b>mapOverVariables</b><span>(fun)</span>
       </a>
     </span>
     <span class='desc'>
-      Get variable units. 
-    </span>
-  </li>
-  <li>
-    <span class='signature'>
-      <a href='#setVariableUnits-dynamic'>
-        #
-(void)
-<b>setVariableUnits</b><span>(variable, units, equivalencies)</span>
-      </a>
-    </span>
-    <span class='desc'>
-      Set variable units. 
+      Map a function over all variables in this node. 
     </span>
   </li>
   <li>
@@ -508,49 +496,38 @@
 </div>
   </div>
   <div class='method_details'>
-    <p class='signature' id='getVariableUnits-dynamic'>
+    <p class='signature' id='mapOverVariables-dynamic'>
       #
-(void)
-<b>getVariableUnits</b><span>(variable, equivalencies)</span>
+(Uncertainty)
+<b>mapOverVariables</b><span>(fun)</span>
       <br>
     </p>
     <div class='docstring'>
-  <p>Get variable units.</p>
+  <p>Map a function over all variables in this node. Does nothing, included for API parity.</p>
 </div>
 <div class='tags'>
-  <h3>Throws:</h3>
-  <ul class='throw'>
+  <h3>Parameters:</h3>
+  <ul class='param'>
     <li>
-      <span class='type'></span>
-      (
-        <tt>Error</tt>
-      )
+      <span class='name'>fun</span>
+      <span class='type'>
+        (
+          <tt>Function</tt>
+        )
+      </span>
       &mdash;
-      <span class='desc'>Not implemented for uncertainties. </span>
+      <span class='desc'>A function to map over variables. </span>
     </li>
   </ul>
-</div>
-  </div>
-  <div class='method_details'>
-    <p class='signature' id='setVariableUnits-dynamic'>
-      #
-(void)
-<b>setVariableUnits</b><span>(variable, units, equivalencies)</span>
-      <br>
-    </p>
-    <div class='docstring'>
-  <p>Set variable units.</p>
-</div>
-<div class='tags'>
-  <h3>Throws:</h3>
-  <ul class='throw'>
+  <h3>Returns:</h3>
+  <ul class='return'>
     <li>
       <span class='type'></span>
       (
-        <tt>Error</tt>
+        <tt><a href='../class/Uncertainty.html'>Uncertainty</a></tt>
       )
       &mdash;
-      <span class='desc'>Not implemented for uncertainties. </span>
+      <span class='desc'>A copy of this node with the function mapped over all variables. </span>
     </li>
   </ul>
 </div>
@@ -679,7 +656,7 @@ Don&#39;t differentiate uncertainties. It won&#39;t work.</p>
 </div>
     </div>
     <div id='footer'>
-  August 13, 14 00:35:56 by
+  December 19, 14 21:26:48 by
   <a href='https://github.com/coffeedoc/codo' title='CoffeeScript API documentation generator'>
     Codo
   </a>
