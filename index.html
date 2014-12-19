@@ -131,6 +131,10 @@
         <p>
           <code>equivalencies</code> is an object mapping variable labels to an array of variable labels that that variable is equivalent to - for example, if <code>x</code> and <code>y</code> are equivalent, then you could have <code>equivalencies = {"x":["x", "y"], "y":["x", "y"]}</code>. Equivalencies is always an optional parameter.
         </p>
+
+        <p>
+          If you find yourself in need of checking the type of a CQ expression node, or you want to monkeypatch CQ, the raw nodes are provided in <code>CQ.raw</code>: <code>{Add, Mul, Pow, Terminal, Variable, Constant, SymbolicConstant, Uncertainty}</code>.
+        </p>
         
       </article>
 
