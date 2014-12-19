@@ -3583,8 +3583,8 @@ return parser;}
 
       Pow.prototype.mapOverVariables = function(fun) {
         var left, right;
-        left = this.left.mapOverVariables(fun);
-        right = this.right.mapOverVariables(fun);
+        left = this.children.left.mapOverVariables(fun);
+        right = this.children.right.mapOverVariables(fun);
         return new Pow(left, right);
       };
 
