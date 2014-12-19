@@ -75,6 +75,14 @@ define ["parse", "nodes"], (parse, nodes) ->
 				subbed = subbed.simplify(equivalencies)
 			return new Expression(subbed)
 
+		# Get all variable names in this expression.
+		#
+		# @example CQ("x*t").getAllVariables(); // Returns ["t", "x"]
+		#
+		# @return [Array<String>] An array of variable labels.
+		getAllVariables: ->
+			return @expr.getAllVariables()
+
 		# Deep-copy this Expression.
 		#
 		# @return [Expression] A copy of this Expression.
