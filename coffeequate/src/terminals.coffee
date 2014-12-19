@@ -211,14 +211,12 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		getUncertainty: ->
 			new Constant(0)
 
-		# Get the units of variables. Included for API parity.
+		# Map a function over all variables in this node. Does nothing, included for API parity.
 		#
-		# @return [Object] null - Constants don't have units.
-		getVariableUnits: ->
-			null
-
-		# Set the units of variables. Does nothing. Included for API parity.
-		setVariableUnits: ->
+		# @param fun [Function] A function to map over variables.
+		# @return [Constant] A copy of this node with the function mapped over all variables.
+		mapOverVariables: (fun) ->
+			return @copy()
 
 		# Create a drawing node representing this constant
 		#
@@ -350,15 +348,12 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		getUncertainty: ->
 			new Constant(0)
 
-		# Get units of variable children of this constant. Included for API parity.
+		# Map a function over all variables in this node. Does nothing, included for API parity.
 		#
-		# @return [Object] null - no children.
-		getVariableUnits: ->
-			null
-
-		# Set units of variable children. Included for API parity.
-		setVariableUnits: ->
-			null
+		# @param fun [Function] A function to map over variables.
+		# @return [SymbolicConstant] A copy of this node with the function mapped over all variables.
+		mapOverVariables: (fun) ->
+			return @copy()
 
 		# Make a drawing node representing this constant.
 		#
@@ -463,36 +458,12 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		getUncertainty: ->
 			new Uncertainty(@label)
 
-		# Get the units of a given Variable.
+		# Map a function over all variables in this node.
 		#
-		# @param variable [String] Label of the variable to get units for.
-		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
-		# @return [BasicNode, Terminal] Units if this is the Variable being looked for. null otherwise.
-		getVariableUnits: (variable, equivalencies={}) ->
-			if variable of equivalencies
-				if @label in equivalencies[variable]
-					return @units
-			else if @label == variable
-				return @units
-			return null
-
-		# Set units for a given Variable.
-		#
-		# @param variable [String] The variable to set units for.
-		# @param units [BasicNode, Terminal] The units to set.
-		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
-		setVariableUnits: (variable, units, equivalencies={}) ->
-			if variable of equivalencies
-				if @label in equivalencies[variable]
-					if units.copy?
-						@units = units.copy()
-					else
-						@units = units
-			else if @label == variable
-				if units.copy?
-					@units = units.copy()
-				else
-					@units = units
+		# @param fun [Function] A function to map over variables.
+		# @return [Variable] A copy of this node with the function mapped over all variables.
+		mapOverVariables: (fun) ->
+			return fun(@copy())
 
 		# Simplify the Variable.
 		#
@@ -638,17 +609,12 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		getUncertainty: ->
 			throw new Error("Can't take uncertainty of an uncertainty")
 
-		# Get variable units.
+		# Map a function over all variables in this node. Does nothing, included for API parity.
 		#
-		# @throw [Error] Not implemented for uncertainties.
-		getVariableUnits: (variable, equivalencies) ->
-			throw new Error("Can't do that with uncertainties")
-
-		# Set variable units.
-		#
-		# @throw [Error] Not implemented for uncertainties.
-		setVariableUnits: (variable, units, equivalencies) ->
-			throw new Error("Can't do that with uncertainties")
+		# @param fun [Function] A function to map over variables.
+		# @return [Uncertainty] A copy of this node with the function mapped over all variables.
+		mapOverVariables: (fun) ->
+			return @copy()
 
 		# Simplify this node.
 		#

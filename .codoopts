@@ -1,9 +1,7 @@
---name       "Coffeequate"
---readme     README.md
---title      "Coffeequate Documentation"
+--name "Coffeequate"
+--readme README.md
+--title "Coffeequate Documentation"
 --extension  coffee
---output     ./doc
+--output ./doc
 .
--
-LICENSE
-coffeequate/src/grammar.jison
+- LICENSE coffeequate/src/grammar.jison

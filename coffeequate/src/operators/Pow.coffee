@@ -81,35 +81,14 @@ define [
 			else
 				return compare(@children.right, b.children.right)
 
-		# Get the dimensions/units of a variable in this node.
+		# Map a function over all variables in this node.
 		#
-		# @param variable [String] The label of the variable to get dimensions of.
-		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
-		# @return [BasicNode] The units of the variable, or null if the variable wasn't found.
-		getVariableUnits: (variable, equivalencies) ->
-			variableEquivalencies = if variable of equivalencies then equivalencies[variable] else [variable]
-			if @children.left instanceof terminals.Variable and @children.left.label in variableEquivalencies
-				return @children.left.units
-			else
-				leftVariableUnits = @children.left.getVariableUnits(variable, equivalencies)
-				if leftVariableUnits?
-					return leftVariableUnits
-			if @children.right instanceof terminals.Variable and @children.right.label in variableEquivalencies
-				return @children.right.units
-			else
-				rightVariableUnits = @children.right.getVariableUnits(variable, equivalencies)
-				if rightVariableUnits?
-					return rightVariableUnits
-			return null
-
-		# Set the dimensions/units of a variable in this node.
-		#
-		# @param variable [String] The label of the variable to set dimensions of.
-		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
-		# @param units [BasicNode] The units to give the variable.
-		setVariableUnits: (variable, units, equivalencies={}) ->
-			@children.left.setVariableUnits(variable, units, equivalencies)
-			@children.right.setVariableUnits(variable, units, equivalencies)
+		# @param fun [Function] A function to map over variables.
+		# @return [Pow] A copy of this node with the function mapped over all variables.
+		mapOverVariables: (fun) ->
+			left = @left.mapOverVariables(fun)
+			right = @right.mapOverVariables(fun)
+			return (new Pow(left, right))
 
 		# Expand this node.
 		#

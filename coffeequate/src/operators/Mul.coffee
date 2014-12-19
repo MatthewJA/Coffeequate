@@ -89,30 +89,15 @@ define [
 
 			return lengthComparison
 
-		# Get the dimensions/units of a variable in this node.
+		# Map a function over all variables in this node.
 		#
-		# @param variable [String] The label of the variable to get dimensions of.
-		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
-		# @return [BasicNode] The units of the variable, or null if the variable wasn't found.
-		getVariableUnits: (variable, equivalencies={}) ->
-			variableEquivalencies = if variable of equivalencies then equivalencies[variable] else [variable]
+		# @param fun [Function] A function to map over variables.
+		# @return [Mul] A copy of this node with the function mapped over all variables.
+		mapOverVariables: (fun) ->
+			children = []
 			for child in @children
-				if child instanceof terminals.Variable and child.label in variableEquivalencies
-					return child.units
-				else
-					childVariableUnits = child.getVariableUnits(variable, equivalencies)
-					if childVariableUnits?
-						return childVariableUnits
-			return null
-
-		# Set the dimensions/units of a variable in this node.
-		#
-		# @param variable [String] The label of the variable to set dimensions of.
-		# @param units [BasicNode] The units to give the variable.
-		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
-		setVariableUnits: (variable, units, equivalencies={}) ->
-			for child in @children
-				child.setVariableUnits(variable, units, equivalencies)
+				children.push(child.mapOverVariables(fun))
+			return (new Mul(children...))
 
 		# Expanding helper method for expanding a multiplication node multiplied by an addition node.
 		#

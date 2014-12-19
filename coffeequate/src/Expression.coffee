@@ -83,6 +83,13 @@ define ["parse", "nodes"], (parse, nodes) ->
 		getAllVariables: ->
 			return @expr.getAllVariables()
 
+		# Map a function over all variables in this expression.
+		#
+		# @param fun [Function] A function to map over variables.
+		# @return [Expression] A copy of this expression with the function mapped over all variables.
+		mapOverVariables: (fun) ->
+			return @expr.mapOverVariables(fun)
+
 		# Deep-copy this Expression.
 		#
 		# @return [Expression] A copy of this Expression.
