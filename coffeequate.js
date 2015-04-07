@@ -1,5 +1,5 @@
 /**
- * Coffeequate v1.1.0
+ * Coffeequate v1.2.0
  * http://matthewja.com/Coffeequate
  */
 
@@ -564,9 +564,6 @@ define("vendor/almond", function(){});
       } else if (CONSTANT_FLOAT_REGEX.test(string)) {
         return new terminals.Constant(string, 1, "float");
       } else if (VARIABLE_REGEX.test(string)) {
-        if (string[0] === "σ") {
-          return new terminals.Uncertainty(string.slice(1));
-        }
         return new terminals.Variable(string);
       } else if (SYMBOLIC_CONSTANT_REGEX.test(string)) {
         return new terminals.SymbolicConstant(string.slice(1));
@@ -4018,7 +4015,9 @@ return parser;}
         if (equivalencies == null) {
           equivalencies = {};
         }
-        if (this.expr.simplify != null) {
+        if (this.expr.expandAndSimplify != null) {
+          expr = this.expr.expandAndSimplify(equivalencies);
+        } else if (this.expr.simplify != null) {
           expr = this.expr.simplify(equivalencies);
         } else {
           expr = this.expr.copy();
