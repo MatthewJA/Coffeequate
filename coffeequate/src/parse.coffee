@@ -53,8 +53,6 @@ define ["require"], (require) ->
 		else if CONSTANT_FLOAT_REGEX.test(string)
 			return new terminals.Constant(string, 1, "float")
 		else if VARIABLE_REGEX.test(string)
-			if string[0] == "σ"
-				return new terminals.Uncertainty(string[1..])
 			return new terminals.Variable(string)
 		else if SYMBOLIC_CONSTANT_REGEX.test(string)
 			return new terminals.SymbolicConstant(string[1..])
