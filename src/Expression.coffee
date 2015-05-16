@@ -156,4 +156,13 @@ define ["parse", "nodes"], (parse, nodes) ->
 
 			return fun
 
+		equals: (other) ->
+			return undefined unless other instanceof Expression
+
+			# convert to canonical form
+			lhs = @expr.expandAndSimplify()
+			rhs = other.expr.expandAndSimplify()
+
+			return lhs.equals(rhs)
+
 	return Expression
