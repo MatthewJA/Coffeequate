@@ -309,6 +309,25 @@ define [
 			if constantterm?.evaluate?() == 0
 				return new terminals.Constant("0")
 
+			newLikeTerms = []
+			for term0 in liketerms
+				[base0, power0] = term0
+				
+				found = false
+				for term1 in newLikeTerms
+					[base1, power1] = term1
+					
+					if power1.equals?(power0, equivalencies)
+						unless base1 instanceof Mul
+							base1 = new Mul(base1)
+							term1[0] = base1
+						base1.children.push(base0)
+						found = true
+						break
+				
+				newLikeTerms.push(term0) unless found
+			liketerms = newLikeTerms
+
 			newMul = null
 			for liketerm in liketerms
 				if liketerm[1].evaluate?() != 1
