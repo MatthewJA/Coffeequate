@@ -326,7 +326,7 @@ define [
 						break
 				
 				newLikeTerms.push(term0) unless found
-			liketerms = newLikeTerms
+			liketerms = ([base.expandAndSimplify(), power] for [base, power] in newLikeTerms)
 
 			newMul = null
 			for liketerm in liketerms
