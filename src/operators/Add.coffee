@@ -540,5 +540,7 @@ define [
 				if child.containsVariable(variable, equivalencies)
 					return true
 			return false
+		
+		@approx: (a, b) -> a + b
 
 	return Add

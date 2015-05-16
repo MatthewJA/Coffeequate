@@ -51,6 +51,10 @@ define ->
 		# @return [Boolean] Whether the two nodes have the same string representation.
 		stringEqual: (other) ->
 			return other.toString() == @toString()
+		
+		approx: ->
+			f = @constructor.approx
+			return @getChildren().map((c) -> c.approx()).reduce((a, b) -> f(a, b))
 
 	# A node with any number of children.
 	class RoseNode extends BasicNode

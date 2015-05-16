@@ -156,4 +156,6 @@ define ["parse", "nodes"], (parse, nodes) ->
 
 			return fun
 
+		approx: -> @expr.approx()
+
 	return Expression

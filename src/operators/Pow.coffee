@@ -389,3 +389,5 @@ define [
 		# @return [Boolean] Whether or not this node contains the given variable.
 		containsVariable: (variable, equivalencies={}) ->
 			return @children.left.containsVariable(variable, equivalencies) or @children.right.containsVariable(variable, equivalencies)
+		
+		@approx: (a, b) -> Math.pow(a, b)
