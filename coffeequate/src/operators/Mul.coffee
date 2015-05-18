@@ -314,19 +314,21 @@ define [
 				[base0, power0] = term0
 				
 				found = false
-				for term1 in newLikeTerms
-					[base1, power1] = term1
-					
-					if power1.equals?(power0, equivalencies)
-						unless base1 instanceof Mul
-							base1 = new Mul(base1)
-							term1[0] = base1
-						base1.children.push(base0)
-						found = true
-						break
+				unless power0.evaluate?() == 1
+					for term1 in newLikeTerms
+						[base1, power1] = term1
+						
+						if power1.equals?(power0, equivalencies)
+							base1.push(base0)
+							found = true
+							break
 				
-				newLikeTerms.push(term0) unless found
-			liketerms = ([base.expandAndSimplify(), power] for [base, power] in newLikeTerms)
+				newLikeTerms.push([[base0], power0]) unless found
+			liketerms = ([
+				(if base.length == 1 then base[0] else new Mul(base...))
+					.expandAndSimplify(),
+				power
+			] for [base, power] in newLikeTerms)
 
 			newMul = null
 			for liketerm in liketerms
