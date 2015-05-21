@@ -43,7 +43,7 @@ define ["parse", "nodes"], (parse, nodes) ->
 		#
 		# @param variable [String] The variable to solve for.
 		# @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
-		# @return [Expression] A solved Expression representing the variable.
+		# @return [Array<Expression>] An array of Expressions representing the variable for each solution.
 		solve: (variable, equivalencies={}) ->
 			(new Expression(solution) for solution in @expr.solve(variable, equivalencies))
 
