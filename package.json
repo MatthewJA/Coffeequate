@@ -1,7 +1,7 @@
 {
   "name": "Coffeequate",
   "description": "A computer algebra system for JavaScript",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "license": "MIT",
   "author": "MatthewJA",
   "main": "./coffeequate/build/coffeequate.js",
