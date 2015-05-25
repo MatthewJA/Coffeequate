@@ -10,5 +10,10 @@
   },
   "dependencies": {
     "coffee-script": "^1.9.2"
+  },
+
+  "repository":{
+    "type":"git",
+    "url":"https://github.com/MatthewJA/Coffeequate.git"
   }
 }
