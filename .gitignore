@@ -1,5 +1,6 @@
-# Disabling the committing of builds.
-!build/*
+### Builds ###
+lib/*
+dist/*
 
 ### Libraries ###
 src/vendor/**/*.js

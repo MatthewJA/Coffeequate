@@ -1,5 +1,5 @@
 /**
- * Coffeequate v1.2.0
+ * Coffeequate v1.2.1
  * http://matthewja.com/Coffeequate
  */
 
