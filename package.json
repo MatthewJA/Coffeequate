@@ -1,6 +1,6 @@
 {
   "name": "Coffeequate",
-  "description": "Computera algebra system for JavaScript",
+  "description": "A computer algebra system for JavaScript",
   "version": "1.2.0",
   "license": "MIT",
   "author": "MatthewJA",
