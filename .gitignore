@@ -1,27 +1,9 @@
-### Compiled Source ###
-*.js
-
-# Disabling the committing of builds.
-#!coffeequate/build/coffeequate.js
-#!coffeequate/build/coffeequate.min.js
-
-# Don't ignore the parser.
-!coffeequate/src/parser.js
-
-### Compiled Docs ###
-doc/*
-
-### Editor Specific ###
-*.sublime-workspace
-.DS_Store/*
-*/**/.DS_Store/*
+### Builds ###
+lib/*
+dist/*
 
 ### Libraries ###
-!coffeequate/src/vendor/**/*.js
+src/vendor/**/*.js
 
-### Tests ###
-# This is temporary, while these are outdated.
-coffeequate/tests/*
-
-### Workspace ###
-progress/*
+### Node ###
+/node_modules

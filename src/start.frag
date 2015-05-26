@@ -1,5 +1,5 @@
 /**
- * Coffeequate v1.2.0
+ * Coffeequate v1.2.1
  * http://matthewja.com/Coffeequate
  */
 
@@ -10,6 +10,8 @@
         //see this AMD call, not the internal modules in
         //the closure below.
         define(factory);
+    } else if (typeof module == 'object' && typeof module.exports == 'object') {
+        module.exports = factory();
     } else {
         //Browser globals case. Just assign the
         //result to a property on the global.

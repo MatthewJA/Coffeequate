@@ -1,22 +1,7 @@
-Coffeequate <sub><sup>v1.2.0</sup></sub>
+Coffeequate <sub><sup>v1.2.1</sup></sub>
 =============================
 
 A computer algebra system for JavaScript. More information at [the webpage](http://matthewja.com/Coffeequate).
-
-## Installation
-Include Coffeequate with an AMD loader, or load it into a `<script>` tag.
-
-```javascript
-require.config({
-    paths: {
-      "coffeequate": "coffeequate.min"
-    }
-});
-```
-
-```html
-<script src="coffeequate.min.js"></script>
-```
 
 ## Use
 Coffeequate gives you a `CQ` function which wraps the functionality of Coffeequate. An alias of this function is `coffeequate`.
