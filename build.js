@@ -2,7 +2,7 @@
     baseUrl: 'lib/',
     mainConfigFile: 'lib/coffeequate.js',
  
-    out: 'dist/coffeequate.min.js',
+    out: 'coffeequate.min.js',
     optimize: 'uglify2',
  
     include: ['coffeequate'],
