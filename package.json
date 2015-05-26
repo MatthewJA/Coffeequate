@@ -3,8 +3,8 @@
   "description": "A computer algebra system for JavaScript",
   "version": "1.2.1",
   "license": "MIT",
-  "author": "MatthewJA",
-  "main": "./coffeequate.min.js",
+  "author": "MatthewJA <hello.i.am.matthewja@gmail.com> (http://matthewja.com)",
+  "main": "coffeequate.min.js",
   "scripts": {
     "postinstall": "cake all"
   },
