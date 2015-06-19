@@ -1,0 +1,9 @@
+site_name: Coffeequate
+site_description: "Coffeequate, a computer algebra system for JavaScript"
+site_author: Matthew Alger
+repo_url: https://github.com/MatthewJA/Coffeequate
+pages:
+- "Getting Started": index.md
+- "Usage": usage.md
+- "Symbolic Constants": symbolicconstants.md
+theme: readthedocs
