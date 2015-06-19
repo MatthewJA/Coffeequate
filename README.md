@@ -1,10 +1,18 @@
-Coffeequate <sub><sup>v1.2.1</sup></sub>
+Coffeequate <sub><sup>v1.2.2</sup></sub>
 =============================
 
-A computer algebra system for JavaScript. More information at [the webpage](http://matthewja.com/Coffeequate).
+A computer algebra system for JavaScript. More information is available at [the webpage](http://matthewja.com/Coffeequate).
+
+## Installation
+Coffeequate can be included directly in a `<script>` tag or installed with `npm`.
+
+If used in a `<script>` tag, Coffeequate defines a `CQ` function (and an alias, `coffeequate`). If used in Node, Coffeequate simply needs to be required:
+```javascript
+var CQ = require("coffeequate");
+```
 
 ## Use
-Coffeequate gives you a `CQ` function which wraps the functionality of Coffeequate. An alias of this function is `coffeequate`.
+Coffeequate gives you a `CQ` function which wraps the functionality of Coffeequate.
 
 To make a new expression, just call `CQ`:
 ```javascript
