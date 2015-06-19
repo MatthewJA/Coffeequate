@@ -158,4 +158,13 @@ define ["parse", "nodes"], (parse, nodes) ->
 
 		approx: -> @expr.approx()
 
+		equals: (other) ->
+			return undefined unless other instanceof Expression
+
+			# convert to canonical form
+			lhs = @expr.expandAndSimplify()
+			rhs = other.expr.expandAndSimplify()
+
+			return lhs.equals(rhs)
+
 	return Expression
