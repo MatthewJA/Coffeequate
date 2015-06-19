@@ -671,5 +671,7 @@ define [
 			if powerCount > 1
 				return false
 			return true
+		
+		@approx: (a, b) -> a * b;
 
 	return Mul

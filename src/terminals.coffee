@@ -18,6 +18,8 @@ define ["parse", "nodes", "prettyRender", "constants"], (parse, nodes, prettyRen
 		# @return [Boolean] Whether or not this node contains the given variable.
 		containsVariable: (variable, equivalencies={}) ->
 			false # We will override this only for variable nodes.
+		
+		approx: -> @evaluate()
 
 	# A constant in the equation tree, e.g. 0.5 or 1/2.
 	# Can be represented as a rational (1/2) or a float (0.5).
