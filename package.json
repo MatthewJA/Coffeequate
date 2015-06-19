@@ -6,9 +6,10 @@
   "author": "MatthewJA <hello.i.am.matthewja@gmail.com> (http://matthewja.com)",
   "main": "coffeequate.min.js",
   "scripts": {
-    "postinstall": "cake all"
+    "prepublish": "cake all"
   },
-  "dependencies": {
+  "files": ["coffeequate.min.js"],
+  "devDependencies": {
     "coffee-script": "^1.9.2",
     "requirejs": "^2.1.17",
     "almond": "^0.3.1"
