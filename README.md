@@ -1,9 +1,9 @@
 Coffeequate <sub><sup>v1.2.2</sup></sub>
 =============================
 
-[![Documentation Status](https://readthedocs.org/projects/coffeequate/badge/?version=latest)](https://readthedocs.org/projects/coffeequate/?badge=latest)
-
 A computer algebra system for JavaScript. More information is available at [the webpage](http://matthewja.com/Coffeequate).
+
+[![Documentation Status](https://readthedocs.org/projects/coffeequate/badge/?version=latest)](https://readthedocs.org/projects/coffeequate/?badge=latest)
 
 ## Installation
 Coffeequate can be included directly in a `<script>` tag or installed with `npm`.
