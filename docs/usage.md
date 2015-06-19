@@ -66,9 +66,85 @@ CQ("m**2*\\c**4 + p**2*\\c**2").solve("p") // sqrt(-(c**4*m**2)), -(sqrt(-(c**4*
 
 `expr.sub(subs)` substitutes values into variables in `expr` according to the map `subs`. `subs` maps variable labels to values that should be substituted in their place. Values should be either numbers or Coffeequate expressions. For example,
 ```javascript
-CQ("E = m*\\c").sub({"m": 10}) // -E + 10*\\c
+CQ("E = m*\\c**2").sub({"m": 10}) // -E + 10*\\c**2
 ```
 
 Much like `simplify` and `solve`, `sub` can take an `equivs` argument mapping variables to an array of equivalent variables. This will be used while substituting and subsequently simplifying.
 
-There are two optional boolean arguments, `subUncertainties` and `evalSymConstants`. If `subUncertainties` is true, then instead of substituting values into variables, `sub` will substitute values into the associated <em>uncertainties</em>. For more information on this, see the documentation for [uncertainties](#uncertainties). If `evalSymConstants` is true, then symbolic constants will have their values substituted 
+There are two optional boolean arguments, `subUncertainties` and `evalSymConstants`. If `subUncertainties` is true, then instead of substituting values into variables, `sub` will substitute values into the associated <em>uncertainties</em>. For more information on this, see the documentation for [uncertainties](#manipulating-uncertainties). If `evalSymConstants` is true, then symbolic constants will have their values substituted:
+```javascript
+CQ("E = m*\\c**2").sub({"m": 10}, {}, false, true) // 898755178736817700 - E
+```
+
+## Checking equality
+
+### equals(other, equivalencies={})
+
+`a.equals(b)` returns true if `a` and `b` represent the same expression, and false otherwise.
+
+### approx()
+
+`expr.approx()` sets all variables to 0 and evaluates the resulting expression, returning a number. This evaluates symbolic constants, too.
+
+## Manipulating variables
+
+### getAllVariables()
+
+A list of variables in the expression can be retrieved with `expr.getAllVariables()`. For example,
+```javascript
+CQ("E = m*\\c**2").getAllVariables() // [ 'E', 'm' ]
+```
+
+### mapOverVariables(f)
+
+`expr.mapOverVariables(f)` applies a function `f` to all variables in the expression. This is useful for changing labels, for example:
+```javascript
+var changeLabel = function(variable) {
+    variable.label += "s";
+    return variable;
+};
+var newExpr = CQ("E = m*\\c**2").mapOverVariables(changeLabel); // Es = ms*\\c**2
+```
+
+This method does not change the original expression.
+
+## Deep-copying expressions
+
+### copy()
+
+The whole expression can be deep-copied with `expr.copy()`. The copy will be completely separate from the original, so it can be changed without mutating the original.
+
+## Manipulating uncertainties
+
+### getUncertainty()
+
+`expr.getUncertainty()` propagates uncertainties through `expr` and returns a new expression representing the uncertainty in `expr`. For example,
+```javascript
+CQ("m*\\c**2").getUncertainty() // sqrt(\\c**4*σ(m)**2)
+```
+
+Uncertainties can be substituted in using `expr.sub`, with the `subUncertainties` argument set to true.
+```javascript
+CQ("m*\\c**2").getUncertainty().sub({m: 1}, {}, true).approx() // 89875517873681760
+```
+
+## Differentiating
+
+### differentiate(variable, equivalencies={})
+
+`expr.differentiate(variable)` differentiates `expr` with respect to `variable` and returns the result. For example,
+```javascript
+CQ("a*x**2 + b*x + c").differentiate("x") // b + 2*a*x
+```
+
+At the moment, this only does simple derivatives, e.g. trying to differentiate `2**x` will fail.
+
+## Converting to functions
+
+### toFunction(variables..., equivalencies={})
+
+Expressions can be converted to functions using `expr.toFunction(variables...)`, which takes some number of variable labels and returns a function that takes those same variables as arguments and returns a value or expression. For example,
+```javascript
+var f = CQ("a*x**2 + b*x + c - y").toFunction("x", "y");
+f(3, 2) // -2 + c + 3*b + 9*a
+```

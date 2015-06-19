@@ -30,6 +30,7 @@ define(["lib/coffeequate.min"], function (CQ) {
 To use with Node, just install with `npm install coffeequate` and `require` it:
 ```
 var CQ = require("coffeequate");
+// Use Coffeequate here!
 ```
 
 ## Basic usage
@@ -42,8 +43,8 @@ The `CQ` function takes strings and returns an `Expression` object that you can 
 - `/` for division
 - `(expr)` for parenthesising
 - `**` for exponentiation
-- Bare literals like `x` are treated as [variables](#variables)
-- Literals preceded by a backslash like `\G` are treated as [symbolic constants](#symbolic-constants)
+- Bare literals like `x` are treated as variables
+- Literals preceded by a backslash like `\G` are treated as symbolic constants
 - Numbers like `1` or `3.1` are treated as integers and floats respectively
 - `a = b` is equivalent to `b - a`, which is implicitly equal to 0
 
@@ -57,4 +58,4 @@ Or we could reproduce Einstein's famous energy-mass equivalence equation:
 CQ("E = m * \\c**2")
 ```
 
-More information about how to manipulate these expressions is on the [expressions](expressions) page.
+More information about how to manipulate these expressions is on the [usage](usage) page.
