@@ -2,6 +2,7 @@
 lib/*
 dist/*
 site/*
+coffeequate.min.js
 
 ### Libraries ###
 src/vendor/**/*.js
