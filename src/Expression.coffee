@@ -175,32 +175,32 @@ define ["parse", "nodes"], (parse, nodes) ->
         # @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels. This will be used for differentiation.
         # @param [Int] Optional. The maximum number of iterations allowed for convergence to occur
         # @return [Float] The numerical solution of the Expression
-        nsolve: -> (guess, tol=1e-9, variable, equivalencies={}, max_iterations=75) -> 
-            
+        nsolve: (guess, variable, equivalencies={}, tol=1e-9, max_iterations=75) -> 
             # Record the initial guess
             p0 = guess
 
             # Get the functions that need to be evaluated
-            f = @expr.toFunction(x)
+            f = @toFunction("x")
 
-            diff = @expr.differentiate(variable, equivalencies)
-            fDash = diff.toFunction()
+            diff = @differentiate(variable, equivalencies)
+            fDash = diff.toFunction("x")
 
             # Attempt to find a solution
             for iteration in [0 ... max_iterations]
-                f1 = fDash(p0)
+                f1 = fDash(p0).approx()
                 if f1 == 0
                     console.log("The derivative is zero")
                     return p0
 
-                f0 = f(p0)
-
+                f0 = f(p0).approx()
                 # Iterate the formula
                 p1 = p0 - (f0/f1)
-
+                console.log p1
                 # See if we have reached the tolerance
-                if abs (p1-p0) < tol:
+                if Math.abs(p1-p0) < tol
                     return p1
+
+                p0 = p1
 
             # Reaching here means that the method didn't converge
             console.log("Maximum number of Iterations")

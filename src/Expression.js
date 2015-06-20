@@ -166,6 +166,39 @@ define(["parse", "nodes"], function(parse, nodes) {
       return lhs.equals(rhs);
     };
 
+    Expression.prototype.nsolve = function(guess, variable, equivalencies, tol, max_iterations) {
+      var diff, f, f0, f1, fDash, i, iteration, p0, p1, ref;
+      if (equivalencies == null) {
+        equivalencies = {};
+      }
+      if (tol == null) {
+        tol = 1e-9;
+      }
+      if (max_iterations == null) {
+        max_iterations = 75;
+      }
+      p0 = guess;
+      f = this.toFunction("x");
+      diff = this.differentiate(variable, equivalencies);
+      fDash = diff.toFunction("x");
+      for (iteration = i = 0, ref = max_iterations; 0 <= ref ? i < ref : i > ref; iteration = 0 <= ref ? ++i : --i) {
+        f1 = fDash(p0).approx();
+        if (f1 === 0) {
+          console.log("The derivative is zero");
+          return p0;
+        }
+        f0 = f(p0).approx();
+        p1 = p0 - (f0 / f1);
+        console.log(p1);
+        if (Math.abs(p1 - p0) < tol) {
+          return p1;
+        }
+        p0 = p1;
+      }
+      console.log("Maximum number of Iterations");
+      return p1;
+    };
+
     return Expression;
 
   })();
