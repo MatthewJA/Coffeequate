@@ -195,7 +195,6 @@ define ["parse", "nodes"], (parse, nodes) ->
                 f0 = f(p0).approx()
                 # Iterate the formula
                 p1 = p0 - (f0/f1)
-                console.log p1
                 # See if we have reached the tolerance
                 if Math.abs(p1-p0) < tol
                     return p1
@@ -203,8 +202,8 @@ define ["parse", "nodes"], (parse, nodes) ->
                 p0 = p1
 
             # Reaching here means that the method didn't converge
-            console.log("Maximum number of Iterations")
-            
+            throw new Error("Maximum Number of Iterations Reached")
+
             return p1 
 
 

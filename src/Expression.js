@@ -189,13 +189,12 @@ define(["parse", "nodes"], function(parse, nodes) {
         }
         f0 = f(p0).approx();
         p1 = p0 - (f0 / f1);
-        console.log(p1);
         if (Math.abs(p1 - p0) < tol) {
           return p1;
         }
         p0 = p1;
       }
-      console.log("Maximum number of Iterations");
+      throw new Error("Maximum Number of Iterations Reached");
       return p1;
     };
 
