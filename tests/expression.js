@@ -1,6 +1,6 @@
 var vows = require('vows'),
     assert = require('assert'),
-    CQ = require("coffeequate");
+    CQ = require("../coffeequate.min");
 
 var suite = vows.describe("expression");
 
