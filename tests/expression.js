@@ -97,5 +97,22 @@ suite.addBatch({
             var expr = CQ("a*x**5 + b*x**4 + c*x**3 + d*x**2 + e*x + f = 0");
             assert.throws(function(){expr.solve("x")}, CQ.AlgebraError);
         }
+    },
+
+    "Expressions can be formatted": {
+        topic: CQ("a + b * c ** d / e - f"),
+        "as strings": function(expr) {
+            assert.equal(expr.toString(), "a - f + (b*c**d)/e");
+        },
+        "as MathML": function(expr) {
+            assert.equal(expr.toMathML(), '<mi class="variable">a</mi><mo>-</'+
+                'mo><mi class="variable">f</mi><mo>+</mo><mfrac> <mrow><mi cla'+
+                'ss="variable">b</mi><mo>&middot;</mo><msup><mi class="variabl'+
+                'e">c</mi><mi class="variable">d</mi></msup></mrow> <mrow><mi '+
+                'class="variable">e</mi></mrow> </mfrac>');
+        },
+        "as LaTeX": function(expr) {
+            assert.equal(expr.toLaTeX(), 'a-f+\\frac{b \\cdot c^{d}}{e}');
+        }
     }
 }).export(module);
