@@ -7,7 +7,7 @@
   "main": "coffeequate.min.js",
   "scripts": {
     "prepublish": "cake all",
-    "test": "vows --spec"
+    "test": "vows --spec tests/*"
   },
   "files": ["coffeequate.min.js"],
   "devDependencies": {
