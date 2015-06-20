@@ -167,4 +167,6 @@ define ["parse", "nodes"], (parse, nodes) ->
 
 			return lhs.equals(rhs)
 
+            
+
 	return Expression
