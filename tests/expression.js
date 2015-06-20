@@ -77,6 +77,25 @@ suite.addBatch({
             assert.isTrue(nSol.equals(sol[0]) || nSol.equals(sol[1]));
             assert.isTrue(nSol.equals(sol[0]) || pSol.equals(sol[0]));
             assert.isTrue(nSol.equals(sol[1]) || pSol.equals(sol[1]));
+        },
+        "can solve simple cubic equations": function() {
+            var expr = CQ("a*x**3 - b = 0");
+            var sol = expr.solve("x");
+            // need to simplify here or we'll hit a bug, see #117
+            assert.isTrue(CQ("(b/a)**(1/3)").equals(sol[0].simplify()));
+            assert.lengthOf(sol, 1);
+        },
+        "fails on unsolvable cubic equations": function() {
+            var expr = CQ("a*x**3 + b*x**2 + c*x + d = 0");
+            assert.throws(function(){expr.solve("x")}, CQ.AlgebraError);
+        },
+        "fails on unsolvable quartic equations": function() {
+            var expr = CQ("a*x**4 + b*x**3 + c*x**2 + d*x + e = 0");
+            assert.throws(function(){expr.solve("x")}, CQ.AlgebraError);
+        },
+        "fails on unsolvable quintic equations": function() {
+            var expr = CQ("a*x**5 + b*x**4 + c*x**3 + d*x**2 + e*x + f = 0");
+            assert.throws(function(){expr.solve("x")}, CQ.AlgebraError);
         }
     }
 }).export(module);
