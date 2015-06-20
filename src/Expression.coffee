@@ -189,8 +189,7 @@ define ["parse", "nodes"], (parse, nodes) ->
             for iteration in [0 ... max_iterations]
                 f1 = fDash(p0).approx()
                 if f1 == 0
-                    console.log("The derivative is zero")
-                    return p0
+                    throw new Error("The derivative is zero")
 
                 f0 = f(p0).approx()
                 # Iterate the formula
@@ -203,10 +202,5 @@ define ["parse", "nodes"], (parse, nodes) ->
 
             # Reaching here means that the method didn't converge
             throw new Error("Maximum Number of Iterations Reached")
-
-            return p1 
-
-
-            
 
     return Expression
