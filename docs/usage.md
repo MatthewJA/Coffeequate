@@ -50,6 +50,22 @@ CQ("m**2*\\c**4 + p**2*\\c**2").solve("p") // sqrt(-(c**4*m**2)), -(sqrt(-(c**4*
 
 `expr.solve(variable, equivalencies)` is the same as above, except that it takes a map of equivalencies. This equivalencies map describes which variables are equivalent to each other. For example, if `x` and `z` are equal, then `equivalencies = {"x":["x", "z"], "z":["x", "z"]}`. The order within the map is irrelevant, but it must be redundant.
 
+### nsolve(guess, variable, equivalencies={}, tol=1e-9, max_iterations=75)
+`expr.nsolve(guess, variable)` finds a numerical solution of the expression `expr` for the the variable `variable` using Newton's Method with the initial value `guess`, assuming that the expression is set to zero. For example,
+
+```javascript
+CQ("x**2 - 2").nsolve(1.5,"x") // 1.4142135623730951```
+
+The use of `equivalencies` is the same as for `expr.solve(variable, equivalencies={})`. 
+
+`expr.nsolve(guess, variable, equivalencies, tol)` finds the numerical solution of the expression `expr` so that the difference between the found solution and the exact solution is less than `tol`.
+
+`expr.nsolve(guess, variable, equivalencies, tol, max_iterations)` will attempt to find a numerical solution within `tol` for the expression `expr` before the maximum number of iterations allowed `max_iterations` is reached. If this doesn't happen, the function will provide the following error
+
+```javascript
+CQ("x**2 + 7").nsolve(1.5,"x")\\
+Error: Maximum Number of Iterations Reached```
+
 ## Simplifying expressions
 
 ### simplify(equivalencies={})
