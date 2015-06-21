@@ -66,7 +66,7 @@ The use of `equivalencies` is the same as for `expr.solve(variable, equivalencie
 `expr.nsolve(guess, variable, equivalencies, tol, max_iterations)` will attempt to find a numerical solution within `tol` for the expression `expr` before the maximum number of iterations allowed `max_iterations` is reached. If this doesn't happen, the function will provide the following error
 
 ```javascript
-CQ("x**2 + 7").nsolve(1.5,"x") \\ Error: Maximum Number of Iterations Reached
+CQ("x**2 + 7").nsolve(1.5,"x") // Error: Maximum Number of Iterations Reached
 ```
 
 ## Simplifying expressions
