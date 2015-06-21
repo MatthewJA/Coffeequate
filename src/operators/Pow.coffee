@@ -374,13 +374,26 @@ define [
             Add = require("operators/Add")
             Mul = require("operators/Mul")
             Constant = require("terminals").Constant
-            if variable in @children.right.getAllVariables
-                throw new Error("I can't differentiate with a variable on the top of a power")
+
+            if variable in @children.right.getAllVariables()
+                if ((@children.left instanceof terminals.SymbolicConstant and
+                    (@children.left.label == "e" or @children.left.label == "E")) or
+                    (@children.left instanceof terminals.Constant and
+                    Math.abs(@children.left.evaluate() - Math.E) < 5e-15))
+                        # There's something very close to \e on the bottom, so we're
+                        # good to go.
+                        # The derivative of e^f(x) is f'(x) e^f(x).
+                        powerDerivative = @children.right.differentiate(variable, equivalencies)
+                        return new Mul(powerDerivative, @copy())
+                    else
+                        throw new Error("Can't differentiate variable in exponent")
+
             if @children.right.evaluate?() == 0
                 return new Constant(0)
+
             return new Mul(new Pow(@children.left, new Add(@children.right, new Constant(-1))),
-                                         @children.left.differentiate(variable, equivalencies),
-                                         @children.right).expandAndSimplify(equivalencies)
+                                   @children.left.differentiate(variable, equivalencies),
+                                   @children.right).expandAndSimplify(equivalencies)
 
         # Check if this node contains a given variable.
         #
