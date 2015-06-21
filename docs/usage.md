@@ -59,7 +59,7 @@ For example,
 CQ("x**2 - 2").nsolve(1.5,"x") // 1.4142135623730951
 ```
 
-The use of `equivalencies` is the same as for `expr.solve(variable, equivalencies={})`. 
+The use of `equivalencies` is the same as for `expr.solve`. 
 
 `expr.nsolve(guess, variable, equivalencies, tol)` finds the numerical solution of the expression `expr` so that the difference between the found solution and the exact solution is less than `tol`.
 
