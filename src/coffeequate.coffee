@@ -32,6 +32,7 @@ define ["operators", "Expression", "parse", "uncertainties", "terminals"], (oper
 		Add: operators.Add
 		Mul: operators.Mul
 		Pow: operators.Pow
+		"Function": operators.Function
 		Terminal: terminals.Terminal
 		Variable: terminals.Variable
 		Constant: terminals.Constant

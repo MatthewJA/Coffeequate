@@ -397,7 +397,7 @@ define [
 
         # Check if this node contains a given variable.
         #
-        # @param variable [String] The label of the variable to differentiate with respect to.
+        # @param variable [String] The label of the variable to find.
         # @param equivalencies [Object] Optional. A map of variable labels to a list of equivalent variable labels.
         # @return [Boolean] Whether or not this node contains the given variable.
         containsVariable: (variable, equivalencies={}) ->

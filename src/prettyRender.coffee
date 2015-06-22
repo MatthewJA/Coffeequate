@@ -239,6 +239,35 @@ define ->
     renderMathML: ->
       "<msup>#{@left.renderMathML()}#{@right.renderMathML()}</msup>"
 
+  # Drawing node representing functions.
+  class prettyRender.Function extends prettyRender.DrawingNode
+
+    # Make a new function drawing node.
+    #
+    # @param label [String] The label of the function.
+    # @param param [prettyRender.DrawingNode] The independent variable of the
+    #   function.
+    # @return [prettyRender.Function] A new function drawing node.
+    constructor: (@label, @param) ->
+
+    # Draw the node as a LaTeX string.
+    #
+    # @return [String] This node drawn as LaTeX.
+    renderLaTeX: ->
+      "#{@label}\\left(#{@param.renderLaTeX()}\\right)"
+
+    # Draw the node as a string.
+    #
+    # @return [String] This node drawn as a string.
+    renderString: ->
+      "#{@label}(#{@param.renderString()})"
+
+    # Draw the node as a MathML string.
+    #
+    # @return [String] This node drawn as MathML.
+    renderMathML: ->
+      "<row><mi>#{@label}</mi><mo>(</mo>#{@param.renderMathML()}<mo>)</mo></mrow>"
+
   # Drawing node representing bracketing.
   class prettyRender.Bracket extends prettyRender.DrawingNode
 
