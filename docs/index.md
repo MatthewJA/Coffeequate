@@ -47,6 +47,7 @@ The `CQ` function takes strings and returns an `Expression` object that you can 
 - Literals preceded by a backslash like `\G` are treated as symbolic constants
 - Numbers like `1` or `3.1` are treated as integers and floats respectively
 - `a = b` is equivalent to `b - a`, which is implicitly equal to 0
+- `f(x)` and `myFunction(z)` are symbolic functions
 
 For example, we could write the distance between `(a, b)` and `(c, d)` like this:
 ```javascript
