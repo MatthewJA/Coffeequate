@@ -1,4 +1,4 @@
-Coffeequate <sub><sup>v1.2.2</sup></sub>
+Coffeequate <sub><sup>v1.3.0</sup></sub>
 =============================
 
 A computer algebra system for JavaScript. Full documentation is [here](http://coffeequate.readthedocs.org).
