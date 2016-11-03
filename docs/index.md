@@ -60,3 +60,16 @@ CQ("E = m * \\c**2")
 ```
 
 More information about how to manipulate these expressions is on the [usage](usage) page.
+
+## Building Coffeequate
+
+To build Coffeequate, you need node, npm, CoffeeScript, and cake. Then run
+```bash
+cake configure && cake all
+```
+to build.
+
+Testing requires vows. Tests can then be run by executing the files in tests/ with node, e.g.
+```bash
+node tests/expression.js
+```
