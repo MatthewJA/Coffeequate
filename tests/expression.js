@@ -114,7 +114,7 @@ suite.addBatch({
         "as LaTeX": function(expr) {
             assert.equal(expr.toLaTeX(), 'a-f+\\frac{b \\cdot c^{d}}{e}');
             var expr_122 = CQ("-x");
-            assert.equal(expr_122.toLaTeX(), '-x');
+            assert.equal(expr_122.toLaTeX(), '-\\left(x\\right)');
         }
     }
 }).export(module);
