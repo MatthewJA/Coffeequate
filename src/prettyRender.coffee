@@ -488,7 +488,7 @@ define ->
     #
     # @return [String] This node drawn as LaTeX.
     renderLaTeX: ->
-      "-\\left(#{@contents}\\right)"
+      "-\\left(#{@contents.renderLaTeX()}\\right)"
 
     # Draw the node as a string.
     #
