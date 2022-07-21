@@ -20,10 +20,10 @@ define ["require"], (require) ->
 			"Could not parse '#{@input}' as #{@type}"
 
 	# Regular expressions that match the various types of terminal recognised by Coffeequate.
-	VARIABLE_REGEX = /^@*[a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ][a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ_\-\d]*$/
+	VARIABLE_REGEX = /^@*[a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ_][a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ_\-\d]*$/
 	CONSTANT_INTEGER_REGEX = /^-?\d+$/
 	CONSTANT_FLOAT_REGEX = /^-?\d+(\.\d+)?(e-?\d+)?$/ # Note that this matches integers too, so we'll need to match this after integers.
-	SYMBOLIC_CONSTANT_REGEX = /^\\@*[a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ][a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ_\-\d]*$/
+	SYMBOLIC_CONSTANT_REGEX = /^\\@*[a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ_][a-zA-Z\u0391-\u03A9\u03B1-\u03C9ϕϖϱϰϑϵ_\-\d]*$/
 	DIMENSIONS_REGEX = /^[^:]*::\{[^:+]*\}$/
 
 	# Take a string and return a Terminal that that string represents.
